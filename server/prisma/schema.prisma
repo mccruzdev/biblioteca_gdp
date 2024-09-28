@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+
+enum Role {
+  ADMIN
+  LIBRARIAN
+  READER
+}
+
+enum BookCondition {
+  GOOD
+  BAD
+}
+
+enum BookStatus {
+  AVAILABLE
+  RESERVED
+}
+
+enum DonationDirection {
+  YES
+  NO
+}
+
+enum ReservationStatus {
+  PENDING
+  PICKED_UP
+  CANCELED
+}
+
+// Models
+
+model User {
+  id           Int                   @id @default(autoincrement())
+  dni          String                @unique @db.VarChar(20)
+  email        String?               @unique @db.VarChar(255)
+  firstName    String                @db.VarChar(255)
+  lastName     String                @db.VarChar(255)
+  phoneNumber  String?               @db.VarChar(20)
+  password     String                @db.VarChar(255)
+  role         Role
+  books        Book[]
+  conditions   BookConditionRecord[]
+  donations    Donation[]
+  reservations Reservation[]
+}
+
+model Location {
+  id         Int     @id @default(autoincrement())
+  shelf      String  @db.VarChar(255)
+  shelfColor String? @db.VarChar(50)
+  shelfLevel Int?
+  books      Book[]
+}
+
+model BookConditionRecord {
+  id               Int               @id @default(autoincrement())
+  condition        BookCondition
+  isDecommissioned DonationDirection
+  userId           Int?
+  user             User?             @relation(fields: [userId], references: [id])
+  books            Book[]
+}
+
+model BookCategory {
+  id          Int     @id @default(autoincrement())
+  category    String  @db.VarChar(255)
+  subcategory String? @db.VarChar(255)
+  books       Book[]
+}
+
+model Book {
+  id          Int                  @id @default(autoincrement())
+  title       String               @db.VarChar(255)
+  author      String?              @db.VarChar(255)
+  publisher   String?              @db.VarChar(255)
+  pages       Int?
+  code        String?              @db.VarChar(50)
+  stock       Int?
+  status      BookStatus
+  locationId  Int?
+  location    Location?            @relation(fields: [locationId], references: [id])
+  conditionId Int?
+  condition   BookConditionRecord? @relation(fields: [conditionId], references: [id])
+  categoryId  Int?
+  category    BookCategory?        @relation(fields: [categoryId], references: [id])
+  userId      Int?
+  user        User?                @relation(fields: [userId], references: [id])
+  Donation    Donation[]
+  Reservation Reservation[]
+}
+
+model Donation {
+  id          Int               @id @default(autoincrement())
+  date        DateTime
+  donorEntity String            @db.VarChar(255)
+  bookId      Int?
+  book        Book?             @relation(fields: [bookId], references: [id])
+  userId      Int?
+  user        User?             @relation(fields: [userId], references: [id])
+  toLibrary   DonationDirection
+}
+
+model Reservation {
+  id                Int               @id @default(autoincrement())
+  reservationDate   DateTime
+  pickupDeadline    DateTime?
+  reservationStatus ReservationStatus
+  bookId            Int?
+  book              Book?             @relation(fields: [bookId], references: [id])
+  loanDate          DateTime?
+  returnDate        DateTime?
+  userId            Int?
+  user              User?             @relation(fields: [userId], references: [id])
+}
