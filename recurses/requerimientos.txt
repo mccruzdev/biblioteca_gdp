@@ -1,0 +1,49 @@
+- panel administrativo
+
+    - agregar libros existentes o entrantes y  control del stock. (CRUD) 
+    - ver excel para ver lo que anotan (entidades y atributos).
+    - registro de las reservas existentes (CRUD).
+
+- vista usuarios
+    será un vista en forma de lista donde se apreciarán los libros disponibles, podrán realizarse busquedas según el nombre o codigo del libro (dependiendo si existe).
+    
+    - reserva de libros mediante tu dni (uso del API de la municipalidad).
+    - busqueda de las reservas existentes según un DNI (generacion de comprobante de reserva).
+    - indicaciones al usuarios.
+
+
+
+DB_BTC
+
+ID DEL LIBRO: (EJEMPLO: 0001N01PN01)
+
+ITEMS                               1
+VITRINAS                            N01
+COLOR DE VITRINAS                   PLOMO
+NIVEL DE VITRINAS                   N01
+TITULO DE TEXTO                     *LIBRO 1*     
+AUTOR                               *ALBAN BUTLER*
+CODIGO                              3241
+EDITORIAL                           IMPRESO EN MEXICO
+PAGINAS                             701
+ESTADO EN EL QUE SE ENCUENTRA       BUENO
+DAR DE BAJA A UN LIBRO  (STOCK)            
+DUPLICADOS DE LIBROS                
+UBICACIÓN DE LIBROS  ¿?               
+DONACION DE LIBROS                  
+LUGAR DE DONACION    
+
+CATEGORIA DEL LIBRO     
+ESTADO                 (DISPONIBLE, RESERVADO, PRESTADO)
+
+---------------------
+BD_BTC_GDP
+---------------------
+
+
+USUARIOS
+RESERVAS
+LIBROS
+BIBLIOTECARIO
+PRESTAMO 
+
