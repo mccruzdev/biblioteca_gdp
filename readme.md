@@ -1,5 +1,6 @@
-FORMA DE TRABAJO: (arquitectura por capas)
+### FORMA DE TRABAJO: (arquitectura por capas)
 -------------------------------------------
+```
 /biblioteca-gdp-sistema
 ├── /client  # Código del frontend (React)
 │   ├── /src
@@ -21,4 +22,4 @@ FORMA DE TRABAJO: (arquitectura por capas)
 ├── /recurses #recursos extras del proyecto
 │   └── /src
 └── README.md
-
+```
