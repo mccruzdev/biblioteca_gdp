@@ -1,85 +1,116 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# API Biblioteca Virtual
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Esta es una API RESTful construida con NestJS para gestionar una biblioteca virtual. Permite a los usuarios administrar libros, categorías, reservas y usuarios, proporcionando los endpoints necesarios para las operaciones CRUD y la gestión de roles de usuario.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tabla de Contenidos
 
-## Description
+- [Características](#características)
+- [Instalación](#instalación)
+- [Ejecución de la Aplicación](#ejecución-de-la-aplicación)
+- [Endpoints de la API](#endpoints-de-la-api)
+- [Variables de Entorno](#variables-de-entorno)
+- [Tecnologías Usadas](#tecnologías-usadas)
+- [Licencia](#licencia)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Características
 
-## Project setup
+- **Gestión de Usuarios**: Permite la creación, actualización y eliminación de usuarios, con control de acceso basado en roles (Administrador, Bibliotecario, Lector).
+- **Gestión de Libros**: Habilita la adición, actualización y eliminación de libros, junto con la ubicación física de los mismos.
+- **Categorías**: Clasifica los libros en diferentes categorías y subcategorías.
+- **Reservas**: Los lectores pueden reservar libros disponibles, y el sistema mantiene el control de los plazos de recogida.
+- **Donaciones**: Registra las donaciones hechas a la biblioteca, ya sean de fuentes externas o internas.
 
-```bash
-$ npm install
-```
+## Instalación
 
-## Compile and run the project
+### Requisitos Previos
 
-```bash
-# development
-$ npm run start
+Antes de comenzar, asegúrate de tener instalados los siguientes programas en tu sistema:
 
-# watch mode
-$ npm run start:dev
+- [Node.js](https://nodejs.org/en/) (versión 14 o superior)
+- [NestJS CLI](https://docs.nestjs.com/cli/overview)
+- [MySQL](https://www.mysql.com/)
 
-# production mode
-$ npm run start:prod
-```
+### Clonar el Repositorio
 
-## Run tests
+Clona este repositorio en tu máquina local:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git clone https://github.com/mccruzdev/biblioteca_gdp.git
+cd biblioteca_gdp
+cd server
 ```
 
-## Resources
+### Instalación de Dependencias
 
-Check out a few resources that may come in handy when working with NestJS:
+Instala las dependencias necesarias usando npm:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm install
+```
 
-## Support
+### Configuración de las variables de entorno
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Crea las siguientes variables de entorno en un archivo `.env`:
 
-## Stay in touch
+```
+// Ejemplo aqui: https://www.prisma.io/docs/orm/overview/databases/mysql#connection-url
+DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Crea las migraciones a la Base de Datos
 
-## License
+Ejecuta el siguiente comando para crear las migraciones:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+npx prisma migrate dev --name Initial
+```
+
+## Ejecución de la Aplicación
+
+Para ejecutar la aplicación en modo de desarrollo, utiliza el siguiente comando:
+
+```bash
+npm run start:dev
+```
+
+La aplicación estará disponible en `http://localhost:8000`.
+
+<!-- ## Endpoints de la API
+
+### Usuarios
+
+- `GET /users`: Lista todos los usuarios.
+- `POST /users`: Crea un nuevo usuario.
+- `GET /users/:id`: Obtiene un usuario por su ID.
+- `PUT /users/:id`: Actualiza los datos de un usuario.
+- `DELETE /users/:id`: Elimina un usuario.
+
+### Libros
+
+- `GET /books`: Lista todos los libros.
+- `POST /books`: Añade un nuevo libro.
+- `GET /books/:id`: Obtiene un libro por su ID.
+- `PUT /books/:id`: Actualiza la información de un libro.
+- `DELETE /books/:id`: Elimina un libro.
+
+### Categorías
+
+- `GET /categories`: Lista todas las categorías.
+- `POST /categories`: Añade una nueva categoría.
+- `PUT /categories/:id`: Actualiza una categoría.
+- `DELETE /categories/:id`: Elimina una categoría.
+
+### Reservas
+
+- `POST /reservations`: Reserva un libro.
+- `GET /reservations/:id`: Obtiene los detalles de una reserva.
+- `PUT /reservations/:id`: Actualiza el estado de una reserva.
+- `DELETE /reservations/:id`: Cancela una reserva. -->
+
+## Tecnologías Usadas
+
+- **NestJS**: Framework para Node.js basado en TypeScript.
+- **TypeScript**: Lenguaje de programación usado para el desarrollo.
+- **Prisma**: ORM para la gestión de la base de datos.
+- **MySQL**: Base de datos relacional utilizada para almacenar datos.
+- **JWT**: Para autenticación basada en tokens.
