@@ -1,5 +1,7 @@
 ### FORMA DE TRABAJO: (arquitectura por capas)
--------------------------------------------
+
+---
+
 ```
 /biblioteca-gdp-sistema
 ├── /client  # Código del frontend (React)
@@ -8,7 +10,7 @@
 │   │   ├── /pages  # Páginas de la aplicación
 │   │   ├── /services  # Servicios para interactuar con el backend
 │   │   └── App.js
-├── /server  # Código del backend (Node.js + Express)
+├── /server  # Código del backend (Node.js + NestJS)
 │   ├── /src
 │   │   ├── /controllers  # Controladores para manejar las rutas
 │   │   ├── /models  # Modelos de datos
