@@ -55,6 +55,11 @@ Crea las siguientes variables de entorno en un archivo `.env`:
 ```
 // Ejemplo aqui: https://www.prisma.io/docs/orm/overview/databases/mysql#connection-url
 DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+
+SECRET_KEY=<you-secret-key>
+
+// Generate your token: https://apis.net.pe/
+APIS_NET_PE_KEY=<your_api_token>
 ```
 
 ### Crea las migraciones a la Base de Datos
