@@ -29,8 +29,8 @@ export class AuthController {
   @ApiResponse({ status: 404, description: 'El DNI no fue encontrado.' })
   @ApiResponse({ status: 400, description: 'El DNI es inválido.' })
   @ApiResponse({ status: 503, description: 'El servicio no está disponible.' })
-  lookupDNI(@Param() dni: string) {
-    return this.auth.getUserDataPerDNI(dni);
+  lookupDNI(@Param() dni: { dni: string }) {
+    return this.auth.getUserDataPerDNI(dni.dni);
   }
 
   @Post('create')

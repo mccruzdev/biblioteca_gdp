@@ -27,6 +27,12 @@ export class AuthService {
       },
     );
 
+    console.log(
+      response,
+      this.configService.get<string>('APIS_NET_PE_KEY'),
+      dni,
+    );
+
     if (response.status === 422)
       throw new HttpException('The DNI is invalid.', HttpStatus.BAD_REQUEST);
     if (response.status === 404)
