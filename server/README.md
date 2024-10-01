@@ -4,13 +4,17 @@ Esta es una API RESTful construida con NestJS para gestionar una biblioteca virt
 
 ## Tabla de Contenidos
 
-- [Características](#características)
-- [Instalación](#instalación)
-- [Ejecución de la Aplicación](#ejecución-de-la-aplicación)
-- [Endpoints de la API](#endpoints-de-la-api)
-- [Variables de Entorno](#variables-de-entorno)
-- [Tecnologías Usadas](#tecnologías-usadas)
-- [Licencia](#licencia)
+- [API Biblioteca Virtual](#api-biblioteca-virtual)
+  - [Tabla de Contenidos](#tabla-de-contenidos)
+  - [Características](#características)
+  - [Instalación](#instalación)
+    - [Requisitos Previos](#requisitos-previos)
+    - [Clonar el Repositorio](#clonar-el-repositorio)
+    - [Instalación de Dependencias](#instalación-de-dependencias)
+    - [Configuración de las variables de entorno](#configuración-de-las-variables-de-entorno)
+    - [Crea las migraciones a la Base de Datos](#crea-las-migraciones-a-la-base-de-datos)
+  - [Ejecución de la Aplicación](#ejecución-de-la-aplicación)
+  - [Tecnologías Usadas](#tecnologías-usadas)
 
 ## Características
 
@@ -78,7 +82,7 @@ Para ejecutar la aplicación en modo de desarrollo, utiliza el siguiente comando
 npm run start:dev
 ```
 
-La aplicación estará disponible en `http://localhost:8000`.
+La aplicación estará disponible en `http://localhost:8000/docs`.
 
 <!-- ## Endpoints de la API
 
