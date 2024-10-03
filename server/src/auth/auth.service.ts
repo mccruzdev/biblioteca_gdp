@@ -79,14 +79,17 @@ export class AuthService {
   async loginUser(user: LoginUserDTO) {
     const userRes = await this.prisma.user.findUnique({
       where: { dni: user.dni },
-      select: { id: true, password: true, role: true },
+      select: { id: true, password: true, role: true, emailVerified: true },
     });
 
     if (!userRes)
       throw new HttpException('User not exists.', HttpStatus.NOT_FOUND);
 
+    if (!userRes.emailVerified)
+      throw new HttpException('Email not confirmed', HttpStatus.FORBIDDEN);
+
     if (!(await this._comparePassword(userRes.password, user.password)))
-      throw new HttpException('User not exists.', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Invalid credentials.', HttpStatus.UNAUTHORIZED);
 
     return {
       token: await this.jwt.signAsync({ id: userRes.id, role: userRes.role }),
