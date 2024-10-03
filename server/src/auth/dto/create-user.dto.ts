@@ -21,7 +21,7 @@ export class CreateUserDTO {
 
   @IsOptional()
   @IsEmail({}, { message: 'email must be a valid email address.' })
-  email?: string;
+  email: string;
 
   @IsString()
   @IsNotEmpty({ message: 'first name cannot be empty.' })
