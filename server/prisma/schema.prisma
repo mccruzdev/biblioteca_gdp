@@ -39,18 +39,21 @@ enum ReservationStatus {
 // Models
 
 model User {
-  id           Int                   @id @default(autoincrement())
-  dni          String                @unique @db.VarChar(20)
-  email        String?               @unique @db.VarChar(255)
-  names        String                @db.VarChar(255)
-  lastName     String                @db.VarChar(255)
-  phoneNumber  String?               @db.VarChar(20)
-  password     String                @db.VarChar(255)
-  role         Role
-  books        Book[]
-  conditions   BookConditionRecord[]
-  donations    Donation[]
-  reservations Reservation[]
+  id                Int                   @id @default(autoincrement())
+  dni               String                @unique @db.VarChar(20)
+  email             String                @unique @db.VarChar(255)
+  emailVerified     Boolean               @default(false)
+  verificationToken String?               @unique @db.VarChar(255)
+  tokenExpiration   DateTime?
+  names             String                @db.VarChar(255)
+  lastName          String                @db.VarChar(255)
+  phoneNumber       String?               @db.VarChar(20)
+  password          String                @db.VarChar(255)
+  role              Role
+  books             Book[]
+  conditions        BookConditionRecord[]
+  donations         Donation[]
+  reservations      Reservation[]
 }
 
 model Location {
