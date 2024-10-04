@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
@@ -40,6 +40,11 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'El usuario ya existe.' })
   createUser(@Body() user: CreateUserDTO) {
     return this.auth.createReaderUser(user);
+  }
+
+  @Get('confirm-email')
+  confirmAccount(@Query() query: { token: string | undefined }) {
+    return this.confirmAccount(query);
   }
 
   @Post('login')

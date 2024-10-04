@@ -76,6 +76,43 @@ export class AuthService {
     }
   }
 
+  async confirmAccount(query: { token: string | undefined }) {
+    if (!query.token)
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+
+    const userRes = await this.prisma.user.findUnique({
+      where: { verificationToken: query.token },
+      select: { id: true, emailVerified: true, tokenExpiration: true },
+    });
+
+    if (!userRes)
+      throw new HttpException(
+        'Invalid token or user not found',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    if (userRes.emailVerified)
+      throw new HttpException(
+        'Account already verified',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    if (
+      userRes.tokenExpiration &&
+      new Date().getTime() > userRes.tokenExpiration.getTime()
+    )
+      throw new HttpException('Token has expired', HttpStatus.FORBIDDEN);
+
+    await this.prisma.user.update({
+      data: {
+        emailVerified: true,
+        verificationToken: null,
+        tokenExpiration: null,
+      },
+      where: { id: userRes.id },
+    });
+  }
+
   async loginUser(user: LoginUserDTO) {
     const userRes = await this.prisma.user.findUnique({
       where: { dni: user.dni },
@@ -106,7 +143,7 @@ export class AuthService {
   }
 
   async _sendConfirmationEmail(email: string, name: string, token: string) {
-    const backendServer = this.configService.get<string>('READER_SERVER');
+    const backendServer = this.configService.get<string>('CLIENT_SERVER');
     const confirmationLink = `${backendServer}/auth/confirm-email?token=${token}`;
     const filePath = join(__dirname, '..', '..', 'resources', 'logo-muni.png');
 
