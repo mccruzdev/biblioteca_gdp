@@ -6,6 +6,7 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -43,6 +44,19 @@ export class AuthController {
   }
 
   @Get('confirm-email')
+  @ApiOperation({ summary: 'Confirms the email verification token' })
+  @ApiQuery({
+    name: 'token',
+    required: true,
+    description: 'Token for email verification',
+    type: String,
+  })
+  @ApiResponse({ status: 200, description: 'Email successfully verified' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid token or user not found, or account already verified',
+  })
+  @ApiResponse({ status: 403, description: 'Token has expired' })
   confirmAccount(@Query() query: { token: string | undefined }) {
     return this.confirmAccount(query);
   }
