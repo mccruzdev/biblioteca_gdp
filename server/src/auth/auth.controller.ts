@@ -1,11 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
+import { RefreshTokenDTO } from './dto/refresh-token.dto';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -42,6 +44,24 @@ export class AuthController {
     return this.auth.createReaderUser(user);
   }
 
+  @Get('confirm-email')
+  @ApiOperation({ summary: 'Confirms the email verification token' })
+  @ApiQuery({
+    name: 'token',
+    required: true,
+    description: 'Token for email verification',
+    type: String,
+  })
+  @ApiResponse({ status: 200, description: 'Email successfully verified' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid token or user not found, or account already verified',
+  })
+  @ApiResponse({ status: 403, description: 'Token has expired' })
+  confirmAccount(@Query() query: { token: string | undefined }) {
+    return this.auth.confirmAccount(query);
+  }
+
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión de usuario' })
   @ApiBody({ type: LoginUserDTO })
@@ -53,5 +73,10 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales incorrectas.' })
   loginUser(@Body() user: LoginUserDTO) {
     return this.auth.loginUser(user);
+  }
+
+  @Post('refresh-token')
+  refreshToken(@Body() user: RefreshTokenDTO) {
+    return this.auth.refreshToken(user);
   }
 }

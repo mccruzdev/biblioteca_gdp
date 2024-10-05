@@ -68,10 +68,8 @@ APIS_NET_PE_KEY=<your_api_token>
 // Backend Server
 BACKEND_SERVER=http://localhost:8000
 
-// Clientes
-READER_SERVER=http://localhost:5173
-LIBRARIAN_SERVER=http://localhost:5174
-ADMIN_SERVER=http://localhost:5175
+// Cliente
+CLIENT_SERVER=http://localhost:5173
 
 // Correos
 EMAIL_HOST=smtp.gmail.com

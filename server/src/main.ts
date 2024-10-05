@@ -8,11 +8,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
-    origin: [
-      process.env.READER_SERVER,
-      process.env.LIBRARIAN_SERVER,
-      process.env.ADMIN_SERVER,
-    ],
+    origin: process.env.CLIENT_SERVER,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
