@@ -1,9 +1,5 @@
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes
-} from "react-router-dom";
-import Login from './pages/auth/modules/Login'
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "./pages/auth/modules/login/Login";
 
 function App() {
   return (
