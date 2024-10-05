@@ -35,7 +35,7 @@ export class AuthController {
     return this.auth.getUserDataPerDNI(dni.dni);
   }
 
-  @Post('create')
+  @Post('create-user')
   @ApiOperation({ summary: 'Crear un nuevo usuario lector' })
   @ApiBody({ type: CreateUserDTO })
   @ApiResponse({ status: 201, description: 'Usuario creado exitosamente.' })
