@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { BooksModule } from './books/books.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { BooksModule } from './modules/books/books.module';
 
 @Module({
   imports: [AuthModule, ConfigModule.forRoot(), BooksModule],
