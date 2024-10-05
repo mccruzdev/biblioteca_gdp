@@ -1,8 +1,4 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateUserDTO } from './dto/create-user.dto';
-import { LoginUserDTO } from './dto/login-user.dto';
-import { RefreshTokenDTO } from './dto/refresh-token.dto';
 import {
   ApiBody,
   ApiOperation,
@@ -11,6 +7,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { CreateUserDTO } from './dto/create-user.dto';
+import { LoginUserDTO } from './dto/login-user.dto';
+import { PassworChangedDTO } from './dto/password-change.dto';
+import { RefreshTokenDTO } from './dto/refresh-token.dto';
+import { ConfirmPasswordChange } from './dto/confirm-password-change.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -35,17 +37,8 @@ export class AuthController {
     return this.auth.getUserDataPerDNI(dni.dni);
   }
 
-  @Post('create')
-  @ApiOperation({ summary: 'Crear un nuevo usuario lector' })
-  @ApiBody({ type: CreateUserDTO })
-  @ApiResponse({ status: 201, description: 'Usuario creado exitosamente.' })
-  @ApiResponse({ status: 409, description: 'El usuario ya existe.' })
-  createUser(@Body() user: CreateUserDTO) {
-    return this.auth.createReaderUser(user);
-  }
-
   @Get('confirm-email')
-  @ApiOperation({ summary: 'Confirms the email verification token' })
+  @ApiOperation({ summary: 'Confirmar el correo' })
   @ApiQuery({
     name: 'token',
     required: true,
@@ -62,6 +55,15 @@ export class AuthController {
     return this.auth.confirmAccount(query);
   }
 
+  @Post('create-user')
+  @ApiOperation({ summary: 'Crear un nuevo usuario lector' })
+  @ApiBody({ type: CreateUserDTO })
+  @ApiResponse({ status: 201, description: 'Usuario creado exitosamente.' })
+  @ApiResponse({ status: 409, description: 'El usuario ya existe.' })
+  createUser(@Body() user: CreateUserDTO) {
+    return this.auth.createReaderUser(user);
+  }
+
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión de usuario' })
   @ApiBody({ type: LoginUserDTO })
@@ -76,7 +78,36 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @ApiOperation({ summary: 'Refrescar el token de sesión' })
+  @ApiBody({ type: RefreshTokenDTO })
+  @ApiResponse({ status: 200, description: 'Token de sesión refrescado.' })
+  @ApiResponse({ status: 404, description: 'El usuario no existe.' })
   refreshToken(@Body() user: RefreshTokenDTO) {
     return this.auth.refreshToken(user);
+  }
+
+  @Post('change-password')
+  @ApiOperation({ summary: 'Solicitar cambio de contraseña' })
+  @ApiBody({ type: PassworChangedDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Solicitud de cambio de contraseña realizada.',
+  })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
+  requestPasswordChange(@Body() user: PassworChangedDTO) {
+    return this.auth.requestPasswordChange(user);
+  }
+
+  @Post('confirm-change-password')
+  @ApiOperation({ summary: 'Confirmar cambio de contraseña' })
+  @ApiBody({ type: ConfirmPasswordChange })
+  @ApiResponse({
+    status: 200,
+    description: 'Contraseña cambiada exitosamente.',
+  })
+  @ApiResponse({ status: 400, description: 'Token inválido.' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
+  confirmPasswordChange(@Body() data: ConfirmPasswordChange) {
+    return this.auth.confirmPasswordChange(data);
   }
 }
