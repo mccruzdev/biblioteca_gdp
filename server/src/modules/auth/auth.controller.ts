@@ -38,7 +38,7 @@ export class AuthController {
   }
 
   @Get('confirm-email')
-  @ApiOperation({ summary: 'Confirms the email verification token' })
+  @ApiOperation({ summary: 'Confirmar el correo' })
   @ApiQuery({
     name: 'token',
     required: true,
@@ -78,16 +78,35 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @ApiOperation({ summary: 'Refrescar el token de sesión' })
+  @ApiBody({ type: RefreshTokenDTO })
+  @ApiResponse({ status: 200, description: 'Token de sesión refrescado.' })
+  @ApiResponse({ status: 404, description: 'El usuario no existe.' })
   refreshToken(@Body() user: RefreshTokenDTO) {
     return this.auth.refreshToken(user);
   }
 
   @Post('change-password')
+  @ApiOperation({ summary: 'Solicitar cambio de contraseña' })
+  @ApiBody({ type: PassworChangedDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Solicitud de cambio de contraseña realizada.',
+  })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
   requestPasswordChange(@Body() user: PassworChangedDTO) {
     return this.auth.requestPasswordChange(user);
   }
 
   @Post('confirm-change-password')
+  @ApiOperation({ summary: 'Confirmar cambio de contraseña' })
+  @ApiBody({ type: ConfirmPasswordChange })
+  @ApiResponse({
+    status: 200,
+    description: 'Contraseña cambiada exitosamente.',
+  })
+  @ApiResponse({ status: 400, description: 'Token inválido.' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
   confirmPasswordChange(@Body() data: ConfirmPasswordChange) {
     return this.auth.confirmPasswordChange(data);
   }
