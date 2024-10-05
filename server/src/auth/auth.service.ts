@@ -9,6 +9,7 @@ import { LoginUserDTO } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { NodemailerService } from 'src/providers/nodemailer/nodemailer.service';
 import { join } from 'path';
+import { RefreshTokenDTO } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -114,23 +115,64 @@ export class AuthService {
   }
 
   async loginUser(user: LoginUserDTO) {
+    const userRes = await this._verifyUser(user.dni, user.password);
+
+    return {
+      token: await this.jwt.signAsync({ id: userRes.id, role: userRes.role }),
+    };
+  }
+
+  async refreshToken(user: RefreshTokenDTO) {
+    const token = this._getToken();
+    const tokenExpiration = new Date(
+      new Date().getTime() + 24 * 60 * 60 * 1000,
+    );
+
+    const userRes = await this._verifyUser(user.dni, user.password, false);
+
+    await this.prisma.user.update({
+      data: {
+        verificationToken: token,
+        tokenExpiration,
+      },
+      where: { id: userRes.id },
+    });
+
+    await this._sendConfirmationEmail(
+      userRes.email,
+      `${userRes.names} ${userRes.lastName}`,
+      token,
+    );
+  }
+
+  async _verifyUser(
+    dni: string,
+    password: string,
+    needEmailVirification: boolean = true,
+  ) {
     const userRes = await this.prisma.user.findUnique({
-      where: { dni: user.dni },
-      select: { id: true, password: true, role: true, emailVerified: true },
+      where: { dni: dni },
+      select: {
+        id: true,
+        email: true,
+        names: true,
+        lastName: true,
+        password: true,
+        role: true,
+        emailVerified: true,
+      },
     });
 
     if (!userRes)
       throw new HttpException('User not exists.', HttpStatus.NOT_FOUND);
 
-    if (!userRes.emailVerified)
+    if (needEmailVirification && !userRes.emailVerified)
       throw new HttpException('Email not confirmed', HttpStatus.FORBIDDEN);
 
-    if (!(await this._comparePassword(userRes.password, user.password)))
+    if (!(await this._comparePassword(userRes.password, password)))
       throw new HttpException('Invalid credentials.', HttpStatus.UNAUTHORIZED);
 
-    return {
-      token: await this.jwt.signAsync({ id: userRes.id, role: userRes.role }),
-    };
+    return userRes;
   }
 
   async _hashPassword(password: string) {

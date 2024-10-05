@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
+import { RefreshTokenDTO } from './dto/refresh-token.dto';
 import {
   ApiBody,
   ApiOperation,
@@ -58,7 +59,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 403, description: 'Token has expired' })
   confirmAccount(@Query() query: { token: string | undefined }) {
-    return this.confirmAccount(query);
+    return this.auth.confirmAccount(query);
   }
 
   @Post('login')
@@ -72,5 +73,10 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales incorrectas.' })
   loginUser(@Body() user: LoginUserDTO) {
     return this.auth.loginUser(user);
+  }
+
+  @Post('refresh-token')
+  refreshToken(@Body() user: RefreshTokenDTO) {
+    return this.auth.refreshToken(user);
   }
 }
