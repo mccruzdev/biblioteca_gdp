@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BaseInput from "../../../components/Input";
 import Button from "./components/Button";
+import { BACKEND_SERVER } from "../../../../config/api";
+import { fetchJSON } from "../../../../services/fetch";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -21,14 +23,42 @@ export default function AuthPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async () => {
+    const { response, json } = await fetchJSON<{ token: string }>({
+      url: `${BACKEND_SERVER}/auth/login`,
+      method: "POST",
+      body: {
+        dni: formData.dni,
+        password: formData.password,
+      },
+    });
+
+    if (response.ok) {
+      localStorage.setItem("gdp-bm", json.token);
+      navigate("/dashboard");
+    }
+    // Si algo falla:
+    //    Informar del error
+  };
+  const handleRegister = async () => {
+    // Si va todo bien:
+    //    Informar sobre que debe confirmar su correo
+    //    Mostrar el login
+    // Si algo falla:
+    //    Informar del error
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
-      console.log("Login attempted with DNI:", formData.dni);
+      // Validaciones
+      // Enviar datos validados al servidor
+      await handleLogin();
     } else {
-      console.log("Registration attempted with data:", formData);
+      // Validaciones
+      // Enviar datos validos al servidor
+      await handleRegister();
     }
-    navigate("/dashboard");
   };
 
   return (
