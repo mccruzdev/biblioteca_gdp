@@ -14,7 +14,7 @@ import { PassworChangedDTO } from './dto/password-change.dto';
 import { RefreshTokenDTO } from './dto/refresh-token.dto';
 import { ConfirmPasswordChange } from './dto/confirm-password-change.dto';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private auth: AuthService) {}
@@ -57,7 +57,21 @@ export class AuthController {
 
   @Post('create-user')
   @ApiOperation({ summary: 'Crear un nuevo usuario lector' })
-  @ApiBody({ type: CreateUserDTO })
+  @ApiBody({
+    type: CreateUserDTO,
+    examples: {
+      example: {
+        value: {
+          dni: '12345678',
+          password: 'MyPassword123%&',
+          email: 'example@gmail.com',
+          names: 'Jhon',
+          lastName: 'Doe',
+          phoneNumber: '987654321',
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 201, description: 'Usuario creado exitosamente.' })
   @ApiResponse({ status: 409, description: 'El usuario ya existe.' })
   createUser(@Body() user: CreateUserDTO) {
@@ -66,7 +80,17 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión de usuario' })
-  @ApiBody({ type: LoginUserDTO })
+  @ApiBody({
+    type: LoginUserDTO,
+    examples: {
+      example: {
+        value: {
+          dni: '12345678',
+          password: 'MyPassword123%&',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Inicio de sesión exitoso. Token JWT devuelto.',
@@ -79,7 +103,17 @@ export class AuthController {
 
   @Post('refresh-token')
   @ApiOperation({ summary: 'Refrescar el token de sesión' })
-  @ApiBody({ type: RefreshTokenDTO })
+  @ApiBody({
+    type: RefreshTokenDTO,
+    examples: {
+      example: {
+        value: {
+          dni: '12345678',
+          password: 'MyPassword123%&',
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: 'Token de sesión refrescado.' })
   @ApiResponse({ status: 404, description: 'El usuario no existe.' })
   refreshToken(@Body() user: RefreshTokenDTO) {
@@ -88,7 +122,16 @@ export class AuthController {
 
   @Post('change-password')
   @ApiOperation({ summary: 'Solicitar cambio de contraseña' })
-  @ApiBody({ type: PassworChangedDTO })
+  @ApiBody({
+    type: PassworChangedDTO,
+    examples: {
+      example: {
+        value: {
+          dni: '12345678',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Solicitud de cambio de contraseña realizada.',
@@ -100,7 +143,17 @@ export class AuthController {
 
   @Post('confirm-change-password')
   @ApiOperation({ summary: 'Confirmar cambio de contraseña' })
-  @ApiBody({ type: ConfirmPasswordChange })
+  @ApiBody({
+    type: ConfirmPasswordChange,
+    examples: {
+      example: {
+        value: {
+          token: '<enter-your-token-here-that-was-sent-by-email>',
+          password: 'MyPassword123%&',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Contraseña cambiada exitosamente.',
