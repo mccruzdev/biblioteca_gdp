@@ -95,38 +95,6 @@ npm run start:dev
 
 La aplicación estará disponible en `http://localhost:8000/docs`.
 
-<!-- ## Endpoints de la API
-
-### Usuarios
-
-- `GET /users`: Lista todos los usuarios.
-- `POST /users`: Crea un nuevo usuario.
-- `GET /users/:id`: Obtiene un usuario por su ID.
-- `PUT /users/:id`: Actualiza los datos de un usuario.
-- `DELETE /users/:id`: Elimina un usuario.
-
-### Libros
-
-- `GET /books`: Lista todos los libros.
-- `POST /books`: Añade un nuevo libro.
-- `GET /books/:id`: Obtiene un libro por su ID.
-- `PUT /books/:id`: Actualiza la información de un libro.
-- `DELETE /books/:id`: Elimina un libro.
-
-### Categorías
-
-- `GET /categories`: Lista todas las categorías.
-- `POST /categories`: Añade una nueva categoría.
-- `PUT /categories/:id`: Actualiza una categoría.
-- `DELETE /categories/:id`: Elimina una categoría.
-
-### Reservas
-
-- `POST /reservations`: Reserva un libro.
-- `GET /reservations/:id`: Obtiene los detalles de una reserva.
-- `PUT /reservations/:id`: Actualiza el estado de una reserva.
-- `DELETE /reservations/:id`: Cancela una reserva. -->
-
 ## Tecnologías Usadas
 
 - **NestJS**: Framework para Node.js basado en TypeScript.
