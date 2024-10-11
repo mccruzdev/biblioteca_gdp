@@ -93,7 +93,7 @@ Para ejecutar la aplicación en modo de desarrollo, utiliza el siguiente comando
 npm run start:dev
 ```
 
-La aplicación estará disponible en `http://localhost:8000/docs`.
+La documentación de la aplicación estará disponible en `http://localhost:8000/docs`.
 
 ## Tecnologías Usadas
 
