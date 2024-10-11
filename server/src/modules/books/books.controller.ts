@@ -1,27 +1,42 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BooksService } from './books.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
 
 @ApiTags('Books')
+@ApiBearerAuth()
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
-  @Get('all')
+  @Get()
   @Roles('READER')
-  getAllBooks() {
-    return [
-      {
-        id: 1,
-        title: 'Book 1',
-        author: 'Author 1',
-      },
-      {
-        id: 2,
-        title: 'Book 2',
-        author: 'Author 2',
-      },
-    ];
+  @ApiOperation({ summary: 'Get all books with pagination' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Limit of books per page',
+  })
+  @ApiResponse({ status: 200, description: 'Successfully fetched books' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
+  })
+  getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.booksService.getAllBooks(Number(page), Number(limit));
   }
 }

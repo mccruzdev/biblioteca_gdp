@@ -22,14 +22,12 @@ export class AuthService {
     private mail: NodemailerService,
   ) {}
 
+  apiKey = this.configService.get<string>('APIS_NET_PE_KEY');
+
   async getUserDataPerDNI(dni: string): Promise<UserReniec> {
     const response = await fetch(
       `https://api.apis.net.pe/v2/reniec/dni?numero=${dni}`,
-      {
-        headers: {
-          Authorization: this.configService.get<string>('APIS_NET_PE_KEY'),
-        },
-      },
+      { headers: { Authorization: this.apiKey } },
     );
 
     if (response.status === 422)
