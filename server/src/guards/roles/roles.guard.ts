@@ -45,9 +45,6 @@ export class RolesGuard implements CanActivate {
       READER: ['READER'],
     };
 
-    const expandedUserRoles = roleHierarchy[data.role] || [];
-    console.log(expandedUserRoles);
-
-    return expandedUserRoles.includes(role);
+    return (roleHierarchy[data.role] || []).includes(role);
   }
 }
