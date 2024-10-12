@@ -4,7 +4,7 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { BookTemplateDTO } from './dto/book-template.dto';
 
 @Injectable()
-export class BooksService {
+export class BooksTemplateService {
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,

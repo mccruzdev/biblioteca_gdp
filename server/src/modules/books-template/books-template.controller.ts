@@ -15,15 +15,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { BooksService } from './books.service';
+import { BooksTemplateService } from './books-template.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
 import { BookTemplateDTO } from './dto/book-template.dto';
 
 @ApiTags('Books')
 @ApiBearerAuth()
-@Controller('books')
-export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+@Controller('books-template')
+export class BooksTemplateController {
+  constructor(private readonly booksService: BooksTemplateService) {}
 
   @Get()
   @Roles('READER')

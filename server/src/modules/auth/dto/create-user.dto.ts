@@ -25,15 +25,17 @@ export class CreateUserDTO {
 
   @IsString()
   @IsNotEmpty({ message: 'first name cannot be empty.' })
-  @Matches(/^[a-zA-Z\s]+$/, {
-    message: 'first name can only contain letters and spaces.',
+  @Matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, {
+    message:
+      'first name can only contain letters, spaces, and accented characters.',
   })
   names: string;
 
   @IsString()
   @IsNotEmpty({ message: 'last name cannot be empty.' })
-  @Matches(/^[a-zA-Z\s]+$/, {
-    message: 'last name can only contain letters and spaces.',
+  @Matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, {
+    message:
+      'last name can only contain letters, spaces, and accented characters.',
   })
   lastName: string;
 

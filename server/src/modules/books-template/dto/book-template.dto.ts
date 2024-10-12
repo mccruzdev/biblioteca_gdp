@@ -2,11 +2,9 @@ import {
   IsString,
   IsOptional,
   IsInt,
-  IsEnum,
   IsPositive,
   Length,
 } from 'class-validator';
-import { BookStatusE } from 'src/types';
 
 export class BookTemplateDTO {
   @IsString()
@@ -35,25 +33,5 @@ export class BookTemplateDTO {
 
   @IsOptional()
   @IsInt()
-  @IsPositive()
-  stock?: number;
-
-  @IsEnum(BookStatusE)
-  status: BookStatusE;
-
-  @IsOptional()
-  @IsInt()
-  locationId?: number;
-
-  @IsOptional()
-  @IsInt()
-  conditionId?: number;
-
-  @IsOptional()
-  @IsInt()
   categoryId?: number;
-
-  @IsOptional()
-  @IsInt()
-  userId?: number;
 }
