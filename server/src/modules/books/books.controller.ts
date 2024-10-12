@@ -1,4 +1,13 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -8,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { BooksService } from './books.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
+import { BookTemplateDTO } from './dto/book-template.dto';
 
 @ApiTags('Books')
 @ApiBearerAuth()
@@ -38,5 +48,26 @@ export class BooksController {
   })
   getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.booksService.getAllBooks(Number(page), Number(limit));
+  }
+
+  @Post()
+  @Roles('LIBRARIAN')
+  async createTemplateBook(@Body() book: BookTemplateDTO) {
+    return this.booksService.createTemplateBook(book);
+  }
+
+  @Put(':id')
+  @Roles('LIBRARIAN')
+  async updateTemplateBook(
+    @Param('id') id: number,
+    @Body() book: BookTemplateDTO,
+  ) {
+    return this.booksService.updateTemplateBook(Number(id), book);
+  }
+
+  @Delete(':id')
+  @Roles('ADMIN')
+  async deleteTemplateBook(@Param('id') id: number) {
+    return this.booksService.deleteTemplateBook(Number(id));
   }
 }
