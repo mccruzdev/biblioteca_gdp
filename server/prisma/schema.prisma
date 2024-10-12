@@ -39,21 +39,20 @@ enum ReservationStatus {
 // Models
 
 model User {
-  id                Int                   @id @default(autoincrement())
-  dni               String                @unique @db.VarChar(20)
-  email             String                @unique @db.VarChar(255)
-  emailVerified     Boolean               @default(false)
-  verificationToken String?               @unique @db.VarChar(255)
-  tokenExpiration   DateTime?
-  names             String                @db.VarChar(255)
-  lastName          String                @db.VarChar(255)
-  phoneNumber       String?               @db.VarChar(20)
-  password          String                @db.VarChar(255)
-  role              Role
-  books             Book[]
-  conditions        BookConditionRecord[]
-  donations         Donation[]
-  reservations      Reservation[]
+  id                  Int                   @id @default(autoincrement())
+  dni                 String                @unique @db.VarChar(20)
+  email               String                @unique @db.VarChar(255)
+  emailVerified       Boolean               @default(false)
+  verificationToken   String?               @unique @db.VarChar(255)
+  tokenExpiration     DateTime?
+  names               String                @db.VarChar(255)
+  lastName            String                @db.VarChar(255)
+  phoneNumber         String?               @db.VarChar(20)
+  password            String                @db.VarChar(255)
+  role                Role
+  reservations        Reservation[]
+  donations           Donation[]
+  BookConditionRecord BookConditionRecord[]
 }
 
 model Location {
@@ -74,42 +73,36 @@ model BookConditionRecord {
 }
 
 model BookCategory {
-  id          Int     @id @default(autoincrement())
-  category    String  @db.VarChar(255)
-  subcategory String? @db.VarChar(255)
-  books       Book[]
+  id          Int            @id @default(autoincrement())
+  category    String         @db.VarChar(255)
+  subcategory String?        @db.VarChar(255)
+  templates   BookTemplate[]
+}
+
+model BookTemplate {
+  id         Int           @id @default(autoincrement())
+  title      String        @db.VarChar(255)
+  author     String?       @db.VarChar(255)
+  publisher  String?       @db.VarChar(255)
+  pages      Int?
+  code       String?       @db.VarChar(50)
+  categoryId Int?
+  category   BookCategory? @relation(fields: [categoryId], references: [id])
+  books      Book[]
 }
 
 model Book {
-  id          Int                  @id @default(autoincrement())
-  title       String               @db.VarChar(255)
-  author      String?              @db.VarChar(255)
-  publisher   String?              @db.VarChar(255)
-  pages       Int?
-  code        String?              @db.VarChar(50)
-  stock       Int?
-  status      BookStatus
-  locationId  Int?
-  location    Location?            @relation(fields: [locationId], references: [id])
-  conditionId Int?
-  condition   BookConditionRecord? @relation(fields: [conditionId], references: [id])
-  categoryId  Int?
-  category    BookCategory?        @relation(fields: [categoryId], references: [id])
-  userId      Int?
-  user        User?                @relation(fields: [userId], references: [id])
-  Donation    Donation[]
-  Reservation Reservation[]
-}
-
-model Donation {
-  id          Int               @id @default(autoincrement())
-  date        DateTime
-  donorEntity String            @db.VarChar(255)
-  bookId      Int?
-  book        Book?             @relation(fields: [bookId], references: [id])
-  userId      Int?
-  user        User?             @relation(fields: [userId], references: [id])
-  toLibrary   DonationDirection
+  id           Int                  @id @default(autoincrement())
+  templateId   Int
+  template     BookTemplate         @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  status       BookStatus
+  locationId   Int?
+  location     Location?            @relation(fields: [locationId], references: [id])
+  conditionId  Int?
+  condition    BookConditionRecord? @relation(fields: [conditionId], references: [id])
+  stock        Int?
+  donations    Donation[]
+  reservations Reservation[]
 }
 
 model Reservation {
@@ -117,10 +110,21 @@ model Reservation {
   reservationDate   DateTime
   pickupDeadline    DateTime?
   reservationStatus ReservationStatus
-  bookId            Int?
-  book              Book?             @relation(fields: [bookId], references: [id])
+  bookId            Int
+  book              Book              @relation(fields: [bookId], references: [id])
   loanDate          DateTime?
   returnDate        DateTime?
   userId            Int?
   user              User?             @relation(fields: [userId], references: [id])
+}
+
+model Donation {
+  id          Int               @id @default(autoincrement())
+  date        DateTime
+  donorEntity String            @db.VarChar(255)
+  bookId      Int
+  book        Book              @relation(fields: [bookId], references: [id])
+  userId      Int?
+  user        User?             @relation(fields: [userId], references: [id])
+  toLibrary   DonationDirection
 }

@@ -4,16 +4,17 @@ import os
 from collections import namedtuple
 
 Register = namedtuple('Register', [
-                      'items',
-                      'showcase',
-                      'showcase_color',
-                      'showcase_level',
-                      'title',
-                      'author',
-                      'code',
-                      'publisher',
-                      'num_pages',
-                      'condition'])
+    'items',
+    'showcase',
+    'showcase_color',
+    'showcase_level',
+    'title',
+    'author',
+    'code',
+    'publisher',
+    'num_pages',
+    'condition'
+])
 
 
 def read_file():
@@ -26,8 +27,11 @@ def read_file():
 
 
 def get_sql():
-    sql = "INSERT INTO Book (title, author, publisher, pages, code, stock, status, locationId, conditionId, categoryId) VALUES\n"
-    values = []
+    sql_template = "INSERT INTO BookTemplate (title, author, publisher, pages, code) VALUES\n"
+    sql_condition = "INSERT INTO BookConditionRecord (`condition`, isDecommissioned) VALUES\n"
+
+    values_template = []
+    values_condition = []
 
     for register in read_file():
         title = f"'{register.title}'" if register.title else "NULL"
@@ -35,25 +39,32 @@ def get_sql():
         publisher = f"'{register.publisher}'" if register.publisher else "NULL"
         pages = register.num_pages if register.num_pages else "NULL"
         code = f"'{register.code}'" if register.code else "NULL"
-        stock = register.items if register.items else "NULL"
 
-        location_id = "NULL"
-        condition_id = "NULL"
-        category_id = "NULL"
+        values_template.append(
+            f"({title}, {author}, {publisher}, {pages}, {code})"
+        )
 
-        values.append(
-            f"({title}, {author}, {publisher}, {pages}, {code}, {stock}, 'AVAILABLE', {location_id}, {condition_id}, {category_id})")
+        condition = f"'BAD'" if register.condition == 'MALO' else "'GOOD'"
+        is_decommissioned = "'NO'"
 
-    sql += ",\n".join(values) + ";"
+        values_condition.append(
+            f"({condition}, {is_decommissioned})"
+        )
 
-    return sql
+    sql_template += ",\n".join(values_template) + ";"
+    sql_condition += ",\n".join(values_condition) + ";"
+
+    return sql_template, sql_condition
 
 
 def main():
-    sql = get_sql()
+    sql_template, sql_condition = get_sql()
 
-    with open('books.sql', 'w', encoding='utf-8') as file:
-        file.write(sql)
+    with open('books_template.sql', 'w', encoding='utf-8') as file:
+        file.write(sql_template)
+
+    with open('books_condition.sql', 'w', encoding='utf-8') as file:
+        file.write(sql_condition)
 
 
 if __name__ == '__main__':
