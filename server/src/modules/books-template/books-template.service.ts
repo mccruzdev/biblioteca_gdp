@@ -42,26 +42,38 @@ export class BooksTemplateService {
   async createTemplateBook(book: BookTemplateDTO) {
     try {
       return await this.prisma.bookTemplate.create({ data: book });
-    } catch {
+    } catch (error) {
       throw this.invalidDataException;
     }
   }
 
   async updateTemplateBook(id: number, book: BookTemplateDTO) {
     try {
-      return await this.prisma.bookTemplate.update({
+      const updatedBook = await this.prisma.bookTemplate.update({
         where: { id },
         data: book,
       });
-    } catch {
+
+      if (!updatedBook)
+        throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+
+      return updatedBook;
+    } catch (error) {
       throw this.invalidDataException;
     }
   }
 
   async deleteTemplateBook(id: number) {
     try {
-      return await this.prisma.bookTemplate.deleteMany({ where: { id } });
-    } catch {
+      const result = await this.prisma.bookTemplate.deleteMany({
+        where: { id },
+      });
+
+      if (result.count === 0)
+        throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+
+      return { message: 'Book successfully deleted' };
+    } catch (error) {
       throw this.invalidDataException;
     }
   }
