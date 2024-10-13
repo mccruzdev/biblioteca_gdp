@@ -2,6 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { BookTemplateDTO } from './dto/book-template.dto';
+import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
+
+const paginate: PaginateFunction = paginator({
+  path: 'books-template',
+  limit: 10,
+});
 
 @Injectable()
 export class BooksTemplateService {
@@ -18,25 +24,7 @@ export class BooksTemplateService {
   );
 
   async getAllBooks(page: number, limit: number) {
-    const url = `${this.backendURL}/books`;
-
-    const [count, booksTemplate] = await Promise.all([
-      this.prisma.bookTemplate.count(),
-      this.prisma.bookTemplate.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-    ]);
-
-    return {
-      count,
-      data: booksTemplate,
-      prev: page > 1 ? `${url}?page=${page - 1}&limit=${limit}` : null,
-      next:
-        page < Math.ceil(count / limit)
-          ? `${url}?page=${page + 1}&limit=${limit}`
-          : null,
-    };
+    return paginate(this.prisma.bookTemplate, {}, { page, limit });
   }
 
   async createTemplateBook(book: BookTemplateDTO) {

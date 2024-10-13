@@ -20,8 +20,8 @@ import { BooksTemplateService } from './books-template.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
 import { BookTemplateDTO } from './dto/book-template.dto';
 
-@ApiTags('Books') // Agrupa las rutas bajo una sección "Books" en la documentación.
-@ApiBearerAuth() // Indica que esta API requiere autenticación mediante token Bearer.
+@ApiTags('Books')
+@ApiBearerAuth()
 @Controller('books-template')
 export class BooksTemplateController {
   constructor(private readonly booksService: BooksTemplateService) {}
