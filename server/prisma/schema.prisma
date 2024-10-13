@@ -68,7 +68,7 @@ model BookConditionRecord {
   condition        BookCondition
   isDecommissioned DonationDirection
   userId           Int?
-  user             User?             @relation(fields: [userId], references: [id])
+  user             User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   books            Book[]
 }
 
@@ -87,7 +87,7 @@ model BookTemplate {
   pages      Int?
   code       String?       @db.VarChar(50)
   categoryId Int?
-  category   BookCategory? @relation(fields: [categoryId], references: [id])
+  category   BookCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   books      Book[]
 }
 
@@ -97,9 +97,9 @@ model Book {
   template     BookTemplate         @relation(fields: [templateId], references: [id], onDelete: Cascade)
   status       BookStatus
   locationId   Int?
-  location     Location?            @relation(fields: [locationId], references: [id])
+  location     Location?            @relation(fields: [locationId], references: [id], onDelete: Cascade)
   conditionId  Int?
-  condition    BookConditionRecord? @relation(fields: [conditionId], references: [id])
+  condition    BookConditionRecord? @relation(fields: [conditionId], references: [id], onDelete: Cascade)
   stock        Int?
   donations    Donation[]
   reservations Reservation[]
@@ -111,11 +111,11 @@ model Reservation {
   pickupDeadline    DateTime?
   reservationStatus ReservationStatus
   bookId            Int
-  book              Book              @relation(fields: [bookId], references: [id])
+  book              Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
   loanDate          DateTime?
   returnDate        DateTime?
   userId            Int?
-  user              User?             @relation(fields: [userId], references: [id])
+  user              User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Donation {
@@ -123,8 +123,8 @@ model Donation {
   date        DateTime
   donorEntity String            @db.VarChar(255)
   bookId      Int
-  book        Book              @relation(fields: [bookId], references: [id])
+  book        Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
   userId      Int?
-  user        User?             @relation(fields: [userId], references: [id])
+  user        User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   toLibrary   DonationDirection
 }

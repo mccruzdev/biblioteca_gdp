@@ -90,7 +90,7 @@ export class BooksTemplateController {
   }
 
   @Delete(':id')
-  @Roles('ADMIN')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Delete a book template by ID' })
   @ApiParam({
     name: 'id',

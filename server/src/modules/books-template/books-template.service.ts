@@ -11,12 +11,7 @@ const paginate: PaginateFunction = paginator({
 
 @Injectable()
 export class BooksTemplateService {
-  constructor(
-    private configService: ConfigService,
-    private prisma: PrismaService,
-  ) {}
-
-  backendURL = this.configService.get<string>('BACKEND_SERVER');
+  constructor(private prisma: PrismaService) {}
 
   invalidDataException = new HttpException(
     'Error creating the book, please verify the provided data.',
