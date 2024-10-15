@@ -64,32 +64,34 @@ export default function AuthPage() {
   return (
     <div className="Container min-h-screen flex flex-col items-center justify-center">
       <div className="z-10 text-center text-white mb-8">
-        <img src="/logo-muni.png" alt="Logo" className="mx-auto w-40 h-40" />
-        <p className="text-1xl font-medium">SGB - MDG</p>
-        <h1 className="mt-2 font-medium ">
+        <img src="/logo-muni.png" alt="Logo" className="mx-auto w-32 h-32" />
+        <p className="text-xl2 font-semibold">SGB - MDG</p>
+        <h1 className="mt-0.5 font-medium ">
           SISTEMA DE GESTION DE LA BIBIBLIOTECA DE LA MUNICIPALIDAD DE GUADALUPE
         </h1>
       </div>
-      <div className="z-10 bg-white p-5 rounded-lg shadow-lg w-full mb-8">
-        <h2 className="text-3xl font-extrabold text-center">
+      <div className="z-10 bg-white p-4 rounded-lg shadow-lg w-full mb-8 " >
+        <h2 className="text-2xl font-extrabold text-center">
           {isLogin ? "Ingresa Aquí" : "Empieza Aquí"}
         </h2>
-        <p className="text-sm text-center text-gray-600 mb-6">
+        <p className="text-sm text-center text-gray-600 mb-4">
           Accede a muchos libros y recursos
         </p>
-        <div className="ButtonContainer flex mb-8 rounded-3xl">
-          <Button
-            isLogin={isLogin}
-            onClick={() => setIsLogin(true)}
-            text="Iniciar sesión"
-            rounded="rounded-l-md"
-          />
-          <Button
-            isLogin={!isLogin}
-            onClick={() => setIsLogin(false)}
-            text="Registrarse"
-            rounded="rounded-r-md"
-          />
+        <div className="flex w-full justify-center">
+          <div className="ButtonContainer flex mb-6 rounded-full p-0 w-72">
+            <Button
+              isLogin={isLogin}
+              onClick={() => setIsLogin(true)}
+              text="Iniciar sesión"
+              rounded="rounded-full"
+            />
+            <Button
+              isLogin={!isLogin}
+              onClick={() => setIsLogin(false)}
+              text="Registrarse"
+              rounded="rounded-full"
+            />
+          </div>
         </div>
         <form onSubmit={handleSubmit}>
           <BaseInput
@@ -144,7 +146,7 @@ export default function AuthPage() {
           />
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-black font-bold py-2 rounded-md hover:bg-yellow-600 transition duration-300"
+            className="w-full bg-yellow-500 text-black font-bold py-1 rounded-full hover:bg-yellow-600 transition duration-300"
           >
             {isLogin ? "Iniciar Sesión" : "Registrarse"}
           </button>
