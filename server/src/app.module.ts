@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { BooksTemplateModule } from './modules/books-template/books-template.module';
 import { LocationModule } from './modules/location/location.module';
+import { BookCategoryModule } from './modules/book-category/book-category.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { LocationModule } from './modules/location/location.module';
     BooksTemplateModule,
     ConfigModule.forRoot(),
     LocationModule,
+    BookCategoryModule,
   ],
   controllers: [],
   providers: [],

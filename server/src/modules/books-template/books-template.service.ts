@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { BookTemplateDTO } from './dto/book-template.dto';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
