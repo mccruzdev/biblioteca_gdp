@@ -27,7 +27,7 @@ export default function BaseInput({
         id={name}
         type={type}
         name={name}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-none focus:ring-2 focus:outline-gray-400"
+        className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:border-none focus:ring-2 focus:outline-gray-400"
         value={value}
         onChange={handleInputChange}
         onFocus={() => setIsFocused(true)}

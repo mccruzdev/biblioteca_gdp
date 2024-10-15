@@ -64,13 +64,13 @@ export default function AuthPage() {
   return (
     <div className="Container min-h-screen flex flex-col items-center justify-center">
       <div className="z-10 text-center text-white mb-8">
-        <img src="/logo-muni.png" alt="Logo" className="mx-auto w-32 h-32" />
+        <img src="/logo-muni.png" alt="Logo" className="mx-auto w-32 h-32 mb-[-15px]" />
         <p className="text-xl2 font-semibold">SGB - MDG</p>
-        <h1 className="mt-0.5 font-medium ">
+        <h1 className="mb-[-15px] font-medium ">
           SISTEMA DE GESTION DE LA BIBIBLIOTECA DE LA MUNICIPALIDAD DE GUADALUPE
         </h1>
       </div>
-      <div className="z-10 bg-white p-4 rounded-lg shadow-lg w-full mb-8 " >
+      <div className="z-10 bg-white p-4 rounded-2xl shadow-lg w-full mb-8 " >
         <h2 className="text-2xl font-extrabold text-center">
           {isLogin ? "Ingresa Aquí" : "Empieza Aquí"}
         </h2>
