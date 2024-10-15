@@ -5,9 +5,11 @@ import BaseInput from "../../../components/Input";
 import Button from "./components/Button";
 import { BACKEND_SERVER } from "../../../../config/api";
 import { fetchJSON } from "../../../../services/fetch";
+import FloatingTab from "./components/FloatingTab";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [showTab, setShowTab] = useState(false);
   const [formData, setFormData] = useState({
     dni: "",
     names: "",
@@ -55,9 +57,10 @@ export default function AuthPage() {
       // Enviar datos validados al servidor
       await handleLogin();
     } else {
+      setShowTab(true);
       // Validaciones
       // Enviar datos validos al servidor
-      await handleRegister();
+      /*await handleRegister();*/
     }
   };
 
@@ -152,6 +155,13 @@ export default function AuthPage() {
           </button>
         </form>
       </div>
+      <FloatingTab 
+        isOpen={showTab}
+        onClose={() => setShowTab(false)}
+        onConfirm={handleRegister}
+        title="Confirma tus datos"
+        message={`¿Estás seguro de que deseas registrarte con los siguientes datos?\n\nDNI: ${formData.dni}\nNombres: ${formData.names}\nApellidos: ${formData.lastName}\nCorreo Electrónico: ${formData.email}\nTeléfono: ${formData.phoneNumber}`}
+      />
     </div>
   );
 }
