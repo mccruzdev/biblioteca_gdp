@@ -5,7 +5,7 @@ interface FloatingTabProps {
     onClose: () => void;
     onConfirm: () => Promise<void>;
     title: string;
-    message: string;
+    message: React.ReactNode; // Cambiado a React.ReactNode
 }
 
 const FloatingTab: React.FC<FloatingTabProps> = ({ isOpen, onClose, onConfirm, title, message }) => {
@@ -28,13 +28,13 @@ const FloatingTab: React.FC<FloatingTabProps> = ({ isOpen, onClose, onConfirm, t
                 <p className="mb-4 whitespace-pre-line">{message}</p>
                 <div className="flex justify-between">
                     <button
-                        className="bg-gray-300 text-black font-bold py-2 px-4 rounded"
+                        className="bg-gray-300 text-black font-bold py-1 px-4 rounded-3xl"
                         onClick={onClose}
                     >
                         Volver
                     </button>
                     <button
-                        className="bg-yellow-500 text-black font-bold py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
+                        className="bg-yellow-500 text-black font-bold py-1 px-4 rounded-3xl hover:bg-yellow-600 transition duration-300"
                         onClick={handleConfirm}
                     >
                         Enviar

@@ -10,6 +10,7 @@ import FloatingTab from "./components/FloatingTab";
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showTab, setShowTab] = useState(false);
+  const [showChangePasswordTab, setShowChangePasswordTab] = useState(false); // Nuevo estado para el cambio de contraseña
   const [formData, setFormData] = useState({
     dni: "",
     names: "",
@@ -18,6 +19,8 @@ export default function AuthPage() {
     phoneNumber: "",
     password: "",
   });
+  const [dniForChange, setDniForChange] = useState(""); // Estado para el DNI en el FloatingTab
+  const [newPassword, setNewPassword] = useState(""); // Estado para la nueva contraseña
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,6 +53,27 @@ export default function AuthPage() {
     //    Informar del error
   };
 
+  const handleRequestPasswordChange = async () => {
+    try {
+      const response = await fetch(`${BACKEND_SERVER}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ dni: dniForChange }), // Enviar el DNI al backend
+      });
+  
+      if (response.ok) {
+        console.log('Solicitud de cambio de contraseña enviada.');
+      } else {
+        const errorData = await response.json();
+        console.error('Error:', errorData);
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
@@ -63,6 +87,10 @@ export default function AuthPage() {
       /*await handleRegister();*/
     }
   };
+
+
+
+
 
   return (
     <div className="Container min-h-screen flex flex-col items-center justify-center">
@@ -154,6 +182,9 @@ export default function AuthPage() {
             {isLogin ? "Iniciar Sesión" : "Registrarse"}
           </button>
         </form>
+        <button onClick={() => setShowChangePasswordTab(true)} className="mt-4 text-blue-500 hover:underline">
+          ¿Olvidaste tu contraseña?
+        </button>
       </div>
       <FloatingTab 
         isOpen={showTab}
@@ -162,6 +193,27 @@ export default function AuthPage() {
         title="Confirma tus datos"
         message={`¿Estás seguro de que deseas registrarte con los siguientes datos?\n\nDNI: ${formData.dni}\nNombres: ${formData.names}\nApellidos: ${formData.lastName}\nCorreo Electrónico: ${formData.email}\nTeléfono: ${formData.phoneNumber}`}
       />
+      <FloatingTab
+        isOpen={showChangePasswordTab}
+        onClose={() => setShowChangePasswordTab(false)}
+        onConfirm={handleRequestPasswordChange}
+        title="Cambio de Contraseña"
+        message={(
+          <>
+            <div className="-mt-1">
+              <label htmlFor="dniInput">Ingresa tu DNI:</label>
+              <input
+                id="dniInput"
+                type="text"
+                value={dniForChange}
+                onChange={(e) => setDniForChange(e.target.value)} // Actualiza el estado con el valor ingresado
+                placeholder="DNI"
+                className="border w-full rounded-lg p-1 mt-3 mb-1 text"
+              />
+            </div>
+          </>
+        )}
+        />
     </div>
   );
 }
