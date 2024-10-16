@@ -6,6 +6,7 @@ import Button from "./components/Button";
 import { BACKEND_SERVER } from "../../../../config/api";
 import { fetchJSON } from "../../../../services/fetch";
 import FloatingTab from "./components/FloatingTab";
+import { toast } from "sonner";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -53,25 +54,28 @@ export default function AuthPage() {
     //    Informar del error
   };
 
-  const handleRequestPasswordChange = async () => {
+  const handleRequestPasswordChange = () => {
     try {
-      const response = await fetch(`${BACKEND_SERVER}/auth/change-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ dni: dniForChange }), // Enviar el DNI al backend
-      });
-  
-      if (response.ok) {
-        console.log('Solicitud de cambio de contraseña enviada.');
-      } else {
-        const errorData = await response.json();
-        console.error('Error:', errorData);
-      }
+      toast.promise(
+        fetch(`${BACKEND_SERVER}/auth/change-password`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ dni: dniForChange }), // Enviar el DNI al backend
+        }),
+        {
+          loading: "Enviando...",
+          success:
+            "Solicitud de cambio de contraseña enviada. Revisa tu correo.",
+          error: "Solicitud fallida.",
+        }
+      );
     } catch (error) {
-      console.error('Error de red:', error);
+      console.error("Error de red:", error);
     }
+
+    setDniForChange("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,20 +92,20 @@ export default function AuthPage() {
     }
   };
 
-
-
-
-
   return (
     <div className="Container min-h-screen flex flex-col items-center justify-center">
       <div className="z-10 text-center text-white mb-8">
-        <img src="/logo-muni.png" alt="Logo" className="mx-auto w-32 h-32 mb-[-15px]" />
+        <img
+          src="/logo-muni.png"
+          alt="Logo"
+          className="mx-auto w-32 h-32 mb-[-15px]"
+        />
         <p className="text-xl2 font-semibold">SGB - MDG</p>
         <h1 className="mb-[-15px] font-medium ">
           SISTEMA DE GESTION DE LA BIBIBLIOTECA DE LA MUNICIPALIDAD DE GUADALUPE
         </h1>
       </div>
-      <div className="z-10 bg-white p-4 rounded-2xl shadow-lg w-full mb-8 " >
+      <div className="z-10 bg-white p-4 rounded-2xl shadow-lg w-full mb-8 ">
         <h2 className="text-2xl font-extrabold text-center">
           {isLogin ? "Ingresa Aquí" : "Empieza Aquí"}
         </h2>
@@ -182,11 +186,14 @@ export default function AuthPage() {
             {isLogin ? "Iniciar Sesión" : "Registrarse"}
           </button>
         </form>
-        <button onClick={() => setShowChangePasswordTab(true)} className="mt-4 text-blue-500 hover:underline">
+        <button
+          onClick={() => setShowChangePasswordTab(true)}
+          className="mt-4 text-blue-500 hover:underline"
+        >
           ¿Olvidaste tu contraseña?
         </button>
       </div>
-      <FloatingTab 
+      <FloatingTab
         isOpen={showTab}
         onClose={() => setShowTab(false)}
         onConfirm={handleRegister}
@@ -198,7 +205,7 @@ export default function AuthPage() {
         onClose={() => setShowChangePasswordTab(false)}
         onConfirm={handleRequestPasswordChange}
         title="Cambio de Contraseña"
-        message={(
+        message={
           <>
             <div className="-mt-1">
               <label htmlFor="dniInput">Ingresa tu DNI:</label>
@@ -212,8 +219,8 @@ export default function AuthPage() {
               />
             </div>
           </>
-        )}
-        />
+        }
+      />
     </div>
   );
 }
