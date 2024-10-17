@@ -46,11 +46,44 @@ export default function AuthPage() {
     //    Informar del error
   };
   const handleRegister = async () => {
-    // Si va todo bien:
-    //    Informar sobre que debe confirmar su correo
-    //    Mostrar el login
-    // Si algo falla:
-    //    Informar del error
+    try {
+      const { response, json } = await fetchJSON({
+        url: `${BACKEND_SERVER}/auth/create-user`,
+        method: "POST",
+        body: {
+          dni: formData.dni,
+          names: formData.names,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          password: formData.password,
+        },
+      });
+  
+      console.log("Response status:", response.status); // Para depuración
+
+    // Manejo de respuesta vacía
+    if (response.status === 204) {
+      toast.success("Registro exitoso. Por favor, confirma tu correo electrónico.");
+    } else if (response.ok || response.status === 201) {
+      // Solo intenta analizar json si hay contenido
+      if (json) {
+        toast.success("Registro exitoso. Por favor, confirma tu correo electrónico.");
+      } else {
+        toast.success("Registro exitoso. Por favor, confirma tu correo electrónico.");
+      }
+    } else {
+      if (response.status === 409) {
+        toast.error("El usuario ya existe. Por favor, intenta con otro DNI o correo electrónico.");
+      } else {
+        console.log("Error details:", json);
+        toast.error("Error en el registro. Por favor, intenta de nuevo.");
+      }
+    }
+  } catch (error) {
+    console.error("Error en el registro:", error);
+    toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
+  }
   };
 
   const handleRequestPasswordChange = () => {
