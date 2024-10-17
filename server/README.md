@@ -85,7 +85,7 @@ Ejecuta el siguiente comando para crear las migraciones:
 npx prisma migrate dev --name Initial
 ```
 
-## Ejecución de la Aplicación
+## Ejecución de la Aplicación   
 
 Para ejecutar la aplicación en modo de desarrollo, utiliza el siguiente comando:
 

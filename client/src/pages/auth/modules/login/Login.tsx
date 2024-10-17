@@ -21,7 +21,7 @@ export default function AuthPage() {
     password: "",
   });
   const [dniForChange, setDniForChange] = useState(""); // Estado para el DNI en el FloatingTab
-  const [newPassword, setNewPassword] = useState(""); // Estado para la nueva contraseña
+  //const [newPassword, setNewPassword] = useState(""); // Estado para la nueva contraseña
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,6 +136,7 @@ export default function AuthPage() {
             label="DNI"
             placeholder="Ingresa tu número de DNI"
           />
+          
           {!isLogin && (
             <>
               <BaseInput
@@ -183,15 +184,17 @@ export default function AuthPage() {
             type="submit"
             className="w-full bg-yellow-500 text-black font-bold py-1 rounded-full hover:bg-yellow-600 transition duration-300"
           >
-            {isLogin ? "Iniciar Sesión" : "Registrarse"}
+            {isLogin? "Iniciar Sesión" : "Registrarse"}
           </button>
         </form>
-        <button
+        {isLogin && (
+          <button
           onClick={() => setShowChangePasswordTab(true)}
-          className="mt-4 text-blue-500 hover:underline"
+          className="mt-4 ml-2 text-gray-500 hover:underline"
         >
           ¿Olvidaste tu contraseña?
         </button>
+        )}
       </div>
       <FloatingTab
         isOpen={showTab}
