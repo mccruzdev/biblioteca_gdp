@@ -161,6 +161,8 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Token inválido.' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
   confirmPasswordChange(@Body() data: ConfirmPasswordChange) {
+    console.log("hoila");
     return this.auth.confirmPasswordChange(data);
+    
   }
 }

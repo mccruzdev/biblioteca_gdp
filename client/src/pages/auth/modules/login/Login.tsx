@@ -21,7 +21,6 @@ export default function AuthPage() {
     password: "",
   });
   const [dniForChange, setDniForChange] = useState(""); // Estado para el DNI en el FloatingTab
-  //const [newPassword, setNewPassword] = useState(""); // Estado para la nueva contraseña
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
