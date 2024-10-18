@@ -1,12 +1,51 @@
 import "../login/style.sass";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import Button from "../login/components/Button";
+import { BACKEND_SERVER } from "../../../../config/api";
 
 export default function ConfirmedEmail() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  useEffect(() => {
+    const confirmEmail = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_SERVER}/auth/confirm-email`, 
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }), 
+          }
+        );
+
+        if (response.ok) {
+          setIsConfirmed(true); 
+          toast.success("¡Correo confirmado exitosamente!");
+        } else {
+          toast.error("Error al confirmar el correo. Intenta de nuevo.");
+        }
+      } catch (error) {
+        toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
+      }
+    };
+
+    if (token) {
+      confirmEmail(); 
+    } else {
+      toast.error("Token no válido. No se puede confirmar el correo.");
+    }
+  }, [token]);
 
   const handleGoToLogin = () => {
-    navigate("/");
+    navigate("/"); 
   };
 
   return (
@@ -18,13 +57,27 @@ export default function ConfirmedEmail() {
           SISTEMA DE GESTION DE LA BIBLIOTECA DE LA MUNICIPALIDAD DE GUADALUPE
         </h1>
       </div>
+
       <div className="z-10 bg-white p-6 rounded-2xl shadow-lg w-full mb-8">
-        <h2 className="text-2xl font-extrabold text-center mb-4">
-          ¡Correo Confirmado!
-        </h2>
-        <p className="text-sm text-center text-gray-600 mb-6">
-          Tu correo ha sido verificado exitosamente. Ahora puedes acceder a todos los recursos.
-        </p>
+        {isConfirmed ? (
+          <>
+            <h2 className="text-2xl font-extrabold text-center mb-4">
+              ¡Correo Confirmado!
+            </h2>
+            <p className="text-sm text-center text-gray-600 mb-6">
+              Tu correo ha sido verificado exitosamente. Ahora puedes acceder a todos los recursos.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-extrabold text-center mb-4">
+              Confirmando tu correo...
+            </h2>
+            <p className="text-sm text-center text-gray-600 mb-6">
+              Estamos verificando tu correo. Por favor, espera un momento.
+            </p>
+          </>
+        )}
         <div className="flex justify-center">
           <Button
             isLogin={true}
