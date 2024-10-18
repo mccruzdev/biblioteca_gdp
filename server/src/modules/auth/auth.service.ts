@@ -10,7 +10,7 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
 import { RefreshTokenDTO } from './dto/refresh-token.dto';
-import { PassworChangedDTO } from './dto/password-change.dto';
+import { PasswordChangedDTO } from './dto/password-change.dto';
 import { ConfirmPasswordChange } from './dto/confirm-password-change.dto';
 
 @Injectable()
@@ -122,7 +122,7 @@ export class AuthService {
     );
   }
 
-  async requestPasswordChange(user: PassworChangedDTO) {
+  async requestPasswordChange(user: PasswordChangedDTO) {
     const userRes = await this.prisma.user.findUnique({
       where: { dni: user.dni },
       select: { id: true, email: true, names: true, lastName: true },
