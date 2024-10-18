@@ -13,12 +13,12 @@ export default function AuthPage() {
   const [showTab, setShowTab] = useState(false);
   const [showChangePasswordTab, setShowChangePasswordTab] = useState(false); // Nuevo estado para el cambio de contraseña
   const [formData, setFormData] = useState({
-    dni: "",
-    names: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
+    dni: "12345678",
+    password: "MyPassword123%&",
+    email: "example@gmail.com",
+    names: "Jhon",
+    lastName: "Doe",
+    phoneNumber: "987654321",
   });
   const [dniForChange, setDniForChange] = useState(""); // Estado para el DNI en el FloatingTab
   const navigate = useNavigate();
@@ -29,14 +29,16 @@ export default function AuthPage() {
   };
 
   const handleLogin = async () => {
-    const { response, json } = await fetchJSON<{ token: string }>({
-      url: `${BACKEND_SERVER}/auth/login`,
-      method: "POST",
-      body: {
-        dni: formData.dni,
-        password: formData.password,
-      },
-    });
+    const { response, json } = await fetchJSON<{ token: string }>(
+      `${BACKEND_SERVER}/auth/login`,
+      {
+        method: "POST",
+        body: {
+          dni: formData.dni,
+          password: formData.password,
+        },
+      }
+    );
 
     if (response.ok) {
       localStorage.setItem("gdp-bm", json.token);
@@ -47,43 +49,43 @@ export default function AuthPage() {
   };
   const handleRegister = async () => {
     try {
-      const { response, json } = await fetchJSON({
-        url: `${BACKEND_SERVER}/auth/create-user`,
-        method: "POST",
-        body: {
-          dni: formData.dni,
-          names: formData.names,
-          lastName: formData.lastName,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          password: formData.password,
-        },
-      });
-  
-      console.log("Response status:", response.status); // Para depuración
+      const { response } = await fetchJSON(
+        `${BACKEND_SERVER}/auth/create-user`,
+        {
+          method: "POST",
+          json: false,
+          body: {
+            dni: formData.dni,
+            names: formData.names,
+            lastName: formData.lastName,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber,
+            password: formData.password,
+          },
+        }
+      );
 
-    // Manejo de respuesta vacía
-    if (response.status === 204) {
-      toast.success("Registro exitoso. Por favor, confirma tu correo electrónico.");
-    } else if (response.ok || response.status === 201) {
-      // Solo intenta analizar json si hay contenido
-      if (json) {
-        toast.success("Registro exitoso. Por favor, confirma tu correo electrónico.");
+      if (response.status === 204) {
+        toast.success(
+          "Registro exitoso. Por favor, confirma tu correo electrónico."
+        );
+      } else if (response.ok || response.status === 201) {
+        toast.success(
+          "Registro exitoso. Por favor, confirma tu correo electrónico."
+        );
       } else {
-        toast.success("Registro exitoso. Por favor, confirma tu correo electrónico.");
+        if (response.status === 409) {
+          toast.error(
+            "El usuario ya existe. Por favor, intenta con otro DNI o correo electrónico."
+          );
+        } else {
+          toast.error("Error en el registro. Por favor, intenta de nuevo.");
+        }
       }
-    } else {
-      if (response.status === 409) {
-        toast.error("El usuario ya existe. Por favor, intenta con otro DNI o correo electrónico.");
-      } else {
-        console.log("Error details:", json);
-        toast.error("Error en el registro. Por favor, intenta de nuevo.");
-      }
+    } catch (error) {
+      console.error("Error en el registro:", error);
+      toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
     }
-  } catch (error) {
-    console.error("Error en el registro:", error);
-    toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
-  }
   };
 
   const handleRequestPasswordChange = () => {
@@ -168,7 +170,7 @@ export default function AuthPage() {
             label="DNI"
             placeholder="Ingresa tu número de DNI"
           />
-          
+
           {!isLogin && (
             <>
               <BaseInput
@@ -216,16 +218,16 @@ export default function AuthPage() {
             type="submit"
             className="w-full bg-yellow-500 text-black font-bold py-1 rounded-full hover:bg-yellow-600 transition duration-300"
           >
-            {isLogin? "Iniciar Sesión" : "Registrarse"}
+            {isLogin ? "Iniciar Sesión" : "Registrarse"}
           </button>
         </form>
         {isLogin && (
           <button
-          onClick={() => setShowChangePasswordTab(true)}
-          className="mt-4 ml-2 text-gray-500 hover:underline"
-        >
-          ¿Olvidaste tu contraseña?
-        </button>
+            onClick={() => setShowChangePasswordTab(true)}
+            className="mt-4 ml-2 text-gray-500 hover:underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
         )}
       </div>
       <FloatingTab

@@ -10,8 +10,11 @@ export default function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/confirm-email" element={<ConfirmedEmail />} />
-          <Route path="/auth/confirm-change-password" element={<ConfirmChangePassword />} />
+          <Route path="/auth/confirm-email" element={<ConfirmedEmail />} />
+          <Route
+            path="/auth/confirm-change-password"
+            element={<ConfirmChangePassword />}
+          />
         </Routes>
         <Toaster />
       </div>
