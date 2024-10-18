@@ -13,36 +13,37 @@ export default function ConfirmedEmail() {
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   useEffect(() => {
-    const confirmEmail = async () => {
-      try {
-        const response = await fetch(
-          `${BACKEND_SERVER}/auth/confirm-email`, 
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }), 
-          }
-        );
-
-        if (response.ok) {
-          setIsConfirmed(true); 
-          toast.success("¡Correo confirmado exitosamente!");
-        } else {
-          toast.error("Error al confirmar el correo. Intenta de nuevo.");
-        }
-      } catch (error) {
-        toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
-      }
+    const confirmEmail = () => {
+      fetch(`${BACKEND_SERVER}/auth/confirm-email?token=${token}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          console.log("Response Status:", response.status);
+          return response.json().then((data) => {
+            if (response.ok) {
+              setIsConfirmed(true);
+              toast.success("¡Correo confirmado exitosamente!");
+            } else {
+              console.log("Response Data:", data);
+              toast.error("Error al confirmar el correo. Intenta de nuevo.");
+            }
+          });
+        })
+        .catch((error) => {
+          console.error("Fetch Error:", error);
+          toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
+        });
     };
 
-    if (token) {
-      confirmEmail(); 
-    } else {
+    if (token && !isConfirmed) {
+      confirmEmail();
+    } else if (!token) {
       toast.error("Token no válido. No se puede confirmar el correo.");
     }
-  }, [token]);
+  }, []);
 
   const handleGoToLogin = () => {
     navigate("/"); 

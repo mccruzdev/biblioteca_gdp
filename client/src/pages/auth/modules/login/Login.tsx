@@ -13,12 +13,12 @@ export default function AuthPage() {
   const [showTab, setShowTab] = useState(false);
   const [showChangePasswordTab, setShowChangePasswordTab] = useState(false); // Nuevo estado para el cambio de contraseña
   const [formData, setFormData] = useState({
-    dni: "12345678",
-    password: "MyPassword123%&",
-    email: "example@gmail.com",
-    names: "Jhon",
-    lastName: "Doe",
-    phoneNumber: "987654321",
+    dni: "",
+    password: "",
+    email: "",
+    names: "",
+    lastName: "",
+    phoneNumber: "",
   });
   const [dniForChange, setDniForChange] = useState(""); // Estado para el DNI en el FloatingTab
   const navigate = useNavigate();
@@ -29,24 +29,29 @@ export default function AuthPage() {
   };
 
   const handleLogin = async () => {
-    const { response, json } = await fetchJSON<{ token: string }>(
-      `${BACKEND_SERVER}/auth/login`,
-      {
-        method: "POST",
-        body: {
-          dni: formData.dni,
-          password: formData.password,
-        },
-      }
-    );
+    try {
+      const { response, json } = await fetchJSON<{ token: string }>(
+        `${BACKEND_SERVER}/auth/login`,
+        {
+          method: "POST",
+          body: {
+            dni: formData.dni,
+            password: formData.password,
+          },
+        }
+      );
 
-    if (response.ok) {
-      localStorage.setItem("gdp-bm", json.token);
-      navigate("/dashboard");
+      if (response.ok) {
+        localStorage.setItem("gdp-bm", json.token);
+        navigate("/dashboard");
+      } else {
+        toast.error("Error al iniciar sesión. Por favor, verifica tus credenciales.");
+      }
+    } catch (error) {
+      toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
     }
-    // Si algo falla:
-    //    Informar del error
   };
+
   const handleRegister = async () => {
     try {
       const { response } = await fetchJSON(
