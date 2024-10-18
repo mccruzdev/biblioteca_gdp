@@ -240,7 +240,25 @@ export default function AuthPage() {
         onClose={() => setShowTab(false)}
         onConfirm={handleRegister}
         title="Confirma tus datos"
-        message={`¿Estás seguro de que deseas registrarte con los siguientes datos?\n\nDNI: ${formData.dni}\nNombres: ${formData.names}\nApellidos: ${formData.lastName}\nCorreo Electrónico: ${formData.email}\nTeléfono: ${formData.phoneNumber}`}
+        message={
+          <>
+            <div>
+              <div className="-mb-3">
+              ¿Estás seguro de que deseas registrarte con los siguientes datos?
+              </div>
+              <br />
+              <strong>DNI:</strong> {formData.dni}
+              <br />
+              <strong>Nombres:</strong> {formData.names}
+              <br />
+              <strong>Apellidos:</strong> {formData.lastName}
+              <br />
+              <strong>Correo Electrónico:</strong> {formData.email}
+              <br />
+              <strong>Teléfono:</strong> {formData.phoneNumber}
+            </div>
+          </>
+        }
       />
       <FloatingTab
         isOpen={showChangePasswordTab}
