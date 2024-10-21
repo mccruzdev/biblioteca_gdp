@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/auth/modules/login/Login";
 
-function App() {
+export default function App() {
   return (
     <Router>
       <div className="App">
@@ -12,5 +12,3 @@ function App() {
     </Router>
   );
 }
-
-export default App;

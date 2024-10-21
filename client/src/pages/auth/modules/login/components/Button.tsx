@@ -13,7 +13,7 @@ export default function Button({
     <button
       className={`flex-1 py-1 font-bold ${rounded} ${
         isLogin ? "bg-yellow-500" : ""
-      } transition duration-300 rounded-3xl`}
+      } transition duration-300 rounded-2xl`}
       onClick={onClick}
     >
       {text}
