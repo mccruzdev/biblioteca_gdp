@@ -39,20 +39,20 @@ enum ReservationStatus {
 // Models
 
 model User {
-  id                  Int                   @id @default(autoincrement())
-  dni                 String                @unique @db.VarChar(20)
-  email               String                @unique @db.VarChar(255)
-  emailVerified       Boolean               @default(false)
-  verificationToken   String?               @unique @db.VarChar(255)
-  tokenExpiration     DateTime?
-  names               String                @db.VarChar(255)
-  lastName            String                @db.VarChar(255)
-  phoneNumber         String?               @db.VarChar(20)
-  password            String                @db.VarChar(255)
-  role                Role
-  reservations        Reservation[]
-  donations           Donation[]
-  BookConditionRecord BookConditionRecord[]
+  id                Int                   @id @default(autoincrement())
+  dni               String                @unique @db.VarChar(20)
+  email             String                @unique @db.VarChar(255)
+  emailVerified     Boolean               @default(false)
+  verificationToken String?               @unique @db.VarChar(255)
+  tokenExpiration   DateTime?
+  names             String                @db.VarChar(255)
+  lastName          String                @db.VarChar(255)
+  phoneNumber       String?               @db.VarChar(20)
+  password          String                @db.VarChar(255)
+  role              Role
+  reservations      Reservation[]
+  donations         Donation[]
+  conditionRecords  BookConditionRecord[]
 }
 
 model Location {
@@ -73,22 +73,32 @@ model BookConditionRecord {
 }
 
 model BookCategory {
-  id          Int            @id @default(autoincrement())
-  category    String         @db.VarChar(255)
-  subcategory String?        @db.VarChar(255)
-  templates   BookTemplate[]
+  id            Int               @id @default(autoincrement())
+  name          String            @db.VarChar(255)
+  subcategories BookSubCategory[]
+  templates     BookTemplate[]
+}
+
+model BookSubCategory {
+  id             Int            @id @default(autoincrement())
+  name           String         @db.VarChar(255)
+  bookCategoryId Int
+  bookCategory   BookCategory   @relation(fields: [bookCategoryId], references: [id], onDelete: Cascade)
+  templates      BookTemplate[]
 }
 
 model BookTemplate {
-  id         Int           @id @default(autoincrement())
-  title      String        @db.VarChar(255)
-  author     String?       @db.VarChar(255)
-  publisher  String?       @db.VarChar(255)
-  pages      Int?
-  code       String?       @db.VarChar(50)
-  categoryId Int?
-  category   BookCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  books      Book[]
+  id                Int              @id @default(autoincrement())
+  title             String           @db.VarChar(255)
+  author            String?          @db.VarChar(255)
+  publisher         String?          @db.VarChar(255)
+  pages             Int?
+  code              String?          @db.VarChar(50)
+  categoryId        Int?
+  category          BookCategory?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  bookSubCategoryId Int?
+  bookSubCategory   BookSubCategory? @relation(fields: [bookSubCategoryId], references: [id], onDelete: Cascade)
+  books             Book[]
 }
 
 model Book {

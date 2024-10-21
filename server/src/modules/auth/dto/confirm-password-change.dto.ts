@@ -7,7 +7,7 @@ export class ConfirmPasswordChange {
   @IsString()
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, {
     message:
-      'password must contain at least one uppercase letter, one lowercase letter, one number, one symbol, and be at least 8 characters long.',
+      'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número, un símbolo y tener al menos 8 caracteres.',
   })
   password: string;
 }
