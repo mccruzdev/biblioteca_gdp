@@ -99,13 +99,16 @@ export class AuthService {
     };
   }
 
-  async refreshToken(user: RefreshTokenDTO) {
+  async refreshRegisterToken(user: RefreshTokenDTO) {
     const token = this._getToken();
     const tokenExpiration = new Date(
       new Date().getTime() + 24 * 60 * 60 * 1000,
     );
 
     const userRes = await this._verifyUser(user.dni, user.password, false);
+
+    if (userRes.emailVerified)
+      throw new HttpException('User already confirmed', HttpStatus.CONFLICT);
 
     await this.prisma.user.update({
       data: {
@@ -154,6 +157,9 @@ export class AuthService {
   async confirmPasswordChange(data: ConfirmPasswordChange) {
     const hashedPassword = await this._hashPassword(data.password);
     const userRes = await this._getUserByToken(data.token, false);
+
+    if (!userRes.emailVerified)
+      throw new HttpException('Email not verified', HttpStatus.FORBIDDEN);
 
     await this.prisma.user.update({
       data: {

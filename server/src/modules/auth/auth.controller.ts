@@ -102,7 +102,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @ApiOperation({ summary: 'Refrescar el token de sesión' })
+  @ApiOperation({ summary: 'Refrescar el token de registro' })
   @ApiBody({
     type: RefreshTokenDTO,
     examples: {
@@ -114,10 +114,10 @@ export class AuthController {
       },
     },
   })
-  @ApiResponse({ status: 200, description: 'Token de sesión refrescado.' })
+  @ApiResponse({ status: 200, description: 'Token de registro refrescado.' })
   @ApiResponse({ status: 404, description: 'El usuario no existe.' })
   refreshToken(@Body() user: RefreshTokenDTO) {
-    return this.auth.refreshToken(user);
+    return this.auth.refreshRegisterToken(user);
   }
 
   @Post('change-password')
