@@ -11,7 +11,15 @@ const paginate: PaginateFunction = paginator({
 export class BookCategoryService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllBooks(page: number, limit: number) {
-    return paginate(this.prisma.bookTemplate, {}, { page, limit });
+  async getAllCategories(page: number, limit: number) {
+    return paginate(
+      this.prisma.bookCategory,
+      {
+        include: {
+          subcategories: true,
+        },
+      },
+      { page, limit, path: 'book-category' },
+    );
   }
 }

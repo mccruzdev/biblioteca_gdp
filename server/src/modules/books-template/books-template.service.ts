@@ -18,7 +18,11 @@ export class BooksTemplateService {
   );
 
   async getAllBooks(page: number, limit: number) {
-    return paginate(this.prisma.bookTemplate, {}, { page, limit });
+    return paginate(
+      this.prisma.bookTemplate,
+      {},
+      { page, limit, path: 'books-template' },
+    );
   }
 
   async createTemplateBook(book: BookTemplateDTO) {
