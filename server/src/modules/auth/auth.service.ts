@@ -4,7 +4,7 @@ import { join } from 'path';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UserReniec } from 'src/entities/user-reniec.entity';
+import { ApiPeruResponse, UserReniec } from 'src/entities/user-reniec.entity';
 import { NodemailerService } from 'src/providers/nodemailer/nodemailer.service';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -22,25 +22,19 @@ export class AuthService {
     private mail: NodemailerService,
   ) {}
 
-  apiKey = this.configService.get<string>('APIS_NET_PE_KEY');
+  apiKey = this.configService.get<string>('API_PERU_DEV');
 
   async getUserDataPerDNI(dni: string): Promise<UserReniec> {
     const response = await fetch(
-      `https://api.apis.net.pe/v2/reniec/dni?numero=${dni}`,
-      { headers: { Authorization: this.apiKey } },
+      `https://apiperu.dev/api/dni/${dni}?api_token=${this.apiKey}`,
     );
 
-    if (response.status === 422)
-      throw new HttpException('The DNI is invalid.', HttpStatus.BAD_REQUEST);
-    if (response.status === 404)
-      throw new HttpException('The DNI was not found.', HttpStatus.NOT_FOUND);
-    else if (!response.ok)
-      throw new HttpException(
-        'The service is unavailable.',
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
+    const json = (await response.json()) as ApiPeruResponse;
 
-    return await response.json();
+    if (!json.success)
+      throw new HttpException(json.message, HttpStatus.BAD_REQUEST);
+
+    return json.data;
   }
 
   async createReaderUser(user: CreateUserDTO) {
