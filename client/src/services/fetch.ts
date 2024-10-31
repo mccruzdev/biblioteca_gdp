@@ -1,21 +1,33 @@
-interface Request {
-  url: string;
+interface Options {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   headers?: object;
   body?: object;
+  json?: boolean;
 }
 
-export const fetchJSON = async <T>(
-  request: Request
-): Promise<{ response: Response; json: T }> => {
-  const response = await fetch(request.url, {
-    method: request.method,
+export async function fetchJSON<T>(
+  url: string,
+  options: { json: false } & Options
+): Promise<{ response: Response }>;
+
+export async function fetchJSON<T>(
+  url: string,
+  options?: Options
+): Promise<{ response: Response; json: T }>;
+
+export async function fetchJSON<T>(url: string, options?: Options) {
+  const response = await fetch(url, {
+    method: options?.method,
     headers: {
       "Content-Type": "application/json",
-      ...request.headers,
+      ...options?.headers,
     },
-    body: JSON.stringify(request.body),
+    body: JSON.stringify(options?.body),
   });
 
-  return { response, json: await response.json() };
-};
+  if (options?.json === false) {
+    return { response };
+  }
+
+  return { response, json: (await response.json()) as T };
+}
