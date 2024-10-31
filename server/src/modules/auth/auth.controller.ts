@@ -10,7 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
-import { PassworChangedDTO } from './dto/password-change.dto';
+import { PasswordChangedDTO } from './dto/password-change.dto';
 import { RefreshTokenDTO } from './dto/refresh-token.dto';
 import { ConfirmPasswordChange } from './dto/confirm-password-change.dto';
 
@@ -102,7 +102,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @ApiOperation({ summary: 'Refrescar el token de sesión' })
+  @ApiOperation({ summary: 'Refrescar el token de registro' })
   @ApiBody({
     type: RefreshTokenDTO,
     examples: {
@@ -114,16 +114,16 @@ export class AuthController {
       },
     },
   })
-  @ApiResponse({ status: 200, description: 'Token de sesión refrescado.' })
+  @ApiResponse({ status: 200, description: 'Token de registro refrescado.' })
   @ApiResponse({ status: 404, description: 'El usuario no existe.' })
   refreshToken(@Body() user: RefreshTokenDTO) {
-    return this.auth.refreshToken(user);
+    return this.auth.refreshRegisterToken(user);
   }
 
   @Post('change-password')
   @ApiOperation({ summary: 'Solicitar cambio de contraseña' })
   @ApiBody({
-    type: PassworChangedDTO,
+    type: PasswordChangedDTO,
     examples: {
       example: {
         value: {
@@ -137,7 +137,7 @@ export class AuthController {
     description: 'Solicitud de cambio de contraseña realizada.',
   })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
-  requestPasswordChange(@Body() user: PassworChangedDTO) {
+  requestPasswordChange(@Body() user: PasswordChangedDTO) {
     return this.auth.requestPasswordChange(user);
   }
 

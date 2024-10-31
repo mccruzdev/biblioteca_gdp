@@ -62,8 +62,8 @@ DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
 
 SECRET_KEY=<you-secret-key>
 
-// Generate your token: https://apis.net.pe/
-APIS_NET_PE_KEY=<your_api_token>
+// Generate your token: https://apiperu.dev/
+API_PERU_DEV=<your_api_token>
 
 // Backend Server
 BACKEND_SERVER=http://localhost:8000

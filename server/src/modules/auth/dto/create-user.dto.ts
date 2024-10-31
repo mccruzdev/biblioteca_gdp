@@ -8,40 +8,40 @@ import {
 
 export class CreateUserDTO {
   @Matches(/^\d{8}$/, {
-    message: 'DNI must have 8 numeric digits.',
+    message: 'El DNI debe tener 8 dígitos numéricos.',
   })
   dni: string;
 
   @IsString()
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, {
     message:
-      'password must contain at least one uppercase letter, one lowercase letter, one number, one symbol, and be at least 8 characters long.',
+      'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número, un símbolo y tener al menos 8 caracteres.',
   })
   password: string;
 
   @IsOptional()
-  @IsEmail({}, { message: 'email must be a valid email address.' })
+  @IsEmail({}, { message: 'El correo electrónico debe ser válido.' })
   email: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'first name cannot be empty.' })
+  @IsNotEmpty({ message: 'El nombre no puede estar vacío.' })
   @Matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, {
     message:
-      'first name can only contain letters, spaces, and accented characters.',
+      'El nombre solo puede contener letras, espacios y caracteres con acento.',
   })
   names: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'last name cannot be empty.' })
+  @IsNotEmpty({ message: 'El apellido no puede estar vacío.' })
   @Matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, {
     message:
-      'last name can only contain letters, spaces, and accented characters.',
+      'El apellido solo puede contener letras, espacios y caracteres con acento.',
   })
   lastName: string;
 
   @IsOptional()
   @Matches(/^\d{9}$/, {
-    message: 'phone number must have exactly 9 digits.',
+    message: 'El número de teléfono debe tener exactamente 9 dígitos.',
   })
   phoneNumber?: string;
 }
