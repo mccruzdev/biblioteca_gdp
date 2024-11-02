@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Search, BookOpen, Users, Settings, FolderPlus, FileText } from 'lucide-react'
+import { Search } from 'lucide-react'
+import Icon from './components/icon'
 
 interface NavItem {
   label: string
@@ -9,19 +10,32 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Catálogo de libros', href: '/catalogo', icon: BookOpen },
+  { 
+    label: 'Catálogo de libros', 
+    href: '/catalogo', 
+    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="catalog"/>
+  },
   { 
     label: 'Préstamos', 
     href: '/prestamos',
-    icon: FileText,
+    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="loan"/>,
     children: [
       { label: 'Préstamos', href: '/prestamos' },
       { label: 'Historial de Préstamos', href: '/prestamos/historial' }
     ]
   },
-  { label: 'Agregar Libros', href: '/agregar-libros', icon: FolderPlus },
-  { label: 'Usuarios', href: '/usuarios', icon: Users },
-  { label: 'Gestión', href: '/gestion', icon: Settings },
+  { label: 'Agregar Libros', 
+    href: '/agregar-libros', 
+    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="addBook"/>
+  },
+  { label: 'Usuarios', 
+    href: '/usuarios', 
+    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="user"/>
+  },
+  { label: 'Gestión', 
+    href: '/gestion', 
+    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="management"/>
+  },
 ]
 
 const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCollapsed }) => {
@@ -85,31 +99,31 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#0E0E0E]">
       <aside
-        className={`fixed left-0 z-40 h-screen transform bg-[#0E0E0E] transition-all duration-200 ease-in-out ${
+        className={`fixed left-0 z-40 h-screen transform bg-[rgba(0,0,0,0.9)] transition-all duration-200 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } ${isCollapsed ? 'w-16' : 'w-64'}`}
       >
-        <div className="flex h-16 items-center gap-4 border-b border-[#545457] px-4">
+        <div className="flex h-20 items-center gap-4 border-b border-[#545457] px-4">
           <button
             onClick={toggleSidebar}
             className="text-[#FFBC24] hover:text-[#ffca52]"
             aria-label="Toggle sidebar"
           >
-            <div className="flex h-6 w-6 flex-col justify-between">
-              <span className="h-0.5 w-full bg-current"></span>
-              <span className="h-0.5 w-full bg-current"></span>
-              <span className="h-0.5 w-full bg-current"></span>
+            <div className="flex h-6 w-8 flex-col justify-between">
+              <span className="h-1 w-full bg-current rounded"></span>
+              <span className="h-1 w-full bg-current rounded"></span>
+              <span className="h-1 w-full bg-current rounded"></span>
             </div>
           </button>
           {!isCollapsed && (
             <img
-              src="/logo-muni.png"
+              src="/logo-muni2.png"
               alt="Logo Municipalidad de Guadalupe"
-              className="h-20"
+              className="h-16"
             />
           )}
         </div>
-        <div className="flex h-[calc(100vh-4rem)] flex-col">
+        <div className="flex h-[calc(100vh-6rem)] flex-col">
           <nav className="flex-1 py-4">
             {navItems.map((item) => (
               <NavLink key={item.href} item={item} isCollapsed={isCollapsed} />
@@ -124,7 +138,7 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      <main className="ml-auto w-[calc(100%-5rem)] lg:w-[calc(100%-18rem)] pl-8">
+      <main className="ml-auto w-[calc(100%-5rem)] lg:w-[calc(100%-15rem)] pl-8">
         <header
           className="fixed top-0 right-0 z-30 flex h-16 items-center justify-between border-b border-[#2A2A2D] bg-[#0E0E0E] px-4 transition-all duration-200 ease-in-out shadow-md w-[calc(100%-5rem)] lg:w-[calc(100%-18rem)]"
         >
@@ -133,7 +147,7 @@ export default function Dashboard() {
             <input
               type="search"
               placeholder="Buscar Libro"
-              className="h-9 w-full max-w-md rounded-md bg-[#1a1a1a] pl-10 pr-4 text-sm text-[#C7C7CC] placeholder:text-[#C7C7CC] focus:outline-none border border-[#3A3A3D]"
+              className="h-9 w-full max-w-md rounded-md bg-[#1a1a1a] pl-10 pr-4 text-sm text-[#C7C7CC] placeholder:text-[#C7C7CC] focus:outline-none"
             />
           </div>
           <div className="text-sm text-[#C7C7CC] ml-4">
@@ -141,7 +155,7 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <div className="p-6 pt-24">
+        <div className="p-6 pt-20">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-white">BIBLIOTECA</h2>
             <p className="text-[#C7C7CC]">
