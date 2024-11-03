@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Search } from 'lucide-react'
-import Icon from './components/icon'
+import Icon from './components/Icon'
+import './style.sass'
 
 interface NavItem {
   label: string
@@ -13,53 +14,63 @@ const navItems: NavItem[] = [
   { 
     label: 'Catálogo de libros', 
     href: '/catalogo', 
-    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="catalog"/>
+    icon: (props) => <Icon type="catalog" {...props} />,
   },
   { 
     label: 'Préstamos', 
     href: '/prestamos',
-    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="loan"/>,
+    icon: (props) => <Icon type="loan" {...props} />,
     children: [
       { label: 'Préstamos', href: '/prestamos' },
       { label: 'Historial de Préstamos', href: '/prestamos/historial' }
     ]
   },
-  { label: 'Agregar Libros', 
+  { 
+    label: 'Agregar Libros', 
     href: '/agregar-libros', 
-    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="addBook"/>
+    icon: (props) => <Icon type="addBook" {...props} />,
   },
-  { label: 'Usuarios', 
+  { 
+    label: 'Usuarios', 
     href: '/usuarios', 
-    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="user"/>
+    icon: (props) => <Icon type="user" {...props} />,
   },
-  { label: 'Gestión', 
+  { 
+    label: 'Gestión', 
     href: '/gestion', 
-    icon: (props: React.SVGProps<SVGSVGElement>) => <Icon type="management"/>
+    icon: (props) => <Icon type="management" {...props} />,
   },
 ]
 
 const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCollapsed }) => {
   const [isOpen, setIsOpen] = useState(false)
   const Icon = item.icon
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleMouseEnter = () => setIsHovered(true)
+  const handleMouseLeave = () => setIsHovered(false)
 
   if (item.children && !isCollapsed) {
     return (
-      <div className="relative">
-        <button 
+      <div className="nav-item-with-children">
+        <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[#C7C7CC] transition-colors hover:bg-[#FFBC24] hover:text-black"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          className={`nav-item ${isOpen ? 'open' : ''}`}
+          aria-expanded={isOpen}
         >
-          <Icon className="h-4 w-4" />
-          <span className="flex-1 text-left">{item.label}</span>
-          <span className="ml-auto">{isOpen ? '▲' : '▼'}</span>
+          <Icon hovered={isHovered} className="nav-icon" />
+          <span className="nav-label">{item.label}</span>
+          <span className="nav-arrow" aria-hidden="true">{isOpen ? '▲' : '▼'}</span>
         </button>
         {isOpen && (
-          <div className="ml-4">
+          <div className="nav-children">
             {item.children.map((child) => (
               <a
                 key={child.href}
                 href={child.href}
-                className="flex w-full items-center px-3 py-2 text-sm text-[#C7C7CC] transition-colors hover:bg-[#FFBC24] hover:text-black"
+                className="nav-child-item"
               >
                 {child.label}
               </a>
@@ -73,16 +84,77 @@ const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCo
   return (
     <a
       href={item.href}
-      className={`flex w-full items-center gap-2 px-3 py-2 text-sm text-[#C7C7CC] transition-colors hover:bg-[#FFBC24] hover:text-black ${
-        isCollapsed ? 'justify-center' : ''
-      }`}
+      className={`nav-item ${isCollapsed ? 'collapsed' : ''}`}
       title={isCollapsed ? item.label : undefined}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <Icon className="h-4 w-4" />
-      {!isCollapsed && <span>{item.label}</span>}
+      <Icon hovered={isHovered} className="nav-icon" />
+      {!isCollapsed && <span className="nav-label">{item.label}</span>}
     </a>
   )
 }
+
+const Sidebar: React.FC<{
+  isSidebarOpen: boolean
+  isCollapsed: boolean
+  toggleSidebar: () => void
+}> = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => (
+  <aside className={`sidebar ${isSidebarOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className="sidebar-header">
+      <button
+        onClick={toggleSidebar}
+        className="sidebar-toggle"
+        aria-label="Toggle sidebar"
+      >
+        <div className="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+      {!isCollapsed && (
+        <img
+          src="/logo-muni2.png"
+          alt="Logo Municipalidad de Guadalupe"
+          className="sidebar-logo"
+        />
+      )}
+    </div>
+    <nav className="sidebar-nav">
+      <ul className="nav-list">
+        {navItems.map((item) => (
+          <li key={item.href}>
+            <NavLink item={item} isCollapsed={isCollapsed} />
+          </li>
+        ))}
+      </ul>
+    </nav>
+    {!isCollapsed && (
+      <div className="sidebar-footer">
+        <div className="footer-content">
+          {/* Footer content */}
+        </div>
+      </div>
+    )}
+  </aside>
+)
+
+const Header: React.FC = () => (
+  <header className="main-header">
+    <div className="search-container">
+      <Search className="search-icon" />
+      <input
+        type="search"
+        placeholder="Buscar Libro"
+        className="search-input"
+      />
+    </div>
+    <div className="user-info">
+      Alexander Miguel Chang Cruz
+    </div>
+  </header>
+)
 
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -97,81 +169,33 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0E0E0E]">
-      <aside
-        className={`fixed left-0 z-40 h-screen transform bg-[rgba(0,0,0,0.9)] transition-all duration-200 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${isCollapsed ? 'w-16' : 'w-64'}`}
-      >
-        <div className="flex h-20 items-center gap-4 border-b border-[#545457] px-4">
-          <button
-            onClick={toggleSidebar}
-            className="text-[#FFBC24] hover:text-[#ffca52]"
-            aria-label="Toggle sidebar"
-          >
-            <div className="flex h-6 w-8 flex-col justify-between">
-              <span className="h-1 w-full bg-current rounded"></span>
-              <span className="h-1 w-full bg-current rounded"></span>
-              <span className="h-1 w-full bg-current rounded"></span>
-            </div>
-          </button>
-          {!isCollapsed && (
-            <img
-              src="/logo-muni2.png"
-              alt="Logo Municipalidad de Guadalupe"
-              className="h-16"
-            />
-          )}
-        </div>
-        <div className="flex h-[calc(100vh-6rem)] flex-col">
-          <nav className="flex-1 py-4">
-            {navItems.map((item) => (
-              <NavLink key={item.href} item={item} isCollapsed={isCollapsed} />
-            ))}
-          </nav>
-          {!isCollapsed && (
-            <div className="border-t border-[#545457] p-4">
-              <div className="text-sm text-[#C7C7CC]">
-              </div>
-            </div>
-          )}
-        </div>
-      </aside>
+    <div className="dashboard">
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+      />
 
-      <main className="ml-auto w-[calc(100%-5rem)] lg:w-[calc(100%-15rem)] pl-8">
-        <header
-          className="fixed top-0 right-0 z-30 flex h-16 items-center justify-between border-b border-[#2A2A2D] bg-[#0E0E0E] px-4 transition-all duration-200 ease-in-out shadow-md w-[calc(100%-5rem)] lg:w-[calc(100%-18rem)]"
-        >
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#C7C7CC]" />
-            <input
-              type="search"
-              placeholder="Buscar Libro"
-              className="h-9 w-full max-w-md rounded-md bg-[#1a1a1a] pl-10 pr-4 text-sm text-[#C7C7CC] placeholder:text-[#C7C7CC] focus:outline-none"
-            />
-          </div>
-          <div className="text-sm text-[#C7C7CC] ml-4">
-            Alexander Miguel Chang Cruz
-          </div>
-        </header>
-
-        <div className="p-6 pt-20">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white">BIBLIOTECA</h2>
-            <p className="text-[#C7C7CC]">
+      <div className="main-content">
+        <Header />
+        <main className="content-area">
+          <section className="welcome-section">
+            <h1>BIBLIOTECA</h1>
+            <p>
               ¡Bienvenido! Explora y reserva tus libros favoritos
             </p>
-          </div>
-          <div className="h-64 rounded-lg bg-[#1a1a1a] p-4 text-[#C7C7CC]">
+          </section>
+          <section className="content-section">
             Contenido
-          </div>
-        </div>
-      </main>
+          </section>
+        </main>
+      </div>
 
       {isSidebarOpen && window.innerWidth <= 1024 && (
         <div
-          className="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"
+          className="overlay"
           onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
     </div>
