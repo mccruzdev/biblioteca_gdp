@@ -47,6 +47,10 @@ $accent-color: #FFBC24
   &.collapsed
     width: 4rem
 
+  &.mobile
+    width: 100%
+    max-width: 16rem
+
 .sidebar-header
   display: flex
   height: 5rem
@@ -56,7 +60,15 @@ $accent-color: #FFBC24
   padding: 0 1rem
 
 .sidebar-toggle
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 2.5rem
+  height: 2.5rem
   color: $accent-color
+  background-color: transparent
+  border: none
+  cursor: pointer
 
   &:hover
     color: color.adjust($accent-color, $lightness: 10%)
@@ -65,11 +77,11 @@ $accent-color: #FFBC24
   display: flex
   flex-direction: column
   justify-content: space-between
-  width: 2rem
-  height: 1.5rem
+  width: 1.5rem
+  height: 1.25rem
 
   span
-    height: 0.25rem
+    height: 0.2rem
     width: 100%
     background-color: currentColor
     border-radius: 0.125rem
@@ -146,14 +158,14 @@ $accent-color: #FFBC24
   align-items: center
   justify-content: space-between
   background-color: $primary-bg
-  padding: 0 1rem 0 3rem
+  padding: 0 1rem
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)
   
   &::after
     content: ''
     position: absolute
     bottom: 0
-    left: 3rem  
+    left: 1rem
     right: 1rem
     height: 1px
     background-color: $border-color
@@ -197,7 +209,6 @@ $accent-color: #FFBC24
 .content-area
   padding: 1.5rem
   margin-top: 4rem
-  margin-left: 2rem
 
 .welcome-section
   margin-bottom: 1.5rem
@@ -220,12 +231,27 @@ $accent-color: #FFBC24
 .overlay
   position: fixed
   inset: 0
-  z-index: 30
+  z-index: 35
   background-color: rgba(0, 0, 0, 0.5)
 
+.mobile-toggle
+  display: none
+
 @media (max-width: 1024px)
-  .sidebar
-    width: 16rem
+  .dashboard
+    &.sidebar-open
+      .main-content
+        margin-left: 16rem
+
+      .main-header
+        left: 16rem
+
+    &:not(.sidebar-open)
+      .main-content
+        margin-left: 0
+
+      .main-header
+        left: 0
 
   .main-content
     margin-left: 0
@@ -233,21 +259,42 @@ $accent-color: #FFBC24
   .main-header
     left: 0
 
+@media (max-width: 768px)
   .dashboard
-    &.sidebar-open
-      .main-content
-        margin-left: 16rem
-        transition: margin-left 0.2s ease-in-out
+    &.mobile
+      .sidebar
+        width: 100%
+        max-width: 16rem
 
-      .main-header
-        left: 16rem
-        transition: left 0.2s ease-in-out
+      &.sidebar-open
+        .main-content, .main-header
+          margin-left: 0
+          left: 0
 
-    &:not(.sidebar-open)
-      .main-content
-        margin-left: 0
-        transition: margin-left 0.2s ease-in-out
+  .mobile-toggle
+    display: flex
+    margin-right: 1rem
 
-      .main-header
-        left: 0
-        transition: left 0.2s ease-in-out
+  .main-header
+    padding: 0 1rem
+
+  .search-container
+    max-width: calc(100% - 120px)
+
+  .user-info
+    display: none
+
+  .content-area
+    margin-left: 1rem
+    margin-right: 1rem
+
+  .welcome-section
+    h1
+      font-size: 1.25rem
+
+    p
+      font-size: 0.875rem
+
+  .content-section
+    height: auto
+    min-height: 12rem

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Search, ChevronUp, ChevronDown, Gift } from 'lucide-react'
 import Icon from './components/Icon'
 import './style.sass'
@@ -112,8 +112,9 @@ const Sidebar: React.FC<{
   isSidebarOpen: boolean
   isCollapsed: boolean
   toggleSidebar: () => void
-}> = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => (
-  <aside className={`sidebar ${isSidebarOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
+  isMobile: boolean
+}> = ({ isSidebarOpen, isCollapsed, toggleSidebar, isMobile }) => (
+  <aside className={`sidebar ${isSidebarOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''} ${isMobile ? 'mobile' : ''}`}>
     <div className="sidebar-header">
       <button
         onClick={toggleSidebar}
@@ -153,8 +154,21 @@ const Sidebar: React.FC<{
   </aside>
 )
 
-const Header: React.FC = () => (
+const Header: React.FC<{ toggleSidebar: () => void, isMobile: boolean }> = ({ toggleSidebar, isMobile }) => (
   <header className="main-header">
+    {isMobile && (
+      <button
+        onClick={toggleSidebar}
+        className="sidebar-toggle mobile-toggle"
+        aria-label="Toggle sidebar"
+      >
+        <div className="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+    )}
     <div className="search-container">
       <Search className="search-icon" />
       <input
@@ -172,9 +186,32 @@ const Header: React.FC = () => (
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768
+      setIsMobile(mobile)
+      if (mobile) {
+        setIsSidebarOpen(false)
+        setIsCollapsed(false)
+      } else if (window.innerWidth <= 1024) {
+        setIsCollapsed(true)
+        setIsSidebarOpen(true)
+      } else {
+        setIsSidebarOpen(true)
+        setIsCollapsed(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    handleResize()
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const toggleSidebar = () => {
-    if (window.innerWidth <= 1024) {
+    if (isMobile) {
       setIsSidebarOpen(!isSidebarOpen)
     } else {
       setIsCollapsed(!isCollapsed)
@@ -182,15 +219,16 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`dashboard ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+    <div className={`dashboard ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''} ${isMobile ? 'mobile' : ''}`}>
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         isCollapsed={isCollapsed}
         toggleSidebar={toggleSidebar}
+        isMobile={isMobile}
       />
 
       <div className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-        <Header />
+        <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
         <main className="content-area">
           <section className="welcome-section">
             <h1>BIBLIOTECA</h1>
@@ -204,7 +242,7 @@ export default function Dashboard() {
         </main>
       </div>
 
-      {isSidebarOpen && window.innerWidth <= 1024 && (
+      {isSidebarOpen && isMobile && (
         <div
           className="overlay"
           onClick={() => setIsSidebarOpen(false)}
