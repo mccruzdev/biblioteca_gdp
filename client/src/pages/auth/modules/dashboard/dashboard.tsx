@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, ChevronUp, ChevronDown, Gift } from 'lucide-react'
 import Icon from './components/Icon'
 import './style.sass'
 
@@ -40,6 +40,15 @@ const navItems: NavItem[] = [
     href: '/gestion', 
     icon: (props) => <Icon type="management" {...props} />,
   },
+  { 
+    label: 'Donaciones', 
+    href: '/donaciones',
+    icon: Gift,
+    children: [
+      { label: 'Historial', href: '/donaciones/historial' },
+      { label: 'Libros Donados', href: '/donaciones/libros-donados' }
+    ]
+  },
 ]
 
 const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCollapsed }) => {
@@ -62,7 +71,11 @@ const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCo
         >
           <Icon hovered={isHovered} className="nav-icon" />
           <span className="nav-label">{item.label}</span>
-          <span className="nav-arrow" aria-hidden="true">{isOpen ? '▲' : '▼'}</span>
+          {isOpen ? (
+            <ChevronUp className="nav-arrow" aria-hidden="true" />
+          ) : (
+            <ChevronDown className="nav-arrow" aria-hidden="true" />
+          )}
         </button>
         {isOpen && (
           <div className="nav-children">
@@ -169,14 +182,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard">
+    <div className={`dashboard ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         isCollapsed={isCollapsed}
         toggleSidebar={toggleSidebar}
       />
 
-      <div className="main-content">
+      <div className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         <Header />
         <main className="content-area">
           <section className="welcome-section">
