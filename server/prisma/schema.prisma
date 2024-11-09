@@ -74,14 +74,14 @@ model BookConditionRecord {
 
 model BookCategory {
   id            Int               @id @default(autoincrement())
-  name          String            @db.VarChar(255)
+  name          String            @unique @db.VarChar(255)
   subcategories BookSubCategory[]
   templates     BookTemplate[]
 }
 
 model BookSubCategory {
   id             Int            @id @default(autoincrement())
-  name           String         @db.VarChar(255)
+  name           String         @unique @db.VarChar(255)
   bookCategoryId Int
   bookCategory   BookCategory   @relation(fields: [bookCategoryId], references: [id], onDelete: Cascade)
   templates      BookTemplate[]
