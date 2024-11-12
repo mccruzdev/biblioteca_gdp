@@ -32,6 +32,10 @@ export class BookTemplateDTO {
   code?: string;
 
   @IsOptional()
-  @IsInt()
-  categoryId?: number;
+  @IsString()
+  category?: string;
+
+  @IsOptional()
+  @IsString()
+  subCategory?: string;
 }

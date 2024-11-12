@@ -7,6 +7,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/roles/roles.decorator';
 
 @ApiTags('CategoryBooks')
 @ApiBearerAuth()
@@ -15,6 +16,7 @@ export class BookCategoryController {
   constructor(private readonly bookCategoryService: BookCategoryService) {}
 
   @Get()
+  @Roles('READER')
   @ApiOperation({ summary: 'Get all categories of books with pagination' })
   @ApiQuery({
     name: 'page',
