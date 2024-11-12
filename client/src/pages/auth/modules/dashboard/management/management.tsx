@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Sidebar } from './components/Sidebar'
-import { Header } from './components/Header'
+import { Sidebar } from '../components/Sidebar'
+import { Header } from '../components/Header'
 import './style.sass'
 
-export function Dashboard() {
+export default function Management() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -50,15 +50,11 @@ export function Dashboard() {
       <div className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
         <main className="content-area">
-          <section className="welcome-section">
-            <h1>BIBLIOTECA</h1>
-            <p>
-              ¡Bienvenido! Explora y reserva tus libros favoritos
-            </p>
-          </section>
-          <section className="content-section">
-            Contenido del Dashboard
-          </section>
+          <div className="management">
+            <h1>Gestión</h1>
+            <p>Esta es la página de gestión.</p>
+            {/* Add your loan page specific content here */}
+          </div>
         </main>
       </div>
 
