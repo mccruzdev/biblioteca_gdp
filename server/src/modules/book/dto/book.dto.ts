@@ -6,7 +6,7 @@ import {
   Length,
 } from 'class-validator';
 
-export class BookTemplateDTO {
+export class BookDTO {
   @IsString()
   @Length(1, 255)
   title: string;

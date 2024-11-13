@@ -110,9 +110,9 @@ model Subcategory {
 
 model Book {
   id            Int          @id @default(autoincrement())
-  isbn          String       @unique
   title         String
   pages         Int?
+  code          String?      @unique
   copies        Copy[]
   authors       Author[]
   Subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])

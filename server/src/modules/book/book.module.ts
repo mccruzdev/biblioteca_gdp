@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { BooksTemplateService } from './books-template.service';
-import { BooksTemplateController } from './books-template.controller';
+import { BooksTemplateService } from './book.service';
+import { BooksTemplateController } from './book.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from 'src/guards/roles/roles.guard';
 import { PrismaService } from 'src/providers/prisma/prisma.service';

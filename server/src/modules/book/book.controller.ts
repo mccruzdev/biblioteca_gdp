@@ -16,13 +16,13 @@ import {
   ApiTags,
   ApiParam,
 } from '@nestjs/swagger';
-import { BooksTemplateService } from './books-template.service';
+import { BooksTemplateService } from './book.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
-import { BookTemplateDTO } from './dto/book-template.dto';
+import { BookDTO } from './dto/book.dto';
 
 @ApiTags('Books')
 @ApiBearerAuth()
-@Controller('books-template')
+@Controller('book')
 export class BooksTemplateController {
   constructor(private readonly booksService: BooksTemplateService) {}
 
@@ -56,13 +56,13 @@ export class BooksTemplateController {
   @ApiResponse({
     status: 201,
     description: 'Successfully created the book template',
-    type: BookTemplateDTO,
+    type: BookDTO,
   })
   @ApiResponse({
     status: 400,
     description: 'Bad Request: Invalid data provided',
   })
-  async createTemplateBook(@Body() book: BookTemplateDTO) {
+  async createTemplateBook(@Body() book: BookDTO) {
     return this.booksService.createTemplateBook(book);
   }
 
@@ -82,10 +82,7 @@ export class BooksTemplateController {
     status: 404,
     description: 'Not Found: Book template does not exist',
   })
-  async updateTemplateBook(
-    @Param('id') id: number,
-    @Body() book: BookTemplateDTO,
-  ) {
+  async updateTemplateBook(@Param('id') id: number, @Body() book: BookDTO) {
     return this.booksService.updateTemplateBook(Number(id), book);
   }
 
