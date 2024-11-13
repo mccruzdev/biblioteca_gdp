@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -16,35 +16,38 @@ import {
   ApiTags,
   ApiParam,
 } from '@nestjs/swagger';
-import { BooksTemplateService } from './book.service';
+import { BooksService } from './book.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
 import { BookDTO } from './dto/book.dto';
 
 @ApiTags('Books')
 @ApiBearerAuth()
 @Controller('book')
-export class BooksTemplateController {
-  constructor(private readonly booksService: BooksTemplateService) {}
+export class BooksController {
+  constructor(private readonly booksService: BooksService) {}
 
   @Get()
   @Roles('READER')
-  @ApiOperation({ summary: 'Get all books with pagination' })
+  @ApiOperation({ summary: 'Get a paginated list of all books' })
   @ApiQuery({
     name: 'page',
-    required: false,
     type: Number,
-    description: 'Page number (default: 1)',
+    description: 'Page number for pagination',
+    required: false,
   })
   @ApiQuery({
     name: 'limit',
-    required: false,
     type: Number,
-    description: 'Number of books per page (default: 10)',
+    description: 'Number of results per page',
+    required: false,
   })
-  @ApiResponse({ status: 200, description: 'Successfully fetched books' })
   @ApiResponse({
-    status: 403,
-    description: 'Forbidden: Insufficient permissions',
+    status: 200,
+    description: 'Paginated list of books retrieved successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid query parameters provided',
   })
   getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.booksService.getAllBooks(Number(page), Number(limit));
@@ -52,57 +55,60 @@ export class BooksTemplateController {
 
   @Post()
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Create a new book template' })
+  @ApiOperation({ summary: 'Create a new book entry' })
   @ApiResponse({
     status: 201,
-    description: 'Successfully created the book template',
-    type: BookDTO,
+    description: 'Book created successfully',
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad Request: Invalid data provided',
+    description: 'Invalid data provided for creating the book',
   })
-  async createTemplateBook(@Body() book: BookDTO) {
-    return this.booksService.createTemplateBook(book);
+  async createBook(@Body() book: BookDTO) {
+    return this.booksService.createBook(book);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Update a book template by ID' })
+  @ApiOperation({ summary: 'Update an existing book by ID' })
   @ApiParam({
     name: 'id',
-    description: 'ID of the book template to update',
     type: Number,
+    description: 'ID of the book to update',
   })
   @ApiResponse({
     status: 200,
-    description: 'Successfully updated the book template',
+    description: 'Book updated successfully',
   })
   @ApiResponse({
     status: 404,
-    description: 'Not Found: Book template does not exist',
+    description: 'Book not found',
   })
-  async updateTemplateBook(@Param('id') id: number, @Body() book: BookDTO) {
-    return this.booksService.updateTemplateBook(Number(id), book);
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid data provided for updating the book',
+  })
+  async updateBook(@Param('id') id: number, @Body() book: BookDTO) {
+    return this.booksService.updateBook(Number(id), book);
   }
 
   @Delete(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Delete a book template by ID' })
+  @ApiOperation({ summary: 'Delete a book by ID' })
   @ApiParam({
     name: 'id',
-    description: 'ID of the book template to delete',
     type: Number,
+    description: 'ID of the book to delete',
   })
   @ApiResponse({
     status: 200,
-    description: 'Successfully deleted the book template',
+    description: 'Book deleted successfully',
   })
   @ApiResponse({
     status: 404,
-    description: 'Not Found: Book template does not exist',
+    description: 'Book not found',
   })
-  async deleteTemplateBook(@Param('id') id: number) {
-    return this.booksService.deleteTemplateBook(Number(id));
+  async deleteBook(@Param('id') id: number) {
+    return this.booksService.deleteBook(Number(id));
   }
 }

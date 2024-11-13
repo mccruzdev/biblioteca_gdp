@@ -9,7 +9,7 @@ const paginate: PaginateFunction = paginator({
 });
 
 @Injectable()
-export class BooksTemplateService {
+export class BooksService {
   constructor(private prisma: PrismaService) {}
 
   invalidDataException = new HttpException(
@@ -21,15 +21,15 @@ export class BooksTemplateService {
     return paginate(this.prisma.book, {}, { page, limit, path: 'book' });
   }
 
-  async createTemplateBook(book: BookDTO) {
-    // try {
-    //   return await this.prisma.book.create({ data: book });
-    // } catch (error) {
-    //   throw this.invalidDataException;
-    // }
+  async createBook(book: BookDTO) {
+    try {
+    } catch (error) {
+      console.error('Error creating book:', error);
+      throw this.invalidDataException;
+    }
   }
 
-  async updateTemplateBook(id: number, book: BookDTO) {
+  async updateBook(id: number, book: BookDTO) {
     // try {
     //   const updatedBook = await this.prisma.book.update({
     //     where: { id },
@@ -43,7 +43,7 @@ export class BooksTemplateService {
     // }
   }
 
-  async deleteTemplateBook(id: number) {
+  async deleteBook(id: number) {
     // try {
     //   const result = await this.prisma.book.deleteMany({
     //     where: { id },
