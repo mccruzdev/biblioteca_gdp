@@ -16,125 +16,141 @@ enum Role {
 }
 
 enum BookCondition {
+  NEW
   GOOD
+  FAIR
+  DAMAGED
   BAD
 }
 
-enum BookStatus {
-  AVAILABLE
-  RESERVED
-}
-
-enum DonationDirection {
-  YES
-  NO
+enum LoanStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+  CANCELLED
 }
 
 enum ReservationStatus {
   PENDING
   PICKED_UP
   CANCELED
+  EXPIRED
 }
 
-// Models
-
-model User {
-  id                Int                   @id @default(autoincrement())
-  dni               String                @unique @db.VarChar(20)
-  email             String                @unique @db.VarChar(255)
-  emailVerified     Boolean               @default(false)
-  verificationToken String?               @unique @db.VarChar(255)
-  tokenExpiration   DateTime?
-  names             String                @db.VarChar(255)
-  lastName          String                @db.VarChar(255)
-  phoneNumber       String?               @db.VarChar(20)
-  password          String                @db.VarChar(255)
-  role              Role
-  reservations      Reservation[]
-  donations         Donation[]
-  conditionRecords  BookConditionRecord[]
+model Copy {
+  id           Int           @id @default(autoincrement())
+  condition    BookCondition
+  reservations Reservation[]
+  loans        Loan[]
+  Location     Location?     @relation(fields: [locationId], references: [id])
+  locationId   Int?
+  Publisher    Publisher?    @relation(fields: [publisherId], references: [id])
+  publisherId  Int?
+  Donation     Donation?     @relation(fields: [donationId], references: [id])
+  donationId   Int?
+  Book         Book?         @relation(fields: [bookId], references: [id])
+  bookId       Int?
 }
 
 model Location {
   id         Int     @id @default(autoincrement())
-  shelf      String  @db.VarChar(255)
+  shelf      String  @unique @db.VarChar(255)
   shelfColor String? @db.VarChar(50)
   shelfLevel Int?
-  books      Book[]
+  copies     Copy[]
 }
 
-model BookConditionRecord {
-  id               Int               @id @default(autoincrement())
-  condition        BookCondition
-  isDecommissioned DonationDirection
-  userId           Int?
-  user             User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  books            Book[]
-}
-
-model BookCategory {
-  id            Int               @id @default(autoincrement())
-  name          String            @db.VarChar(255)
-  subcategories BookSubCategory[]
-  templates     BookTemplate[]
-}
-
-model BookSubCategory {
-  id             Int            @id @default(autoincrement())
-  name           String         @db.VarChar(255)
-  bookCategoryId Int
-  bookCategory   BookCategory   @relation(fields: [bookCategoryId], references: [id], onDelete: Cascade)
-  templates      BookTemplate[]
-}
-
-model BookTemplate {
-  id                Int              @id @default(autoincrement())
-  title             String           @db.VarChar(255)
-  author            String?          @db.VarChar(255)
-  publisher         String?          @db.VarChar(255)
-  pages             Int?
-  code              String?          @db.VarChar(50)
-  categoryId        Int?
-  category          BookCategory?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  bookSubCategoryId Int?
-  bookSubCategory   BookSubCategory? @relation(fields: [bookSubCategoryId], references: [id], onDelete: Cascade)
-  books             Book[]
-}
-
-model Book {
-  id           Int                  @id @default(autoincrement())
-  templateId   Int
-  template     BookTemplate         @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  status       BookStatus
-  locationId   Int?
-  location     Location?            @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  conditionId  Int?
-  condition    BookConditionRecord? @relation(fields: [conditionId], references: [id], onDelete: Cascade)
-  stock        Int?
-  donations    Donation[]
-  reservations Reservation[]
-}
-
-model Reservation {
-  id                Int               @id @default(autoincrement())
-  reservationDate   DateTime
-  pickupDeadline    DateTime?
-  reservationStatus ReservationStatus
-  bookId            Int
-  book              Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  loanDate          DateTime?
-  returnDate        DateTime?
-  userId            Int?
-  user              User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Publisher {
+  id          Int     @id @default(autoincrement())
+  name        String
+  email       String  @unique @db.VarChar(255)
+  country     String?
+  address     String?
+  phoneNumber String? @unique
+  website     String? @unique
+  copies      Copy[]
 }
 
 model Donation {
-  id          Int               @id @default(autoincrement())
-  date        DateTime
-  donorEntity String            @db.VarChar(255)
-  bookId      Int
-  book        Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  userId      Int?
-  user        User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  toLibrary   DonationDirection
+  id          Int      @id @default(autoincrement())
+  date        DateTime @default(now())
+  description String?
+  copies      Copy[]
+  Donor       Donor?   @relation(fields: [donorId], references: [id])
+  donorId     Int?
+}
+
+model Donor {
+  id       Int        @id @default(autoincrement())
+  name     String
+  email    String     @unique @db.VarChar(255)
+  donation Donation[]
+}
+
+model Author {
+  id    Int     @id @default(autoincrement())
+  name  String
+  email String? @unique @db.VarChar(255)
+  books Book[]
+}
+
+model Category {
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  books      Book[]
+  Category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+}
+
+model Book {
+  id            Int          @id @default(autoincrement())
+  isbn          String       @unique
+  title         String
+  pages         Int?
+  copies        Copy[]
+  authors       Author[]
+  Subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategoryId Int?
+}
+
+model Reservation {
+  id      Int               @id @default(autoincrement())
+  created DateTime          @default(now())
+  dueDate DateTime
+  status  ReservationStatus
+  copies  Copy[]
+  User    User?             @relation(fields: [userId], references: [id])
+  userId  Int?
+}
+
+model Loan {
+  id       Int        @id @default(autoincrement())
+  loanDate DateTime   @default(now())
+  dueDate  DateTime
+  status   LoanStatus
+  copies   Copy[]
+  User     User?      @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model User {
+  id                Int           @id @default(autoincrement())
+  dni               String        @unique @db.VarChar(9)
+  names             String
+  lastName          String
+  phoneNumber       String        @unique @db.VarChar(9)
+  password          String
+  role              Role
+  email             String        @unique @db.VarChar(255)
+  emailVerified     Boolean       @default(false)
+  verificationToken String?       @unique
+  tokenExpiration   DateTime?
+  loans             Loan[]
+  reservations      Reservation[]
 }
