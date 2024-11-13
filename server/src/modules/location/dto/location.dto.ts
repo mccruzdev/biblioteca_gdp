@@ -17,5 +17,5 @@ export class LocationDTO {
   @IsOptional()
   @IsInt({ message: 'The shelfLevel field must be an integer.' })
   @Min(0, { message: 'The shelfLevel field cannot be negative.' })
-  shelfLevel?: number;
+  shelfLevel?: string;
 }

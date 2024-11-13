@@ -13,7 +13,7 @@ export class BookCategoryService {
 
   async getAllCategories(page: number, limit: number) {
     return paginate(
-      this.prisma.bookCategory,
+      this.prisma.category,
       {
         include: {
           subcategories: true,
