@@ -39,6 +39,7 @@ enum ReservationStatus {
 
 model Copy {
   id           Int           @id @default(autoincrement())
+  code         String?       @unique
   condition    BookCondition
   reservations Reservation[]
   loans        Loan[]
@@ -54,16 +55,16 @@ model Copy {
 
 model Location {
   id         Int     @id @default(autoincrement())
-  shelf      String  @unique @db.VarChar(255)
+  shelf      String  @db.VarChar(255)
   shelfColor String? @db.VarChar(50)
-  shelfLevel Int?
+  shelfLevel String?
   copies     Copy[]
 }
 
 model Publisher {
   id          Int     @id @default(autoincrement())
   name        String
-  email       String  @unique @db.VarChar(255)
+  email       String? @unique @db.VarChar(255)
   country     String?
   address     String?
   phoneNumber String? @unique
@@ -112,7 +113,6 @@ model Book {
   id            Int          @id @default(autoincrement())
   title         String
   pages         Int?
-  code          String?      @unique
   copies        Copy[]
   authors       Author[]
   Subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
