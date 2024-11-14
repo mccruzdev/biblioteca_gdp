@@ -18,7 +18,44 @@ export class BooksService {
   );
 
   async getAllBooks(page: number, limit: number) {
-    return paginate(this.prisma.book, {}, { page, limit, path: 'book' });
+    const transformBookData = (books: any) => {
+      return books.map((book: any) => ({
+        id: book.id,
+        title: book.title,
+        pages: book.pages,
+        authors: book.authors.map((author: any) => ({
+          id: author.id,
+          name: author.name,
+          email: author.email,
+        })),
+        subcategory: book.Subcategory?.name || null,
+        category: book.Subcategory?.Category?.name || null,
+      }));
+    };
+
+    return await paginate(
+      this.prisma.book,
+      {
+        select: {
+          id: true,
+          title: true,
+          pages: true,
+          authors: true,
+          Subcategory: {
+            select: {
+              name: true,
+              Category: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      { page, path: 'books', limit },
+      transformBookData,
+    );
   }
 
   async createBook(book: BookDTO) {
