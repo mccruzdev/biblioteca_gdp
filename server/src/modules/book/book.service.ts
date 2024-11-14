@@ -23,6 +23,73 @@ export class BooksService {
 
   async createBook(book: BookDTO) {
     try {
+      const data = {
+        title: book.title,
+        pages: book.pages,
+        categoryId: null,
+        subcategoryId: null,
+        authors: [] as { id: number; name: string; email: string | null }[],
+      };
+
+      if (book.category) {
+        const category = await this.prisma.category.upsert({
+          where: { name: book.category },
+          update: {},
+          create: { name: book.category },
+        });
+        data.categoryId = category.id;
+
+        if (book.subcategory) {
+          const subcategory = await this.prisma.subcategory.upsert({
+            where: { name: book.subcategory, categoryId: data.categoryId },
+            update: {},
+            create: { name: book.subcategory, categoryId: category.id },
+          });
+          data.subcategoryId = subcategory.id;
+        }
+      }
+
+      const authorNames = book.authors.map((author) => author.name);
+      const existingAuthors = await this.prisma.author.findMany({
+        where: { name: { in: authorNames } },
+      });
+      const existingAuthorNames = existingAuthors.map((author) => author.name);
+
+      const newAuthorsData = book.authors
+        .filter((author) => !existingAuthorNames.includes(author.name))
+        .map((author) => ({
+          name: author.name,
+          email: author.email ?? null,
+        }));
+
+      if (newAuthorsData.length > 0) {
+        await this.prisma.author.createMany({
+          data: newAuthorsData,
+        });
+
+        const newAuthors = await this.prisma.author.findMany({
+          where: { name: { in: newAuthorsData.map((a) => a.name) } },
+        });
+        data.authors.push(...newAuthors);
+      }
+
+      data.authors.push(...existingAuthors);
+
+      await this.prisma.book.create({
+        data: {
+          title: data.title,
+          pages: data.pages,
+          subcategoryId: data.subcategoryId,
+          authors: {
+            connectOrCreate: data.authors.map((author) => {
+              return {
+                where: { id: author.id },
+                create: { name: author.name, email: author.email },
+              };
+            }),
+          },
+        },
+      });
     } catch (error) {
       console.error('Error creating book:', error);
       throw this.invalidDataException;
