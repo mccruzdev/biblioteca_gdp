@@ -31,6 +31,7 @@ export class BooksService {
         authors: [] as { id: number; name: string; email: string | null }[],
       };
 
+      // Create category and subcategory if not exist and is provided
       if (book.category) {
         const category = await this.prisma.category.upsert({
           where: { name: book.category },
@@ -49,32 +50,36 @@ export class BooksService {
         }
       }
 
-      const authorNames = book.authors.map((author) => author.name);
-      const existingAuthors = await this.prisma.author.findMany({
-        where: { name: { in: authorNames } },
-      });
-      const existingAuthorNames = existingAuthors.map((author) => author.name);
-
-      const newAuthorsData = book.authors
-        .filter((author) => !existingAuthorNames.includes(author.name))
-        .map((author) => ({
-          name: author.name,
-          email: author.email ?? null,
-        }));
-
-      if (newAuthorsData.length > 0) {
-        await this.prisma.author.createMany({
-          data: newAuthorsData,
+      // Create authors if not exist and is provided
+      if (book.authors) {
+        const authorNames = book.authors.map((author) => author.name);
+        const existingAuthors = await this.prisma.author.findMany({
+          where: { name: { in: authorNames } },
         });
+        const existingAuthorNames = existingAuthors.map(
+          (author) => author.name,
+        );
 
-        const newAuthors = await this.prisma.author.findMany({
-          where: { name: { in: newAuthorsData.map((a) => a.name) } },
-        });
-        data.authors.push(...newAuthors);
+        const newAuthorsData = book.authors
+          .filter((author) => !existingAuthorNames.includes(author.name))
+          .map((author) => ({
+            name: author.name,
+            email: author.email ?? null,
+          }));
+
+        if (newAuthorsData.length > 0) {
+          await this.prisma.author.createMany({ data: newAuthorsData });
+
+          const newAuthors = await this.prisma.author.findMany({
+            where: { name: { in: newAuthorsData.map((a) => a.name) } },
+          });
+          data.authors.push(...newAuthors);
+        }
+
+        data.authors.push(...existingAuthors);
       }
 
-      data.authors.push(...existingAuthors);
-
+      // Create book
       await this.prisma.book.create({
         data: {
           title: data.title,
@@ -91,7 +96,6 @@ export class BooksService {
         },
       });
     } catch (error) {
-      console.error('Error creating book:', error);
       throw this.invalidDataException;
     }
   }
@@ -111,15 +115,11 @@ export class BooksService {
   }
 
   async deleteBook(id: number) {
-    // try {
-    //   const result = await this.prisma.book.deleteMany({
-    //     where: { id },
-    //   });
-    //   if (result.count === 0)
-    //     throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
-    //   return { message: 'Book successfully deleted' };
-    // } catch (error) {
-    //   throw this.invalidDataException;
-    // }
+    try {
+      await this.prisma.book.delete({ where: { id } });
+      return { message: 'Book successfully deleted' };
+    } catch (error) {
+      throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+    }
   }
 }
