@@ -35,7 +35,7 @@ export class BookDTO {
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => Author)
-  authors: Author[];
+  authors?: Author[];
 
   @IsOptional()
   @IsString()

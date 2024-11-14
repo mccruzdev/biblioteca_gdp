@@ -18,12 +18,18 @@ export type PaginateFunction = <T, K>(
   model: any,
   args?: K,
   options?: PaginateOptions,
+  transformData?: (books: any) => any,
 ) => Promise<PaginatedResult<T>>;
 
 export const paginator = (
   defaultOptions: PaginateOptions,
 ): PaginateFunction => {
-  return async (model, args: any = { where: undefined }, options) => {
+  return async (
+    model,
+    args: any = { where: undefined },
+    options,
+    transformData?: (books: any) => any,
+  ) => {
     const page = Number(options?.page || defaultOptions?.page) || 1;
     const limit = Number(options?.limit || defaultOptions?.limit) || 10;
 
@@ -36,8 +42,11 @@ export const paginator = (
         skip,
       }),
     ]);
+
     const lastPage = Math.ceil(total / limit);
     const baseUrl = `${process.env.BACKEND_SERVER}/${options.path}`;
+
+    const transformedData = transformData ? transformData(data) : data;
 
     return {
       total,
@@ -47,7 +56,7 @@ export const paginator = (
       prev: page > 1 ? `${baseUrl}?page=${page - 1}&limit=${limit}` : null,
       next:
         page < lastPage ? `${baseUrl}?page=${page + 1}&limit=${limit}` : null,
-      data,
+      data: transformedData,
     };
   };
 };

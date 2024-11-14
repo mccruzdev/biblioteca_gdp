@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -68,7 +68,7 @@ export class BooksController {
     return this.booksService.createBook(book);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Update an existing book by ID' })
   @ApiParam({
