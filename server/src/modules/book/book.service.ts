@@ -31,55 +31,13 @@ export class BooksService {
         authors: [] as { id: number; name: string; email: string | null }[],
       };
 
-      // Create category and subcategory if not exist and is provided
-      if (book.category) {
-        const category = await this.prisma.category.upsert({
-          where: { name: book.category },
-          update: {},
-          create: { name: book.category },
-        });
-        data.categoryId = category.id;
+      const { categoryId, subcategoryId } =
+        await this._createOrUpdateCategoryAndSubcategory(book);
+      data.categoryId = categoryId;
+      data.subcategoryId = subcategoryId;
 
-        if (book.subcategory) {
-          const subcategory = await this.prisma.subcategory.upsert({
-            where: { name: book.subcategory, categoryId: data.categoryId },
-            update: {},
-            create: { name: book.subcategory, categoryId: category.id },
-          });
-          data.subcategoryId = subcategory.id;
-        }
-      }
+      data.authors = await this._createOrUpdateAuthors(book);
 
-      // Create authors if not exist and is provided
-      if (book.authors) {
-        const authorNames = book.authors.map((author) => author.name);
-        const existingAuthors = await this.prisma.author.findMany({
-          where: { name: { in: authorNames } },
-        });
-        const existingAuthorNames = existingAuthors.map(
-          (author) => author.name,
-        );
-
-        const newAuthorsData = book.authors
-          .filter((author) => !existingAuthorNames.includes(author.name))
-          .map((author) => ({
-            name: author.name,
-            email: author.email ?? null,
-          }));
-
-        if (newAuthorsData.length > 0) {
-          await this.prisma.author.createMany({ data: newAuthorsData });
-
-          const newAuthors = await this.prisma.author.findMany({
-            where: { name: { in: newAuthorsData.map((a) => a.name) } },
-          });
-          data.authors.push(...newAuthors);
-        }
-
-        data.authors.push(...existingAuthors);
-      }
-
-      // Create book
       await this.prisma.book.create({
         data: {
           title: data.title,
@@ -101,17 +59,44 @@ export class BooksService {
   }
 
   async updateBook(id: number, book: BookDTO) {
-    // try {
-    //   const updatedBook = await this.prisma.book.update({
-    //     where: { id },
-    //     data: book,
-    //   });
-    //   if (!updatedBook)
-    //     throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
-    //   return updatedBook;
-    // } catch (error) {
-    //   throw this.invalidDataException;
-    // }
+    try {
+      const data: {
+        title: string;
+        pages: number;
+        categoryId: null | number;
+        subcategoryId: null | number;
+        authors: { id: number; name: string; email: string | null }[];
+      } = {
+        title: book.title,
+        pages: book.pages,
+        categoryId: null,
+        subcategoryId: null,
+        authors: [],
+      };
+
+      const { categoryId, subcategoryId } =
+        await this._createOrUpdateCategoryAndSubcategory(book);
+      data.categoryId = categoryId;
+      data.subcategoryId = subcategoryId;
+
+      data.authors = await this._createOrUpdateAuthors(book);
+
+      await this.prisma.book.update({
+        where: { id },
+        data: {
+          title: data.title,
+          pages: data.pages,
+          subcategoryId: data.subcategoryId,
+          authors: {
+            set: data.authors.map((author) => ({
+              id: author.id,
+            })),
+          },
+        },
+      });
+    } catch (error) {
+      throw this.invalidDataException;
+    }
   }
 
   async deleteBook(id: number) {
@@ -121,5 +106,67 @@ export class BooksService {
     } catch (error) {
       throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
     }
+  }
+
+  // Create category and subcategory if not exist and is provided
+  async _createOrUpdateCategoryAndSubcategory(book: BookDTO): Promise<{
+    categoryId: null | number;
+    subcategoryId: null | number;
+  }> {
+    let data = {
+      categoryId: null,
+      subcategoryId: null,
+    };
+
+    if (book.category) {
+      const category = await this.prisma.category.upsert({
+        where: { name: book.category },
+        update: {},
+        create: { name: book.category },
+      });
+      data.categoryId = category.id;
+
+      if (book.subcategory) {
+        const subcategory = await this.prisma.subcategory.upsert({
+          where: { name: book.subcategory, categoryId: data.categoryId },
+          update: {},
+          create: { name: book.subcategory, categoryId: category.id },
+        });
+        data.subcategoryId = subcategory.id;
+      }
+    }
+
+    return data;
+  }
+
+  // Actualizar o crear autores si se proporciona
+  async _createOrUpdateAuthors(book: BookDTO) {
+    let authors: { id: number; name: string; email: string | null }[] = [];
+
+    if (book.authors) {
+      const authorNames = book.authors.map((author) => author.name);
+      const existingAuthors = await this.prisma.author.findMany({
+        where: { name: { in: authorNames } },
+      });
+      const existingAuthorNames = existingAuthors.map((author) => author.name);
+
+      const newAuthorsData = book.authors
+        .filter((author) => !existingAuthorNames.includes(author.name))
+        .map((author) => ({
+          name: author.name,
+          email: author.email ?? null,
+        }));
+
+      if (newAuthorsData.length > 0) {
+        await this.prisma.author.createMany({ data: newAuthorsData });
+        const newAuthors = await this.prisma.author.findMany({
+          where: { name: { in: newAuthorsData.map((a) => a.name) } },
+        });
+        authors.push(...newAuthors);
+      }
+      authors.push(...existingAuthors);
+    }
+
+    return authors;
   }
 }
