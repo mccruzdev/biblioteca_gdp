@@ -34,3 +34,17 @@ export enum ReservationStatusE {
   PICKED_UP = 'PICKED_UP',
   CANCELED = 'CANCELED',
 }
+
+export interface Author {
+  id: number;
+  name: string;
+  email?: string | null;
+}
+
+export interface ParseBook {
+  id: number;
+  title: string;
+  pages?: number;
+  authors?: Author[];
+  Subcategory?: any | null;
+}

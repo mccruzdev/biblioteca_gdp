@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { BookDTO } from './dto/book.dto';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
+import { Author, ParseBook } from 'src/types';
 
 const paginate: PaginateFunction = paginator({
   path: 'book',
@@ -17,45 +18,44 @@ export class BooksService {
     HttpStatus.BAD_REQUEST,
   );
 
+  customSelect = {
+    id: true,
+    title: true,
+    pages: true,
+    authors: true,
+    Subcategory: {
+      select: {
+        name: true,
+        Category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    },
+  };
+
   async getAllBooks(page: number, limit: number) {
-    const transformBookData = (books: any) => {
-      return books.map((book: any) => ({
-        id: book.id,
-        title: book.title,
-        pages: book.pages,
-        authors: book.authors.map((author: any) => ({
-          id: author.id,
-          name: author.name,
-          email: author.email,
-        })),
-        subcategory: book.Subcategory?.name || null,
-        category: book.Subcategory?.Category?.name || null,
-      }));
+    const transformBookData = (books: ParseBook[]) => {
+      return books.map((book: any) => this._getParseBook(book));
     };
 
     return await paginate(
       this.prisma.book,
-      {
-        select: {
-          id: true,
-          title: true,
-          pages: true,
-          authors: true,
-          Subcategory: {
-            select: {
-              name: true,
-              Category: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      { page, path: 'books', limit },
+      { select: this.customSelect },
+      { page, path: 'book', limit },
       transformBookData,
     );
+  }
+
+  async getBookById(id: number) {
+    const book = await this.prisma.book.findUnique({
+      where: { id },
+      select: this.customSelect,
+    });
+
+    if (!book) throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
+    return book;
   }
 
   async createBook(book: BookDTO) {
@@ -65,7 +65,7 @@ export class BooksService {
         pages: book.pages,
         categoryId: null,
         subcategoryId: null,
-        authors: [] as { id: number; name: string; email: string | null }[],
+        authors: [] as Author[],
       };
 
       const { categoryId, subcategoryId } =
@@ -102,7 +102,7 @@ export class BooksService {
         pages: number;
         categoryId: null | number;
         subcategoryId: null | number;
-        authors: { id: number; name: string; email: string | null }[];
+        authors: Author[];
       } = {
         title: book.title,
         pages: book.pages,
@@ -178,7 +178,7 @@ export class BooksService {
 
   // Actualizar o crear autores si se proporciona
   async _createOrUpdateAuthors(book: BookDTO) {
-    let authors: { id: number; name: string; email: string | null }[] = [];
+    let authors: Author[] = [];
 
     if (book.authors) {
       const authorNames = book.authors.map((author) => author.name);
@@ -205,5 +205,20 @@ export class BooksService {
     }
 
     return authors;
+  }
+
+  async _getParseBook(book: ParseBook) {
+    return {
+      id: book.id,
+      title: book.title,
+      pages: book.pages,
+      authors: book.authors.map((author: any) => ({
+        id: author.id,
+        name: author.name,
+        email: author.email,
+      })),
+      subcategory: book.Subcategory?.name || null,
+      category: book.Subcategory?.Category?.name || null,
+    };
   }
 }
