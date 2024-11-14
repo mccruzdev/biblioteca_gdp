@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -49,8 +50,35 @@ export class BooksController {
     status: 400,
     description: 'Invalid query parameters provided',
   })
-  getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
+  getAllBooks(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
     return this.booksService.getAllBooks(Number(page), Number(limit));
+  }
+
+  @Get(':id')
+  @Roles('READER')
+  @ApiOperation({ summary: 'Get book by ID' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID of the book to get',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Book retrieved successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Book not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid data provided for retrieving the book',
+  })
+  getBookById(@Param('id', ParseIntPipe) id: number) {
+    return this.booksService.getBookById(id);
   }
 
   @Post()
@@ -88,8 +116,11 @@ export class BooksController {
     status: 400,
     description: 'Invalid data provided for updating the book',
   })
-  async updateBook(@Param('id') id: number, @Body() book: BookDTO) {
-    return this.booksService.updateBook(Number(id), book);
+  async updateBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() book: BookDTO,
+  ) {
+    return this.booksService.updateBook(id, book);
   }
 
   @Delete(':id')
@@ -108,7 +139,7 @@ export class BooksController {
     status: 404,
     description: 'Book not found',
   })
-  async deleteBook(@Param('id') id: number) {
-    return this.booksService.deleteBook(Number(id));
+  async deleteBook(@Param('id', ParseIntPipe) id: number) {
+    return this.booksService.deleteBook(id);
   }
 }
