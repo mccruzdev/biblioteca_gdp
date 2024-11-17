@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiQuery,
   ApiBearerAuth,
+  ApiBody,
 } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/roles/roles.decorator';
 import { LocationService } from './location.service';
@@ -27,20 +28,23 @@ export class LocationController {
 
   @Get()
   @Roles('READER')
-  @ApiOperation({ summary: 'Get all locations with pagination' })
+  @ApiOperation({ summary: 'Obtener todas las locaciones con paginación' })
   @ApiQuery({
     name: 'page',
     required: false,
     type: Number,
-    description: 'Page number for pagination',
+    description: 'Número de la página',
   })
   @ApiQuery({
     name: 'limit',
     required: false,
     type: Number,
-    description: 'Limit of locations per page',
+    description: 'Resultados por página',
   })
-  @ApiResponse({ status: 200, description: 'Successfully fetched locations' })
+  @ApiResponse({
+    status: 200,
+    description: 'Locaciones devueltas correctamente',
+  })
   @ApiResponse({
     status: 403,
     description:
@@ -52,11 +56,28 @@ export class LocationController {
 
   @Post()
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Create a new location' })
-  @ApiResponse({ status: 201, description: 'Successfully created location' })
+  @ApiOperation({ summary: 'Crear una nueva locación' })
+  @ApiBody({
+    type: LocationDTO,
+    examples: {
+      example: {
+        value: {
+          shelf: 'Estante Superior',
+          shelfColor: 'Rojo',
+          shelfLevel: 'N° 1',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Locación creada correctamente' })
   @ApiResponse({
     status: 400,
-    description: 'Bad Request: Invalid data provided',
+    description: 'Datos invalidos',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
   })
   createLocation(@Body() location: LocationDTO) {
     return this.locationService.createLocation(location);
@@ -64,15 +85,35 @@ export class LocationController {
 
   @Put(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Update a location by ID' })
-  @ApiResponse({ status: 200, description: 'Successfully updated location' })
+  @ApiOperation({ summary: 'Actualizar una locación por ID' })
+  @ApiBody({
+    type: LocationDTO,
+    examples: {
+      example: {
+        value: {
+          shelf: 'Estante Superior',
+          shelfColor: 'Rojo',
+          shelfLevel: 'N° 1',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Locación actualizada correctamente',
+  })
   @ApiResponse({
     status: 404,
-    description: 'Not Found: Location not found',
+    description: 'Locación no encontrada',
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad Request: Invalid data provided',
+    description: 'Datos invalidos',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
   })
   updateLocation(@Param('id') id: string, @Body() location: LocationDTO) {
     return this.locationService.updateLocation(Number(id), location);
@@ -80,11 +121,16 @@ export class LocationController {
 
   @Delete(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Delete a location by ID' })
-  @ApiResponse({ status: 204, description: 'Successfully deleted location' })
+  @ApiOperation({ summary: 'Eliminar una locación por ID' })
+  @ApiResponse({ status: 204, description: 'Locación eliminada correctamente' })
   @ApiResponse({
     status: 404,
-    description: 'Not Found: Location not found',
+    description: 'Locación no encontrada',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
   })
   deleteLocation(@Param('id') id: string) {
     return this.locationService.deleteLocation(Number(id));

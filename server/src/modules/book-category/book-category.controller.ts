@@ -15,22 +15,22 @@ export class BookCategoryController {
   constructor(private readonly bookCategoryService: BookCategoryService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all categories of books with pagination' })
+  @ApiOperation({ summary: 'Retorna todas las categorias con paginación' })
   @ApiQuery({
     name: 'page',
     required: false,
     type: Number,
-    description: 'Page number (default: 1)',
+    description: 'Número de página',
   })
   @ApiQuery({
     name: 'limit',
     required: false,
     type: Number,
-    description: 'Number of books per page (default: 10)',
+    description: 'Resultado por páginas',
   })
   @ApiResponse({
     status: 200,
-    description: 'Successfully fetched category books',
+    description: 'Categorias devueltas correctamente',
   })
   @ApiResponse({
     status: 403,
