@@ -29,53 +29,50 @@ export class BooksController {
 
   @Get()
   @Roles('READER')
-  @ApiOperation({ summary: 'Get a paginated list of all books' })
+  @ApiOperation({ summary: 'Obtener una lista paginada de todos los libros' })
   @ApiQuery({
     name: 'page',
     type: Number,
-    description: 'Page number for pagination',
+    description: 'Número de la página',
     required: false,
   })
   @ApiQuery({
     name: 'limit',
     type: Number,
-    description: 'Number of results per page',
+    description: 'Resultados por página',
     required: false,
   })
   @ApiResponse({
     status: 200,
-    description: 'Paginated list of books retrieved successfully',
+    description: 'Lista paginada de todos los libros',
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid query parameters provided',
+    description: 'Parámetros invalidos',
   })
-  getAllBooks(
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('limit', ParseIntPipe) limit = 10,
-  ) {
+  getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.booksService.getAllBooks(Number(page), Number(limit));
   }
 
   @Get(':id')
   @Roles('READER')
-  @ApiOperation({ summary: 'Get book by ID' })
+  @ApiOperation({ summary: 'Obtener un libro por su ID' })
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'ID of the book to get',
+    description: 'ID del libro a obtener',
   })
   @ApiResponse({
     status: 200,
-    description: 'Book retrieved successfully',
+    description: 'Libro devuelto satisfactoriamente',
   })
   @ApiResponse({
     status: 404,
-    description: 'Book not found',
+    description: 'Libro no encontrado',
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid data provided for retrieving the book',
+    description: 'Datos invalidos',
   })
   getBookById(@Param('id', ParseIntPipe) id: number) {
     return this.booksService.getBookById(id);
@@ -83,63 +80,60 @@ export class BooksController {
 
   @Post()
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Create a new book entry' })
+  @ApiOperation({ summary: 'Agregar un nuevo libro' })
   @ApiResponse({
     status: 201,
-    description: 'Book created successfully',
+    description: 'Libro creado correctamente',
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid data provided for creating the book',
+    description: 'Datos invalidos',
   })
-  async createBook(@Body() book: BookDTO) {
+  createBook(@Body() book: BookDTO) {
     return this.booksService.createBook(book);
   }
 
   @Put(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Update an existing book by ID' })
+  @ApiOperation({ summary: 'Actualizar un libro por ID' })
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'ID of the book to update',
+    description: 'ID del libro a actualizar',
   })
   @ApiResponse({
     status: 200,
-    description: 'Book updated successfully',
+    description: 'Libro actualizado correctamente',
   })
   @ApiResponse({
     status: 404,
-    description: 'Book not found',
+    description: 'Libro no encontrado',
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid data provided for updating the book',
+    description: 'Datos invalidos',
   })
-  async updateBook(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() book: BookDTO,
-  ) {
+  updateBook(@Param('id', ParseIntPipe) id: number, @Body() book: BookDTO) {
     return this.booksService.updateBook(id, book);
   }
 
   @Delete(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Delete a book by ID' })
+  @ApiOperation({ summary: 'Eliminar un libro por ID' })
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'ID of the book to delete',
+    description: 'ID del libro a eliminar',
   })
   @ApiResponse({
     status: 200,
-    description: 'Book deleted successfully',
+    description: 'Libro eliminado correctamente',
   })
   @ApiResponse({
     status: 404,
-    description: 'Book not found',
+    description: 'Libro no encontrado',
   })
-  async deleteBook(@Param('id', ParseIntPipe) id: number) {
+  deleteBook(@Param('id', ParseIntPipe) id: number) {
     return this.booksService.deleteBook(id);
   }
 }

@@ -55,7 +55,7 @@ export class BooksService {
     });
 
     if (!book) throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
-    return book;
+    return this._getParseBook(book);
   }
 
   async createBook(book: BookDTO) {
@@ -207,7 +207,7 @@ export class BooksService {
     return authors;
   }
 
-  async _getParseBook(book: ParseBook) {
+  _getParseBook(book: ParseBook) {
     return {
       id: book.id,
       title: book.title,
