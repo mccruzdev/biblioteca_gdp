@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, Length, Min } from 'class-validator';
+import { IsString, IsOptional, Length } from 'class-validator';
 
 export class LocationDTO {
   @IsString({ message: 'The shelf field must be a string.' })
@@ -15,7 +15,9 @@ export class LocationDTO {
   shelfColor?: string;
 
   @IsOptional()
-  @IsInt({ message: 'The shelfLevel field must be an integer.' })
-  @Min(0, { message: 'The shelfLevel field cannot be negative.' })
+  @IsString({ message: 'The shelfLevel field must be an integer.' })
+  @Length(1, 50, {
+    message: 'The shelfColor field must be at most 50 characters long.',
+  })
   shelfLevel?: string;
 }
