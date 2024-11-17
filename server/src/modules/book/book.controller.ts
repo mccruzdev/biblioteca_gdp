@@ -16,6 +16,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { BooksService } from './book.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
@@ -50,6 +51,11 @@ export class BooksController {
     status: 400,
     description: 'Parámetros invalidos',
   })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
+  })
   getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.booksService.getAllBooks(Number(page), Number(limit));
   }
@@ -74,6 +80,11 @@ export class BooksController {
     status: 400,
     description: 'Datos invalidos',
   })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
+  })
   getBookById(@Param('id', ParseIntPipe) id: number) {
     return this.booksService.getBookById(id);
   }
@@ -81,6 +92,29 @@ export class BooksController {
   @Post()
   @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Agregar un nuevo libro' })
+  @ApiBody({
+    type: BookDTO,
+    examples: {
+      example: {
+        value: {
+          title: 'Introduction to NestJS',
+          pages: 300,
+          authors: [
+            {
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            },
+            {
+              name: 'Jane Smith',
+              email: 'jane.smith@example.com',
+            },
+          ],
+          category: 'Programming',
+          subcategory: 'Backend Development',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 201,
     description: 'Libro creado correctamente',
@@ -89,6 +123,11 @@ export class BooksController {
     status: 400,
     description: 'Datos invalidos',
   })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
+  })
   createBook(@Body() book: BookDTO) {
     return this.booksService.createBook(book);
   }
@@ -96,6 +135,29 @@ export class BooksController {
   @Put(':id')
   @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Actualizar un libro por ID' })
+  @ApiBody({
+    type: BookDTO,
+    examples: {
+      example: {
+        value: {
+          title: 'Introduction to NestJS',
+          pages: 300,
+          authors: [
+            {
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            },
+            {
+              name: 'Jane Smith',
+              email: 'jane.smith@example.com',
+            },
+          ],
+          category: 'Programming',
+          subcategory: 'Backend Development',
+        },
+      },
+    },
+  })
   @ApiParam({
     name: 'id',
     type: Number,
@@ -112,6 +174,11 @@ export class BooksController {
   @ApiResponse({
     status: 400,
     description: 'Datos invalidos',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
   })
   updateBook(@Param('id', ParseIntPipe) id: number, @Body() book: BookDTO) {
     return this.booksService.updateBook(id, book);
@@ -132,6 +199,11 @@ export class BooksController {
   @ApiResponse({
     status: 404,
     description: 'Libro no encontrado',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
   })
   deleteBook(@Param('id', ParseIntPipe) id: number) {
     return this.booksService.deleteBook(id);
