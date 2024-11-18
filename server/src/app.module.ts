@@ -4,6 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BooksTemplateModule } from './modules/book/book.module';
 import { LocationModule } from './modules/location/location.module';
 import { BookCategoryModule } from './modules/book-category/book-category.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { BookCategoryModule } from './modules/book-category/book-category.module
     BooksTemplateModule,
     LocationModule,
     BookCategoryModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],

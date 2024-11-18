@@ -1,3 +1,8 @@
+export interface TokenData {
+  id: number;
+  role: RolesT;
+}
+
 export type RolesT = 'ADMIN' | 'LIBRARIAN' | 'READER';
 
 export enum RolesE {

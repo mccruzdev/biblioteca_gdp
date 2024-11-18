@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
@@ -79,6 +87,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Iniciar sesión de usuario' })
   @ApiBody({
     type: LoginUserDTO,
@@ -102,6 +111,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Refrescar el token de registro' })
   @ApiBody({
     type: RefreshTokenDTO,
@@ -121,6 +131,7 @@ export class AuthController {
   }
 
   @Post('change-password')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Solicitar cambio de contraseña' })
   @ApiBody({
     type: PasswordChangedDTO,
@@ -142,6 +153,7 @@ export class AuthController {
   }
 
   @Post('confirm-change-password')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Confirmar cambio de contraseña' })
   @ApiBody({
     type: ConfirmPasswordChange,
