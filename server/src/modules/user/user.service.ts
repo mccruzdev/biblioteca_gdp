@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { TokenManager } from 'src/common/token/token';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { TokenData } from 'src/types';
 
 @Injectable()
 export class UserService {
@@ -10,29 +10,12 @@ export class UserService {
     private prisma: PrismaService,
   ) {}
 
+  tokenManager = new TokenManager(this.jwtService);
+
   async me(authorization: string | undefined) {
-    if (!authorization)
-      throw new HttpException(
-        'Authorization header is missing',
-        HttpStatus.FORBIDDEN,
-      );
+    const data = this.tokenManager.getDataFromHeader(authorization);
 
-    const token = authorization.split(' ')[1];
-    if (!token)
-      throw new HttpException(
-        'Token is missing in Authorization header',
-        HttpStatus.FORBIDDEN,
-      );
-
-    let data: TokenData | null;
-
-    try {
-      data = this.jwtService.verify<TokenData>(token);
-    } catch {
-      throw new HttpException('Invalid token', HttpStatus.FORBIDDEN);
-    }
-
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       select: {
         dni: true,
         names: true,
@@ -43,5 +26,9 @@ export class UserService {
       },
       where: { id: data.id },
     });
+
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    return user;
   }
 }
