@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ChevronUp, ChevronDown, Gift } from 'lucide-react'
 import Icon from './Icon'
 
@@ -79,13 +80,13 @@ const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCo
         {isOpen && (
           <div className="nav-children">
             {item.children.map((child) => (
-              <a
+              <Link
                 key={child.href}
-                href={child.href}
+                to={child.href}
                 className="nav-child-item"
               >
                 {child.label}
-              </a>
+              </Link>
             ))}
           </div>
         )}
@@ -94,8 +95,8 @@ const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCo
   }
 
   return (
-    <a
-      href={item.href}
+    <Link
+      to={item.href}
       className={`nav-item ${isCollapsed ? 'collapsed' : ''}`}
       title={isCollapsed ? item.label : undefined}
       onMouseEnter={handleMouseEnter}
@@ -103,7 +104,7 @@ const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({ item, isCo
     >
       <Icon hovered={isHovered} className="nav-icon" />
       {!isCollapsed && <span className="nav-label">{item.label}</span>}
-    </a>
+    </Link>
   )
 }
 

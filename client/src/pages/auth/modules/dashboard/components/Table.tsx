@@ -60,13 +60,13 @@ export const BookTable: React.FC<BookTableProps> = ({ books }) => {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-lg border border-gray-700">
-        <Table striped hoverable className="w-full text-sm text-left text-gray-300 dark:text-gray-300">
-          <Table.Head className="text-xs uppercase bg-gray-700 dark:bg-gray-700 text-gray-300 dark:text-gray-300">
+      <div className="overflow-x-auto rounded-lg"/*Borde gris claro alrededor de la tabla*/> 
+        <Table striped hoverable className="overflow-x-auto w-full text-sm text-left text-gray-200"/*Texto gris claro en modo claro y gris claro en modo oscuro*/>
+          <Table.Head className="text-xs uppercase !bg-black text-gray-200">
             {Object.keys(books[0]).map((key) => (
               <Table.HeadCell 
                 key={key}
-                className="px-3 py-2 cursor-pointer hover:bg-gray-600 dark:hover:bg-gray-600"
+                className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500" // Fondo gris oscuro al pasar el mouse sobre las celdas del encabezado
                 onClick={() => handleSort(key as keyof Book)}
               >
                 <div className="flex items-center">
@@ -75,15 +75,15 @@ export const BookTable: React.FC<BookTableProps> = ({ books }) => {
                 </div>
               </Table.HeadCell>
             ))}
-            <Table.HeadCell className="px-3 py-2">
+            <Table.HeadCell className="px-3 py-2 !bg-black">
               <span className="sr-only">Acciones</span>
             </Table.HeadCell>
           </Table.Head>
-          <Table.Body className="divide-y divide-gray-700 dark:divide-gray-700">
+          <Table.Body>
             {sortedBooks.map((book) => (
               <Table.Row 
                 key={book.id} 
-                className="bg-gray-800 dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700"
+                className="custom-bg hover:!bg-" // Fondo gris medio para las filas, cambia a gris oscuro al pasar el mouse
               >
                 {Object.values(book).map((value, index) => (
                   <Table.Cell key={index} className="px-3 py-2 whitespace-nowrap">
@@ -95,7 +95,7 @@ export const BookTable: React.FC<BookTableProps> = ({ books }) => {
                     label={<MoreHorizontal className="h-4 w-4" />}
                     dismissOnClick={false}
                     renderTrigger={() => (
-                      <Button color="gray" size="xs">
+                      <Button color="black" size="xs">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     )}
@@ -112,13 +112,13 @@ export const BookTable: React.FC<BookTableProps> = ({ books }) => {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg shadow-lg max-w-md w-full mx-4">
-            <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <h3 className="text-xl font-semibold text-white">Realiza tu reserva</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> 
+          <div className="custom-bg rounded-lg shadow-lg max-w-md w-full mx-4"> 
+            <div className="flex items-center justify-between p-4 border-b border-gray-700"> 
+              <h3 className="text-xl font-semibold text-white">Realiza tu reserva</h3> 
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                className="text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" 
               >
                 <X className="h-6 w-6" />
                 <span className="sr-only">Cerrar</span>
@@ -127,28 +127,28 @@ export const BookTable: React.FC<BookTableProps> = ({ books }) => {
             {selectedBook && (
               <div className="p-4 space-y-4">
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-400">Título</p>
-                  <p className="text-white">{selectedBook.titulo}</p>
+                  <p className="text-sm text-gray-400">Título</p> 
+                  <p className="text-white">{selectedBook.titulo}</p> 
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-400">Autor</p>
-                  <p className="text-white">{selectedBook.autor}</p>
+                  <p className="text-sm text-gray-400">Autor</p> 
+                  <p className="text-white">{selectedBook.autor}</p> 
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-400">Categoría</p>
-                  <p className="text-white">{selectedBook.categoria}</p>
+                  <p className="text-sm text-gray-400">Categoría</p> 
+                  <p className="text-white">{selectedBook.categoria}</p> 
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-400">Subcategoría</p>
-                  <p className="text-white">{selectedBook.subcategoria}</p>
+                  <p className="text-sm text-gray-400">Subcategoría</p> 
+                  <p className="text-white">{selectedBook.subcategoria}</p> 
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-400">Número de páginas</p>
-                  <p className="text-white">{selectedBook.numPaginas}</p>
+                  <p className="text-sm text-gray-400">Número de páginas</p> 
+                  <p className="text-white">{selectedBook.numPaginas}</p> 
                 </div>
               </div>
             )}
-            <div className="flex justify-end space-x-3 p-4 border-t border-gray-700">
+            <div className="flex justify-end space-x-3 p-4 border-t border-gray-700"> 
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
@@ -157,7 +157,7 @@ export const BookTable: React.FC<BookTableProps> = ({ books }) => {
               </button>
               <button
                 onClick={confirmReservation}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500"
+                className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-yellow-500" // Texto blanco, fondo azul que cambia a azul más oscuro al pasar el mouse
               >
                 Reservar
               </button>
