@@ -1,12 +1,12 @@
-import { Controller, Get, Headers } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   ApiBearerAuth,
-  ApiHeader,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -16,19 +16,15 @@ export class UserController {
 
   @Get('me')
   @ApiOperation({ summary: 'Obtener los datos del usuario' })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Token de autenticación',
-  })
   @ApiResponse({
     status: 200,
     description: 'Datos del usuario',
   })
   @ApiResponse({
     status: 403,
-    description: 'Token no valido',
+    description: 'No autorizado',
   })
-  me(@Headers('authorization') authorization: string | undefined) {
-    return this.userService.me(authorization);
+  me(@Req() req: Request) {
+    return this.userService.me(req.headers.authorization);
   }
 }
