@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
 import { Header } from './components/Header'
+import { Content } from './components/Content'
 import './style.sass'
 
 export function Dashboard() {
@@ -47,20 +48,9 @@ export function Dashboard() {
         isMobile={isMobile}
       />
 
-      <div className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-        <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
-        <main className="content-area">
-          <section className="welcome-section">
-            <h1>BIBLIOTECA</h1>
-            <p>
-              ¡Bienvenido! Explora y reserva tus libros favoritos
-            </p>
-          </section>
-          <section className="content-section">
-            Contenido del Dashboard
-          </section>
-        </main>
-      </div>
+      <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
+
+      <Content isCollapsed={isCollapsed} isSidebarOpen={isSidebarOpen} />
 
       {isSidebarOpen && isMobile && (
         <div
