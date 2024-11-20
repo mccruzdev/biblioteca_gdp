@@ -7,6 +7,7 @@ import { BACKEND_SERVER } from "../../../../config/api";
 import { fetchJSON } from "../../../../services/fetch";
 import FloatingTab from "./components/FloatingTab";
 import { toast } from "sonner";
+import { useTokenUC } from "../../../../context/user/user.hook";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,6 +23,7 @@ export default function AuthPage() {
   });
   const [dniForChange, setDniForChange] = useState(""); // Estado para el DNI en el FloatingTab
   const navigate = useNavigate();
+  const { setItem } = useTokenUC();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,9 +45,12 @@ export default function AuthPage() {
 
       if (response.ok) {
         localStorage.setItem("gdp-bm", json.token);
+        setItem(json.token);
         navigate("/dashboard");
       } else {
-        toast.error("Error al iniciar sesión. Por favor, verifica tus credenciales.");
+        toast.error(
+          "Error al iniciar sesión. Por favor, verifica tus credenciales."
+        );
       }
     } catch (error) {
       toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
@@ -244,7 +249,8 @@ export default function AuthPage() {
           <>
             <div>
               <div className="-mb-3">
-              ¿Estás seguro de que deseas registrarte con los siguientes datos?
+                ¿Estás seguro de que deseas registrarte con los siguientes
+                datos?
               </div>
               <br />
               <strong>DNI:</strong> {formData.dni}

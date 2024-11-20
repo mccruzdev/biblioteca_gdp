@@ -1,4 +1,5 @@
 import "./content.sass";
+import { useWindowSize } from "../../../../hooks/size";
 
 interface Props {
   children: React.ReactNode;
@@ -6,8 +7,13 @@ interface Props {
 }
 
 export function Content({ children, isCollapsed }: Props) {
+  const { width } = useWindowSize();
   return (
-    <main className={`Content${isCollapsed ? " Content--collapsed" : ""}`}>
+    <main
+      className={`Content${
+        width < 600 || isCollapsed ? " Content--collapsed" : ""
+      }`}
+    >
       {children}
     </main>
   );
