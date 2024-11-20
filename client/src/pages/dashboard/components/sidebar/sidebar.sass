@@ -1,0 +1,32 @@
+@use '../../../../sass/styles'
+
+.Sidebar
+  @include styles.f-start-()
+  flex-direction: column
+  gap: 1rem
+  padding: 1rem 0
+  position: fixed
+  top: 56px
+  left: 0
+  width: 200px
+  z-index: 99999
+  height: calc(100vh - 56px)
+  background-color: styles.$primary-bg
+  border-right: 2px solid styles.$sidebar-border-color
+
+  .Sidebar-logo
+    @include styles.f-c-()
+    width: 100%
+    img
+      width: 120px
+
+  .Sidebar-nav
+    display: flex
+    flex-direction: column
+    width: 100%
+
+.Sidebar--collapsed
+  width: 3rem
+
+  .Sidebar-logo
+    width: 100%

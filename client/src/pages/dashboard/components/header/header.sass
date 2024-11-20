@@ -1,0 +1,25 @@
+@use '../../../../sass/styles'
+
+.Header
+  @include styles.f-c-end()
+  z-index: 99999
+  gap: 1rem
+  padding: .5rem 1rem
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 3.5rem
+  background-color: styles.$primary-bg
+  border-bottom: 2px solid styles.$sidebar-border-color
+
+  .Header-button
+    border: none
+    background-color: transparent
+    svg
+      width: 20px
+      fill: styles.$accent-color
+
+  .Header-content
+    @include styles.f-c-end()
+    flex: 1
