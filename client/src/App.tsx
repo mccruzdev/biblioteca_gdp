@@ -23,7 +23,7 @@ import { DashboardLoanHistory } from "./pages/dashboard/modules/pages/loan-histo
 export default function App() {
   return (
     <Router>
-      <div className="App">
+      <div className="App" id="app">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/auth/confirm-email" element={<ConfirmedEmail />} />
@@ -31,18 +31,11 @@ export default function App() {
             path="/auth/confirm-change-password"
             element={<ConfirmChangePassword />}
           />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/loan" element={<Loan />} />
-          <Route path="/dashboard/loan-history" element={<LoanHistory />} />
-          <Route path="/dashboard/add-books" element={<AddBooks />} />
-          <Route path="/dashboard/users" element={<Users />} />
-          <Route path="/dashboard/management" element={<Management />} />
           <Route
-            path="/dashboard/donation-history"
-            element={<DonationHistory />}
+            path="/d052f161/3b51/49d8/90d8/a4f5017a3c2b"
+            element={<Dashboard />}
           />
-          <Route path="/dashboard/donated-books" element={<DonatedBooks />} />
-          <Route path="/_dashboard" element={<DashboardPage />}>
+          <Route path="/dashboard" element={<DashboardPage />}>
             <Route path="" element={<DashboardCatalog />} />
             <Route path="loan" element={<DashboardLoan />} />
             <Route path="loan-history" element={<DashboardLoanHistory />} />

@@ -4,36 +4,40 @@ import { NavItem } from "./components/nav-link";
 export const navItems: NavItem[] = [
   {
     label: "Catálogo de libros",
-    href: "/_dashboard",
+    href: "/dashboard",
     icon: (props) => <Icon type="catalog" {...props} />,
   },
+  // {
+  //   label: "Préstamos",
+  //   href: "/dashboard/loan",
+  //   icon: (props) => <Icon type="loan" {...props} />,
+  //   children: [
+  //     { label: "Préstamos", href: "/dashboard/loan" },
+  //     { label: "Historial de Préstamos", href: "/dashboard/loan-history" },
+  //   ],
+  // },
   {
-    label: "Préstamos",
-    href: "/_dashboard/loan",
-    icon: (props) => <Icon type="loan" {...props} />,
+    label: "Libros",
+    href: "/dashboard/books",
+    icon: (props) => <Icon type="addBook" {...props} />,
     children: [
-      { label: "Préstamos", href: "/_dashboard/loan" },
-      { label: "Historial de Préstamos", href: "/_dashboard/loan-history" },
+      { label: "Libros", href: "/dashboard/books" },
+      { label: "Ejemplares", href: "/dashboard/ejemplares" },
     ],
   },
-  {
-    label: "Agregar Libros",
-    href: "/_dashboard/add-books",
-    icon: (props) => <Icon type="addBook" {...props} />,
-  },
-  {
-    label: "Usuarios",
-    href: "/_dashboard/users",
-    icon: (props) => <Icon type="user" {...props} />,
-  },
-  {
-    label: "Gestión",
-    href: "/_dashboard/management",
-    icon: (props) => <Icon type="management" {...props} />,
-  },
-  {
-    label: "Donaciones",
-    href: "/_dashboard/donations",
-    icon: (props) => <Icon type="gift" {...props} />,
-  },
+  // {
+  //   label: "Usuarios",
+  //   href: "/dashboard/users",
+  //   icon: (props) => <Icon type="user" {...props} />,
+  // },
+  // {
+  //   label: "Gestión",
+  //   href: "/dashboard/management",
+  //   icon: (props) => <Icon type="management" {...props} />,
+  // },
+  // {
+  //   label: "Donaciones",
+  //   href: "/dashboard/donations",
+  //   icon: (props) => <Icon type="gift" {...props} />,
+  // },
 ];

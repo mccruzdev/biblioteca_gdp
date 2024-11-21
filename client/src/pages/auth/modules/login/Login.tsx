@@ -1,5 +1,5 @@
 import "./style.sass";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BaseInput from "../../../components/Input";
 import Button from "./components/Button";
@@ -135,6 +135,12 @@ export default function AuthPage() {
       /*await handleRegister();*/
     }
   };
+
+  useEffect(() => {
+    document.getElementById("app")?.classList.add("App-bg");
+
+    return () => document.getElementById("app")?.classList.remove("App-bg");
+  }, []);
 
   return (
     <div className="Container min-h-screen flex flex-col items-center justify-center">

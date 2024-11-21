@@ -1,89 +1,29 @@
 import "./catalog.sass";
 import { BookTable } from "../../components/book-table";
+import { useEffect, useState } from "react";
+import { BookI, PaginatedI } from "../../../../../types";
+import { fetchJSON } from "../../../../../services/fetch";
+import { BACKEND_SERVER } from "../../../../../config/api";
+import { useTokenUC } from "../../../../../context/user/user.hook";
 
 export function DashboardCatalog() {
-  const books = [
-    {
-      id: 1,
-      titulo: "El gran Gatsby",
-      numPaginas: 180,
-      autor: "F. Scott Fitzgerald",
-      categoria: "Novela",
-      subcategoria: "Clásico",
-    },
-    {
-      id: 2,
-      titulo: "Cien años de soledad",
-      numPaginas: 417,
-      autor: "Gabriel García Márquez",
-      categoria: "Novela",
-      subcategoria: "Realismo mágico",
-    },
-    {
-      id: 3,
-      titulo: "1984",
-      numPaginas: 328,
-      autor: "George Orwell",
-      categoria: "Novela",
-      subcategoria: "Distopía",
-    },
-    {
-      id: 4,
-      titulo: "Orgullo y prejuicio",
-      numPaginas: 432,
-      autor: "Jane Austen",
-      categoria: "Novela",
-      subcategoria: "Romance",
-    },
-    {
-      id: 5,
-      titulo: "Don Quijote de la Mancha",
-      numPaginas: 863,
-      autor: "Miguel de Cervantes",
-      categoria: "Novela",
-      subcategoria: "Clásico",
-    },
-    {
-      id: 6,
-      titulo: "Crimen y castigo",
-      numPaginas: 671,
-      autor: "Fiodor Dostoievski",
-      categoria: "Novela",
-      subcategoria: "Psicológica",
-    },
-    {
-      id: 7,
-      titulo: "Ulises",
-      numPaginas: 730,
-      autor: "James Joyce",
-      categoria: "Novela",
-      subcategoria: "Modernista",
-    },
-    {
-      id: 8,
-      titulo: "Matar a un ruiseñor",
-      numPaginas: 281,
-      autor: "Harper Lee",
-      categoria: "Novela",
-      subcategoria: "Ficción sureña",
-    },
-    {
-      id: 9,
-      titulo: "En busca del tiempo perdido",
-      numPaginas: 4215,
-      autor: "Marcel Proust",
-      categoria: "Novela",
-      subcategoria: "Modernista",
-    },
-    {
-      id: 10,
-      titulo: "Moby-Dick",
-      numPaginas: 585,
-      autor: "Herman Melville",
-      categoria: "Novela",
-      subcategoria: "Aventura",
-    },
-  ];
+  const { data } = useTokenUC();
+  const [paginatedBooks, setPaginatedBooks] =
+    useState<PaginatedI<BookI> | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (!data) return; // TODO: Redirect to login
+      const { response, json } = await fetchJSON<PaginatedI<BookI>>(
+        `${BACKEND_SERVER}/book`,
+        { authorization: data }
+      );
+
+      if (response.ok) {
+        setPaginatedBooks(json);
+      }
+    })();
+  }, [data]);
 
   return (
     <>
@@ -98,7 +38,7 @@ export function DashboardCatalog() {
           <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
         </div>
         <div className="pt-3">
-          <BookTable books={books} showCatalog={true} />
+          {paginatedBooks && <BookTable books={paginatedBooks?.data} />}
         </div>
       </section>
     </>
