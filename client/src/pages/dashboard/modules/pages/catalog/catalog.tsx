@@ -98,7 +98,7 @@ export function DashboardCatalog() {
           <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
         </div>
         <div className="pt-3">
-          <BookTable books={books} />
+          <BookTable books={books} showCatalog={true} />
         </div>
       </section>
     </>
