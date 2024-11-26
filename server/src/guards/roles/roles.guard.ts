@@ -1,13 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+import { TokenManager } from 'src/common/token/token';
 import { Roles } from 'src/decorators/roles/roles.decorator';
 import { RolesT } from 'src/types';
-
-interface TokenData {
-  id: number;
-  role: RolesT;
-}
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -15,6 +11,8 @@ export class RolesGuard implements CanActivate {
     private reflector: Reflector,
     private jwtService: JwtService,
   ) {}
+
+  tokenManager = new TokenManager(this.jwtService);
 
   canActivate(context: ExecutionContext) {
     const role = this.reflector.get<RolesT>(Roles, context.getHandler());
@@ -24,20 +22,7 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
 
     const authorizationHeader = request.headers['authorization'];
-    if (!authorizationHeader) return false;
-
-    const token = authorizationHeader.split('Bearer ')[1];
-    if (!token) return false;
-
-    let data: TokenData | null;
-
-    try {
-      data = this.jwtService.verify<TokenData>(token);
-    } catch {
-      return false;
-    }
-
-    if (!data || !data.role) return false;
+    const data = this.tokenManager.getDataFromHeader(authorizationHeader);
 
     const roleHierarchy = {
       ADMIN: ['READER', 'LIBRARIAN', 'ADMIN'],

@@ -1,3 +1,8 @@
+export interface TokenData {
+  id: number;
+  role: RolesT;
+}
+
 export type RolesT = 'ADMIN' | 'LIBRARIAN' | 'READER';
 
 export enum RolesE {
@@ -6,31 +11,48 @@ export enum RolesE {
   READER = 'READER',
 }
 
-export type BookConditionT = 'GOOD' | 'BAD';
+export type BookConditionT = 'NEW' | 'GOOD' | 'FAIR' | 'DAMAGED' | 'BAD';
 
 export enum BookConditionE {
+  NEW = 'NEW',
   GOOD = 'GOOD',
+  FAIR = 'FAIR',
+  DAMAGED = 'DAMAGED',
   BAD = 'BAD',
 }
 
-export type BookStatusT = 'AVAILABLE' | 'RESERVED';
+export type LoanStatusT = 'ACTIVE' | 'RETURNED' | 'OVERDUE' | 'CANCELLED';
 
-export enum BookStatusE {
-  AVAILABLE = 'AVAILABLE',
-  RESERVED = 'RESERVED',
+export enum LoanStatusE {
+  ACTIVE = 'ACTIVE',
+  RETURNED = 'RETURNED',
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED',
 }
 
-export type DonationDirectionT = 'YES' | 'NO';
-
-export enum DonationDirectionE {
-  YES = 'YES',
-  NO = 'NO',
-}
-
-export type ReservationStatus = 'PENDING' | 'PICKED_UP' | 'CANCELED';
+export type ReservationStatus =
+  | 'PENDING'
+  | 'PICKED_UP'
+  | 'CANCELED'
+  | 'EXPIRED';
 
 export enum ReservationStatusE {
   PENDING = 'PENDING',
   PICKED_UP = 'PICKED_UP',
   CANCELED = 'CANCELED',
+  EXPIRED = 'EXPIRED',
+}
+
+export interface Author {
+  id: number;
+  name: string;
+  email?: string | null;
+}
+
+export interface ParseBook {
+  id: number;
+  title: string;
+  pages?: number;
+  authors?: Author[];
+  Subcategory?: any | null;
 }

@@ -206,14 +206,14 @@ def generate_sql_book(file):
 
 
 def generate_sql_copy(copies: list[Copy]):
-    sql = "INSERT INTO Copy (code, `condition`) VALUES \n"
+    sql = "INSERT INTO Copy (code, `condition`, bookId) VALUES \n"
 
     codes = []
 
-    for copy in copies:
+    for i, copy in enumerate(copies):
         if copy.code.strip() in codes:
             continue
-        sql += f"('{copy.code.strip()}', '{copy.condition}')"
+        sql += f"('{copy.code.strip()}', '{copy.condition}', {i+1})"
         codes.append(copy.code)
         if copy != copies[-1]:
             sql += ',\n'
@@ -235,10 +235,5 @@ def main():
     write_file('script.sql', content)
 
 
-# for book in file['books']:
-#     print(book.title, book.pages)
-
-# for copy in file['copies']:
-#     print(copy.code, copy.condition)
 if __name__ == "__main__":
     main()
