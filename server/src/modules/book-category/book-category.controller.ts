@@ -16,12 +16,9 @@ export class BookCategoryController {
   constructor(private readonly bookCategoryService: BookCategoryService) {}
 
   @Get()
-<<<<<<< HEAD
   @Roles('READER')
   @ApiOperation({ summary: 'Get all categories of books with pagination' })
-=======
   @ApiOperation({ summary: 'Retorna todas las categorias con paginación' })
->>>>>>> dev-server
   @ApiQuery({
     name: 'page',
     required: false,
