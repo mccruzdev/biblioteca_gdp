@@ -6,6 +6,7 @@ import { LocationModule } from './modules/location/location.module';
 import { BookCategoryModule } from './modules/book-category/book-category.module';
 import { UserModule } from './modules/user/user.module';
 import { CopyModule } from './modules/copy/copy.module';
+import { ReservationModule } from './modules/reservation/reservation.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CopyModule } from './modules/copy/copy.module';
     BookCategoryModule,
     UserModule,
     CopyModule,
+    ReservationModule,
   ],
   controllers: [],
   providers: [],
