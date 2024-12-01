@@ -1,10 +1,11 @@
 import "./catalog.sass";
-import { BookTable } from "../../components/book-table";
 import { useEffect, useState } from "react";
 import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useTokenUC } from "../../../../../context/user/user.hook";
+import { BookTable } from "./components/book-table";
+//import { BookTable } from "../../components/book-table";
 
 export function DashboardCatalog() {
   const { data } = useTokenUC();
@@ -38,7 +39,7 @@ export function DashboardCatalog() {
           <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
         </div>
         <div className="pt-3">
-          {paginatedBooks && <BookTable books={paginatedBooks?.data} />}
+          {paginatedBooks && <BookTable books={paginatedBooks?.data} />}*
         </div>
       </section>
     </>
