@@ -1,31 +1,31 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { TokenManager } from 'src/common/token/token';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { ReservationDTO } from './dto/reservation.dto';
-import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
+import { LoanDTO } from './dto/loan.dto';
 
 const paginateAll: PaginateFunction = paginator({
-  path: 'reservation',
+  path: 'loan',
   limit: 10,
 });
 
 const paginateMe: PaginateFunction = paginator({
-  path: 'reservation/me',
+  path: 'loan/me',
   limit: 10,
 });
 
 @Injectable()
-export class ReservationService {
+export class LoanService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 
   tokenManager = new TokenManager(this.jwtService);
-  selectReservation = {
+  selectLoan = {
     id: true,
-    created: true,
+    loanDate: true,
     dueDate: true,
     status: true,
     copies: {
@@ -37,11 +37,11 @@ export class ReservationService {
     },
   };
 
-  async getAllReservations(page: number, limit: number) {
+  async getAllLoans(page: number, limit: number) {
     return paginateAll(
-      this.prisma.reservation,
-      { select: this.selectReservation },
-      { page, limit, path: 'reservation' },
+      this.prisma.loan,
+      { select: this.selectLoan },
+      { page, limit, path: 'loan' },
     );
   }
 
@@ -52,23 +52,20 @@ export class ReservationService {
   ) {
     const data = this.tokenManager.getDataFromHeader(authorization);
 
-    return paginateAll(
-      this.prisma.reservation,
+    return paginateMe(
+      this.prisma.loan,
       {
-        select: this.selectReservation,
+        select: this.selectLoan,
         where: { userId: data.id },
       },
-      { page, limit, path: 'reservation' },
+      { page, limit, path: 'loan/me' },
     );
   }
 
-  async registerReservation(
-    authorization: string | undefined,
-    data: ReservationDTO,
-  ) {
+  async registerLoan(authorization: string | undefined, data: LoanDTO) {
     const dataHeader = this.tokenManager.getDataFromHeader(authorization);
 
-    await this.prisma.reservation.create({
+    await this.prisma.loan.create({
       data: {
         dueDate: data.dueDate,
         status: data.status,
@@ -80,15 +77,15 @@ export class ReservationService {
     });
   }
 
-  async updateReservation(
+  async updateLoan(
     authorization: string | undefined,
     id: number,
-    data: ReservationDTO,
+    data: LoanDTO,
   ) {
     const dataHeader = this.tokenManager.getDataFromHeader(authorization);
 
     try {
-      await this.prisma.reservation.update({
+      await this.prisma.loan.update({
         data: {
           dueDate: data.dueDate,
           status: data.status,
@@ -100,21 +97,21 @@ export class ReservationService {
       });
     } catch {
       throw new HttpException(
-        'Reservation or Copy Id not found',
+        'Loan or Copy Id not found',
         HttpStatus.NOT_FOUND,
       );
     }
   }
 
-  async deleteReservation(authorization: string | undefined, id: number) {
+  async deleteLoan(authorization: string | undefined, id: number) {
     const dataHeader = this.tokenManager.getDataFromHeader(authorization);
 
     try {
-      await this.prisma.reservation.delete({
+      await this.prisma.loan.delete({
         where: { id, userId: dataHeader.id },
       });
     } catch {
-      throw new HttpException('Reservation not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Loan not found', HttpStatus.NOT_FOUND);
     }
   }
 }

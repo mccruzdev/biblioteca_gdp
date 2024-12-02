@@ -7,6 +7,7 @@ import { BookCategoryModule } from './modules/book-category/book-category.module
 import { UserModule } from './modules/user/user.module';
 import { CopyModule } from './modules/copy/copy.module';
 import { ReservationModule } from './modules/reservation/reservation.module';
+import { LoanModule } from './modules/loan/loan.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ReservationModule } from './modules/reservation/reservation.module';
     UserModule,
     CopyModule,
     ReservationModule,
+    LoanModule,
   ],
   controllers: [],
   providers: [],
