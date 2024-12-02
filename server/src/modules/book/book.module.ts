@@ -15,4 +15,4 @@ import { ConfigModule } from '@nestjs/config';
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
-export class BooksTemplateModule {}
+export class BooksModule {}

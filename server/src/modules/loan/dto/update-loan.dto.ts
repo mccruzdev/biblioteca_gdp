@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { LoanStatusE } from 'src/types';
 
-export class LoanDTO {
+export class UpdateLoanDTO {
   @IsDate({ message: 'The dueDate field must be a valid date.' })
   @Type(() => Date)
   dueDate: Date;

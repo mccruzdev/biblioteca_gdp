@@ -2,8 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenManager } from 'src/common/token/token';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { ReservationDTO } from './dto/reservation.dto';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
+import { CreateReservationDTO } from './dto/create-reservation.dto';
+import { UpdateReservationDTO } from './dto/update-reservation.dto';
 
 const paginateAll: PaginateFunction = paginator({
   path: 'reservation',
@@ -52,7 +53,7 @@ export class ReservationService {
   ) {
     const data = this.tokenManager.getDataFromHeader(authorization);
 
-    return paginateAll(
+    return paginateMe(
       this.prisma.reservation,
       {
         select: this.selectReservation,
@@ -64,14 +65,14 @@ export class ReservationService {
 
   async registerReservation(
     authorization: string | undefined,
-    data: ReservationDTO,
+    data: CreateReservationDTO,
   ) {
     const dataHeader = this.tokenManager.getDataFromHeader(authorization);
 
     await this.prisma.reservation.create({
       data: {
         dueDate: data.dueDate,
-        status: data.status,
+        status: 'PENDING',
         userId: dataHeader.id,
         copies: {
           connect: data.copies.map((copyId) => ({ id: copyId })),
@@ -83,7 +84,7 @@ export class ReservationService {
   async updateReservation(
     authorization: string | undefined,
     id: number,
-    data: ReservationDTO,
+    data: UpdateReservationDTO,
   ) {
     const dataHeader = this.tokenManager.getDataFromHeader(authorization);
 

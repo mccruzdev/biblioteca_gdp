@@ -3,7 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { TokenManager } from 'src/common/token/token';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { LoanDTO } from './dto/loan.dto';
+import { CreateLoanDTO } from './dto/create-loan.dto';
+import { UpdateLoanDTO } from './dto/update-loan.dto';
 
 const paginateAll: PaginateFunction = paginator({
   path: 'loan',
@@ -62,13 +63,13 @@ export class LoanService {
     );
   }
 
-  async registerLoan(authorization: string | undefined, data: LoanDTO) {
+  async registerLoan(authorization: string | undefined, data: CreateLoanDTO) {
     const dataHeader = this.tokenManager.getDataFromHeader(authorization);
 
     await this.prisma.loan.create({
       data: {
         dueDate: data.dueDate,
-        status: data.status,
+        status: 'ACTIVE',
         userId: dataHeader.id,
         copies: {
           connect: data.copies.map((copyId) => ({ id: copyId })),
@@ -80,7 +81,7 @@ export class LoanService {
   async updateLoan(
     authorization: string | undefined,
     id: number,
-    data: LoanDTO,
+    data: UpdateLoanDTO,
   ) {
     const dataHeader = this.tokenManager.getDataFromHeader(authorization);
 
