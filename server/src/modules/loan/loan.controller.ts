@@ -10,8 +10,6 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import { ReservationService } from './reservation.service';
-import { Request } from 'express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -21,18 +19,22 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ReservationDTO } from './dto/reservation.dto';
+import { LoanService } from './loan.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
+import { LoanDTO } from './dto/loan.dto';
+import { Request } from 'express';
 
-@ApiTags('Reservation')
+@ApiTags('Loan')
 @ApiBearerAuth()
-@Controller('reservation')
-export class ReservationController {
-  constructor(private reservationService: ReservationService) {}
+@Controller('loan')
+export class LoanController {
+  constructor(private loanService: LoanService) {}
 
   @Get()
   @Roles('ADMIN')
-  @ApiOperation({ summary: 'Obtener una lista paginada de todas las reservas' })
+  @ApiOperation({
+    summary: 'Obtener una lista paginada de todos los prestamos',
+  })
   @ApiQuery({
     name: 'page',
     type: Number,
@@ -47,7 +49,7 @@ export class ReservationController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista paginada de todas las reservas',
+    description: 'Lista paginada de todos los prestamos',
   })
   @ApiResponse({
     status: 400,
@@ -58,17 +60,14 @@ export class ReservationController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  getAllReservations(@Query('page') page = 1, @Query('limit') limit = 10) {
-    return this.reservationService.getAllReservations(
-      Number(page),
-      Number(limit),
-    );
+  getAllLoans(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.loanService.getAllLoans(Number(page), Number(limit));
   }
 
   @Get('/me')
   @Roles('READER')
   @ApiOperation({
-    summary: 'Obtener una lista paginada de las reservas del usuario',
+    summary: 'Obtener una lista paginada de todos los prestamos',
   })
   @ApiQuery({
     name: 'page',
@@ -84,7 +83,7 @@ export class ReservationController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista paginada de las reservas del usuario',
+    description: 'Lista paginada de los prestamos del usuario',
   })
   @ApiResponse({
     status: 400,
@@ -100,7 +99,7 @@ export class ReservationController {
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
-    return this.reservationService.getMyReservations(
+    return this.loanService.getMyReservations(
       req.headers.authorization,
       Number(page),
       Number(limit),
@@ -109,14 +108,14 @@ export class ReservationController {
 
   @Post()
   @Roles('READER')
-  @ApiOperation({ summary: 'Registrar reservaciones' })
+  @ApiOperation({ summary: 'Registrar prestamos' })
   @ApiBody({
-    type: ReservationDTO,
+    type: LoanDTO,
     examples: {
       example: {
         value: {
           dueDate: '2024-11-30T01:38:47.506Z',
-          status: 'PENDING',
+          status: 'ACTIVE',
           copies: [1, 2, 3],
         },
       },
@@ -124,7 +123,7 @@ export class ReservationController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Reserva creada correctamente',
+    description: 'Prestamo creado correctamente',
   })
   @ApiResponse({
     status: 400,
@@ -135,28 +134,25 @@ export class ReservationController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  registerReservation(@Req() req: Request, @Body() data: ReservationDTO) {
-    return this.reservationService.registerReservation(
-      req.headers.authorization,
-      data,
-    );
+  registerLoan(@Req() req: Request, @Body() data: LoanDTO) {
+    return this.loanService.registerLoan(req.headers.authorization, data);
   }
 
   @Put(':id')
   @Roles('READER')
-  @ApiOperation({ summary: 'Actualizar reservaciones' })
+  @ApiOperation({ summary: 'Actualizar prestamos' })
   @ApiParam({
     name: 'id',
     type: Number,
     description: 'ID del libro a actualizar',
   })
   @ApiBody({
-    type: ReservationDTO,
+    type: LoanDTO,
     examples: {
       example: {
         value: {
           dueDate: '2024-11-30T01:38:47.506Z',
-          status: 'PENDING',
+          status: 'ACTIVE',
           copies: [1, 2, 3],
         },
       },
@@ -164,7 +160,7 @@ export class ReservationController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Reserva actualizada correctamente',
+    description: 'Prestamo actualizado correctamente',
   })
   @ApiResponse({
     status: 400,
@@ -177,31 +173,27 @@ export class ReservationController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Reserva o ID del ejemplar no encontrado',
+    description: 'Prestamo o ID del ejemplar no encontrado',
   })
-  updateReservation(
+  updateLoan(
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: ReservationDTO,
+    @Body() data: LoanDTO,
   ) {
-    return this.reservationService.updateReservation(
-      req.headers.authorization,
-      id,
-      data,
-    );
+    return this.loanService.updateLoan(req.headers.authorization, id, data);
   }
 
   @Delete(':id')
   @Roles('READER')
-  @ApiOperation({ summary: 'Eliminar reserva por ID' })
+  @ApiOperation({ summary: 'Eliminar préstamo por ID' })
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'ID de la reserva a eliminar',
+    description: 'ID del préstamo a eliminar',
   })
   @ApiResponse({
     status: 200,
-    description: 'Reserva eliminada correctamente',
+    description: 'Prestamo eliminado correctamente',
   })
   @ApiResponse({
     status: 403,
@@ -210,15 +202,9 @@ export class ReservationController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Reserva no encontrado',
+    description: 'Préstamo no encontrado',
   })
-  deleteReservation(
-    @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.reservationService.deleteReservation(
-      req.headers.authorization,
-      id,
-    );
+  deleteLoan(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+    return this.loanService.deleteLoan(req.headers.authorization, id);
   }
 }
