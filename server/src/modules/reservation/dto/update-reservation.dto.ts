@@ -9,7 +9,7 @@ import {
 import { Type } from 'class-transformer';
 import { ReservationStatusE } from 'src/types';
 
-export class ReservationDTO {
+export class UpdateReservationDTO {
   @IsDate({ message: 'The dueDate field must be a valid date.' })
   @Type(() => Date)
   dueDate: Date;

@@ -21,8 +21,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ReservationDTO } from './dto/reservation.dto';
 import { Roles } from 'src/decorators/roles/roles.decorator';
+import { CreateReservationDTO } from './dto/create-reservation.dto';
+import { UpdateReservationDTO } from './dto/update-reservation.dto';
 
 @ApiTags('Reservation')
 @ApiBearerAuth()
@@ -111,7 +112,7 @@ export class ReservationController {
   @Roles('READER')
   @ApiOperation({ summary: 'Registrar reservaciones' })
   @ApiBody({
-    type: ReservationDTO,
+    type: CreateReservationDTO,
     examples: {
       example: {
         value: {
@@ -135,7 +136,7 @@ export class ReservationController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  registerReservation(@Req() req: Request, @Body() data: ReservationDTO) {
+  registerReservation(@Req() req: Request, @Body() data: CreateReservationDTO) {
     return this.reservationService.registerReservation(
       req.headers.authorization,
       data,
@@ -151,7 +152,7 @@ export class ReservationController {
     description: 'ID del libro a actualizar',
   })
   @ApiBody({
-    type: ReservationDTO,
+    type: UpdateReservationDTO,
     examples: {
       example: {
         value: {
@@ -182,7 +183,7 @@ export class ReservationController {
   updateReservation(
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: ReservationDTO,
+    @Body() data: UpdateReservationDTO,
   ) {
     return this.reservationService.updateReservation(
       req.headers.authorization,

@@ -21,8 +21,9 @@ import {
 } from '@nestjs/swagger';
 import { LoanService } from './loan.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
-import { LoanDTO } from './dto/loan.dto';
 import { Request } from 'express';
+import { CreateLoanDTO } from './dto/create-loan.dto';
+import { UpdateLoanDTO } from './dto/update-loan.dto';
 
 @ApiTags('Loan')
 @ApiBearerAuth()
@@ -110,7 +111,7 @@ export class LoanController {
   @Roles('READER')
   @ApiOperation({ summary: 'Registrar prestamos' })
   @ApiBody({
-    type: LoanDTO,
+    type: CreateLoanDTO,
     examples: {
       example: {
         value: {
@@ -134,7 +135,7 @@ export class LoanController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  registerLoan(@Req() req: Request, @Body() data: LoanDTO) {
+  registerLoan(@Req() req: Request, @Body() data: CreateLoanDTO) {
     return this.loanService.registerLoan(req.headers.authorization, data);
   }
 
@@ -147,7 +148,7 @@ export class LoanController {
     description: 'ID del libro a actualizar',
   })
   @ApiBody({
-    type: LoanDTO,
+    type: UpdateLoanDTO,
     examples: {
       example: {
         value: {
@@ -178,7 +179,7 @@ export class LoanController {
   updateLoan(
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: LoanDTO,
+    @Body() data: UpdateLoanDTO,
   ) {
     return this.loanService.updateLoan(req.headers.authorization, id, data);
   }

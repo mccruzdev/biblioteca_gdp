@@ -9,17 +9,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
-class Author {
-  @IsString()
-  @Length(1, 50)
-  name: string;
-
-  @IsOptional()
-  @IsString()
-  @Length(5, 100)
-  email?: string;
-}
+import { AuthorDTO } from 'src/modules/author/dto/author.dto';
 
 export class BookDTO {
   @IsString()
@@ -34,8 +24,8 @@ export class BookDTO {
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => Author)
-  authors?: Author[];
+  @Type(() => AuthorDTO)
+  authors?: AuthorDTO[];
 
   @IsOptional()
   @IsString()
