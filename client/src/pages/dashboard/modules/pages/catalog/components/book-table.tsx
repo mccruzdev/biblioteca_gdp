@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { MoreHorizontal, ChevronLeft, ChevronRight, CalendarIcon, Clock, Check } from 'lucide-react'
+import { MoreHorizontal, ChevronLeft, ChevronRight, CalendarIcon, Check } from 'lucide-react'
 import { BookI } from "../../../../../../types"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale'
