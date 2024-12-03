@@ -1,12 +1,12 @@
 import "./books.sass";
 //import React from "react";
-import { BookTable } from "../../components/addbooks";
 import { useEffect, useState } from "react";
 import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useTokenUC } from "../../../../../context/user/user.hook";
 import { BookTableCrud } from "./components/book-table-crud";
+import NewBook from "../books/new/button-book";
 
 export function DashboardBooks() {
   const { data } = useTokenUC();
@@ -27,14 +27,16 @@ export function DashboardBooks() {
     })();
   }, [data]);
 
-
   return (
     <>
-      <section className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-2">BIBLIOTECA</h1>
-        <p className="text-gray-400">
-          ¡Bienvenido! Explora y reserva tus libros favoritos
-        </p>
+      <section className="mb-6 pt-2 flex justify-between ">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-2">BIBLIOTECA</h1>
+          <p className="text-gray-400">
+            ¡Bienvenido! Explora y reserva tus libros favoritos
+          </p>
+        </div>
+        <NewBook />
       </section>
       <section className="Catalog-content-section">
         <div className="border-b border-gray-100 py-1">
@@ -47,32 +49,3 @@ export function DashboardBooks() {
     </>
   );
 }
-
-
-/*
-  const deleteBook = async (bookId: string) => {
-    if (!data) return; // Asegúrate de que el usuario esté autenticado
-
-    const { response } = await fetchJSON(
-      `${BACKEND_SERVER}/book/${bookId}`,
-      {
-        method: 'DELETE',
-        authorization: data,
-      }
-    );
-
-    if (response.ok) {
-      // Actualiza el estado para eliminar el libro de la lista
-      setPaginatedBooks((prevBooks) => {
-        if (!prevBooks) return null; // Si no hay libros, retorna null
-        return {
-          ...prevBooks,
-          data: prevBooks.data.filter(book => book.id !== Number(bookId)), // Convert bookId to number
-        };
-      });
-    } else {
-      // Manejo de errores (opcional)
-      console.error('Error al eliminar el libro');
-    }
-  };
-*/

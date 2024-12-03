@@ -27,6 +27,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../../../../../components/ui/select";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "../../../../../../components/ui/dialog"
 
 
 interface BookTableProps {
@@ -34,8 +43,11 @@ interface BookTableProps {
 }
 
 export function BookTableCrud({ books }: BookTableProps) {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [booksPerPage, setBooksPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1)
+    const [booksPerPage, setBooksPerPage] = useState(10)
+    const [selectedBook, setSelectedBook] = useState<BookI | null>(null)
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const indexOfLastBook = currentPage * booksPerPage;
     const indexOfFirstBook = indexOfLastBook - booksPerPage;
@@ -51,7 +63,15 @@ export function BookTableCrud({ books }: BookTableProps) {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
     };
 
+    const handleEdit = (book: BookI) => {
+        setSelectedBook(book)
+        setIsEditModalOpen(true)
+    }
 
+    const handleDelete = (book: BookI) => {
+        setSelectedBook(book)
+        setIsDeleteModalOpen(true)
+    }
 
     const renderPaginationButtons = () => {
         const buttons = [];
@@ -181,10 +201,10 @@ export function BookTableCrud({ books }: BookTableProps) {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem className="cursor-pointer">
+                                        <DropdownMenuItem onClick={() => handleEdit(book)} className="cursor-pointer">
                                             editar
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">
+                                        <DropdownMenuItem onClick={() => handleDelete(book)} className="cursor-pointer">
                                             eliminar
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -239,7 +259,39 @@ export function BookTableCrud({ books }: BookTableProps) {
                     </SelectContent>
                 </Select>
             </div>
+            
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Editar Libro</DialogTitle>
+                        <DialogDescription>
+                            {/* Aquí puedes añadir el formulario de edición */
 
+                            }
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+                        <Button onClick={() => {/* lógica para guardar cambios */}}>Guardar</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Eliminar Libro</DialogTitle>
+                        <DialogDescription>
+                            ¿Estás seguro de que deseas eliminar este libro?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
+                        <Button onClick={() => {/* lógica para eliminar el libro */}}>Eliminar</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            
         </>
     );
 }
