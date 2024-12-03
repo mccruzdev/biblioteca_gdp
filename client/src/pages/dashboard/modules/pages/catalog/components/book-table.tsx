@@ -5,42 +5,16 @@ import { format } from "date-fns"
 import { es } from 'date-fns/locale'
 import { Calendar } from "../../../../../../components/ui/calendar"
 import { cn } from "../../../../../../lib/utils"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../../../../../components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../../../components/ui/table"
 import { Button } from "../../../../../../components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../../../components/ui/dropdown-menu"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../../../../components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../../../../components/ui/select"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../../../../../components/ui/popover"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../../../../components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../../../components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../../../components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "../../../../../../components/ui/popover"
 import { Label } from "../../../../../../components/ui/label"
+import { useToast } from "../../../../../../hooks/use-toast"
+import { ToastAction } from "../../../../../../components/ui/toast"
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../../../components/ui/card"
 
 interface BookTableProps {
   books: BookI[]
@@ -54,6 +28,7 @@ export function BookTable({ books }: BookTableProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined)
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const { toast } = useToast()
 
   const indexOfLastBook = currentPage * booksPerPage
   const indexOfFirstBook = indexOfLastBook - booksPerPage
@@ -77,12 +52,25 @@ export function BookTable({ books }: BookTableProps) {
   }
 
   const handleConfirmReservation = () => {
-    if (!selectedBook || !selectedDate || !selectedTime) return
+    if (!selectedBook || !selectedDate || !selectedTime) {
+      toast({
+        title: "Error",
+        description: "Por favor, selecciona una fecha y hora para la reserva.",
+        variant: "destructive",
+      })
+      return
+    }
 
     console.log('Reserva confirmada:', {
       book: selectedBook.title,
       date: format(selectedDate, 'dd/MM/yyyy', { locale: es }),
       time: selectedTime
+    })
+
+    toast({
+      title: "Reserva confirmada",
+      description: `Has reservado "${selectedBook.title}" para el ${format(selectedDate, 'dd/MM/yyyy', { locale: es })} a las ${selectedTime}.`,
+      action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
     })
 
     setIsModalOpen(false)
@@ -103,15 +91,15 @@ export function BookTable({ books }: BookTableProps) {
       startPage = 1
       endPage = totalPages
     } else if (currentPage <= Math.ceil(maxButtons / 2)) {
-      // Cerca del inicio
+      // Estamos cerca del inicio
       startPage = 1
       endPage = maxButtons - 2
     } else if (currentPage >= totalPages - Math.floor(maxButtons / 2)) {
-      // Cerca del final
+      // Estamos cerca del final
       startPage = totalPages - maxButtons + 3
       endPage = totalPages
     } else {
-      // En el medio
+      // Estamos en el medio
       startPage = currentPage - Math.floor((maxButtons - 4) / 2)
       endPage = currentPage + Math.ceil((maxButtons - 4) / 2)
     }
@@ -146,11 +134,10 @@ export function BookTable({ books }: BookTableProps) {
           variant={i === currentPage ? "default" : "outline"}
           size="sm"
           onClick={() => setCurrentPage(i)}
-          className={`px-3 py-2 ${
-            i === currentPage
-              ? "bg-primary text-primary-foreground hover:bg-primary/90"
-              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-          }`}
+          className={`px-3 py-2 ${i === currentPage
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            }`}
         >
           {i}
         </Button>
@@ -184,55 +171,79 @@ export function BookTable({ books }: BookTableProps) {
     return buttons
   }
 
+  const renderBookCard = (book: BookI) => (
+    <Card key={book.id} className="mb-4">
+      <CardHeader>
+        <CardTitle>{book.title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p><strong>ID:</strong> {book.id}</p>
+        <p><strong>Páginas:</strong> {book.pages}</p>
+        <p><strong>Autor:</strong> {book.authors[0] ? book.authors[0].name : "Desconocido"}</p>
+        <p><strong>Categoría:</strong> {book.category}</p>
+        <p><strong>Subcategoría:</strong> {book.subcategory}</p>
+        <Button onClick={() => handleReserve(book)} className="mt-2">
+          Reservar
+        </Button>
+      </CardContent>
+    </Card>
+  )
+
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Id</TableHead>
-            <TableHead>Título</TableHead>
-            <TableHead>Páginas</TableHead>
-            <TableHead>Autor</TableHead>
-            <TableHead>Categoría</TableHead>
-            <TableHead>Subcategoría</TableHead>
-            <TableHead className="text-right">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentBooks.map((book) => (
-            <TableRow key={book.id}>
-              <TableCell className="font-medium">{book.id}</TableCell>
-              <TableCell>{book.title}</TableCell>
-              <TableCell>{book.pages}</TableCell>
-              <TableCell>
-                {book.authors[0] ? book.authors[0].name : "Desconocido"}
-              </TableCell>
-              <TableCell>{book.category}</TableCell>
-              <TableCell>{book.subcategory}</TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Abrir menú</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem 
-                      onClick={() => handleReserve(book)}
-                      className="cursor-pointer"
-                    >
-                      Reservar
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+      <div className="hidden md:block"> {/* Desktop view */}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Id</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Páginas</TableHead>
+              <TableHead>Autor</TableHead>
+              <TableHead>Categoría</TableHead>
+              <TableHead>Subcategoría</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {currentBooks.map((book) => (
+              <TableRow key={book.id}>
+                <TableCell className="font-medium">{book.id}</TableCell>
+                <TableCell>{book.title}</TableCell>
+                <TableCell>{book.pages}</TableCell>
+                <TableCell>
+                  {book.authors[0] ? book.authors[0].name : "Desconocido"}
+                </TableCell>
+                <TableCell>{book.category}</TableCell>
+                <TableCell>{book.subcategory}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Abrir menú</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => handleReserve(book)}
+                        className="cursor-pointer"
+                      >
+                        Reservar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      <div className="flex items-center justify-between space-x-2 py-4">
+      <div className="md:hidden"> {/* Mobile view */}
+        {currentBooks.map(renderBookCard)}
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           Página {currentPage} de {totalPages}
         </div>
@@ -311,6 +322,7 @@ export function BookTable({ books }: BookTableProps) {
                     onSelect={handleDateSelect}
                     locale={es}
                     initialFocus
+                    disabled={(date) => date < new Date()}
                   />
                   {selectedDate && (
                     <div className="p-2 flex justify-end">
@@ -352,5 +364,4 @@ export function BookTable({ books }: BookTableProps) {
     </>
   )
 }
-
 
