@@ -38,7 +38,7 @@ export function DashboardCatalog() {
           <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
         </div>
         <div className="pt-3">
-          {paginatedBooks && <BookTable books={paginatedBooks.data} />}
+        {paginatedBooks && <BookTable books={paginatedBooks.data} token={data || ''} />}
         </div>
       </section>
       <Toaster />
