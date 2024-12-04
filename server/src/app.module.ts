@@ -9,6 +9,7 @@ import { CopyModule } from './modules/copy/copy.module';
 import { ReservationModule } from './modules/reservation/reservation.module';
 import { LoanModule } from './modules/loan/loan.module';
 import { AuthorModule } from './modules/author/author.module';
+import { DonorModule } from './modules/donor/donor.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthorModule } from './modules/author/author.module';
     ReservationModule,
     LoanModule,
     AuthorModule,
+    DonorModule,
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
 
 export class AuthorDTO {
   @IsString()
@@ -6,7 +6,6 @@ export class AuthorDTO {
   name: string;
 
   @IsOptional()
-  @IsString()
-  @Length(5, 100)
+  @IsEmail()
   email?: string;
 }
