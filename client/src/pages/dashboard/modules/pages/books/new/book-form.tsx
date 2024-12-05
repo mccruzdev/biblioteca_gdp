@@ -20,6 +20,7 @@ export function BookForm() {
       authorization: token,
       body: {
         ...data,
+        authors: [{name: data.authors}],
         pages: parseInt(data.pages),
       },
     });
