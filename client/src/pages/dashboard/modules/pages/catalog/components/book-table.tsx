@@ -10,29 +10,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { useToast } from "../../../../../../hooks/use-toast"
 import { ToastAction } from "../../../../../../components/ui/toast"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../../../components/ui/card"
-import { BACKEND_SERVER } from "../../../../../../config/api"
 import { ReservationModal } from "./reservation-modal"
 import { usePagination } from "../hooks/use-pagination"
+import { catalogApi, Copy, CreateReservationDTO } from "../catalog.api"
 
 interface BookTableProps {
   books: BookI[]
   token: string
 }
 
-interface CreateReservationDTO {
-  dueDate: string;
-  status: string;
-  copies: number[];
-}
-
 export function BookTable({ books, token }: BookTableProps) {
-  // Estado local para el número de libros por página y el modal de reserva
   const [booksPerPage, setBooksPerPage] = useState(10)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedBook, setSelectedBook] = useState<BookI | null>(null)
+  const [copies, setCopies] = useState<Copy[]>([])
   const { toast } = useToast()
 
-  // Hook personalizado de paginación
   const {
     currentPage,
     totalPages,
@@ -42,52 +35,36 @@ export function BookTable({ books, token }: BookTableProps) {
     goToPage,
   } = usePagination(books, booksPerPage)
 
-  // Manejar la acción de reservar un libro
-  const handleReserve = (book: BookI) => {
-    setSelectedBook(book)
-    setIsModalOpen(true)
+  const handleReserve = async (book: BookI) => {
+    try {
+      const data = await catalogApi.getCopies(book.id, token);
+      setCopies(data);
+      setSelectedBook(book);
+      setIsModalOpen(true);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    }
   }
 
-  // Crear una reserva en el servidor
-  const createReservation = async (data: CreateReservationDTO) => {
-    if (!token) {
-      throw new Error('Token de autorización no disponible');
-    }
-
-    const response = await fetch(`${BACKEND_SERVER}/reservation`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || 'Failed to create reservation');
-    }
-
-    const responseText = await response.text();
-    return responseText ? JSON.parse(responseText) : null;
-  }
-
-  // Manejar la confirmación de una reserva
-  const handleConfirmReservation = async (date: Date, time: string) => {
-    if (!selectedBook) return;
+  const handleConfirmReservation = async (date: Date, time: string, selectedCopy: Copy) => {
+    if (!selectedBook || !selectedCopy) return;
 
     try {
       const reservationData: CreateReservationDTO = {
         dueDate: new Date(date.setHours(parseInt(time.split(':')[0]))).toISOString(),
         status: 'PENDING',
-        copies: [selectedBook.id]
+        copies: [selectedCopy.id]
       };
 
-      await createReservation(reservationData);
+      await catalogApi.createReservation(reservationData, token);
 
       toast({
         title: "Reserva confirmada",
-        description: `Has reservado "${selectedBook.title}" para el ${format(date, 'dd/MM/yyyy', { locale: es })} a las ${time}.`,
+        description: `Has reservado "${selectedBook.title}" (Copia: ${selectedCopy.code}) para el ${format(date, 'dd/MM/yyyy', { locale: es })} a las ${time}.`,
         action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
       })
 
@@ -101,13 +78,11 @@ export function BookTable({ books, token }: BookTableProps) {
     }
   }
 
-  // Renderizar los botones de paginación
   const renderPaginationButtons = () => {
     const buttons = []
     const maxButtons = 7
     let startPage, endPage
 
-    // Lógica para determinar qué botones de página mostrar
     if (totalPages <= maxButtons) {
       startPage = 1
       endPage = totalPages
@@ -122,25 +97,22 @@ export function BookTable({ books, token }: BookTableProps) {
       endPage = currentPage + Math.ceil((maxButtons - 4) / 2)
     }
 
-    // Añadir el botón para la primera página
     buttons.push(
       <Button
         key={1}
         variant={1 === currentPage ? "default" : "outline"}
         size="sm"
         onClick={() => goToPage(1)}
-        className="px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+        className="px-3 py-2 bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90"
       >
         1
       </Button>
     )
 
-    // Añadir elipsis si es necesario
     if (startPage > 2) {
       buttons.push(<span key="start-ellipsis" className="px-2 py-2">...</span>)
     }
 
-    // Añadir botones para las páginas intermedias
     for (let i = Math.max(2, startPage); i <= Math.min(endPage, totalPages - 1); i++) {
       buttons.push(
         <Button
@@ -149,8 +121,8 @@ export function BookTable({ books, token }: BookTableProps) {
           size="sm"
           onClick={() => goToPage(i)}
           className={`px-3 py-2 ${i === currentPage
-              ? "bg-primary text-primary-foreground hover:bg-primary/90"
-              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            ? "bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90"
+            : "bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24]"
             }`}
         >
           {i}
@@ -158,12 +130,10 @@ export function BookTable({ books, token }: BookTableProps) {
       )
     }
 
-    // Añadir elipsis final si es necesario
     if (endPage < totalPages - 1) {
       buttons.push(<span key="end-ellipsis" className="px-2 py-2">...</span>)
     }
 
-    // Añadir botón para la última página
     if (totalPages > 1) {
       buttons.push(
         <Button
@@ -171,7 +141,7 @@ export function BookTable({ books, token }: BookTableProps) {
           variant={totalPages === currentPage ? "default" : "outline"}
           size="sm"
           onClick={() => goToPage(totalPages)}
-          className="px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+          className="px-3 py-2 bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90"
         >
           {totalPages}
         </Button>
@@ -181,9 +151,8 @@ export function BookTable({ books, token }: BookTableProps) {
     return buttons
   }
 
-  // Renderizar una tarjeta de libro (móvil)
   const renderBookCard = (book: BookI) => (
-    <Card key={book.id} className="mb-4">
+    <Card key={book.id} className="mb-4 border-[#3e3e40] bg-[#0e0e0e] text-[#C7C7CC]">
       <CardHeader>
         <CardTitle>{book.title}</CardTitle>
       </CardHeader>
@@ -193,7 +162,7 @@ export function BookTable({ books, token }: BookTableProps) {
         <p><strong>Autor:</strong> {book.authors[0] ? book.authors[0].name : "Desconocido"}</p>
         <p><strong>Categoría:</strong> {book.category}</p>
         <p><strong>Subcategoría:</strong> {book.subcategory}</p>
-        <Button onClick={() => handleReserve(book)} className="mt-2">
+        <Button onClick={() => handleReserve(book)} className="mt-2 bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90">
           Reservar
         </Button>
       </CardContent>
@@ -202,43 +171,42 @@ export function BookTable({ books, token }: BookTableProps) {
 
   return (
     <>
-      {/* Vista de escritorio */}
-      <div className="hidden md:block">
+      <div className="hidden md:block rounded-lg border border-[#3e3e40] bg-[#0e0e0e] p-4">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Id</TableHead>
-              <TableHead>Título</TableHead>
-              <TableHead>Páginas</TableHead>
-              <TableHead>Autor</TableHead>
-              <TableHead>Categoría</TableHead>
-              <TableHead>Subcategoría</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+            <TableRow className="border-b-[#3e3e40]">
+              <TableHead className="w-[100px] text-[#C7C7CC]">Id</TableHead>
+              <TableHead className="text-[#C7C7CC]">Título</TableHead>
+              <TableHead className="text-[#C7C7CC]">Páginas</TableHead>
+              <TableHead className="text-[#C7C7CC]">Autor</TableHead>
+              <TableHead className="text-[#C7C7CC]">Categoría</TableHead>
+              <TableHead className="text-[#C7C7CC]">Subcategoría</TableHead>
+              <TableHead className="text-right text-[#C7C7CC]">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentBooks.map((book) => (
-              <TableRow key={book.id}>
-                <TableCell className="font-medium">{book.id}</TableCell>
-                <TableCell>{book.title}</TableCell>
-                <TableCell>{book.pages}</TableCell>
-                <TableCell>
+              <TableRow key={book.id} className="border-b-[#3e3e40]">
+                <TableCell className="font-medium text-[#C7C7CC]">{book.id}</TableCell>
+                <TableCell className="text-[#C7C7CC]">{book.title}</TableCell>
+                <TableCell className="text-[#C7C7CC]">{book.pages}</TableCell>
+                <TableCell className="text-[#C7C7CC]">
                   {book.authors[0] ? book.authors[0].name : "Desconocido"}
                 </TableCell>
-                <TableCell>{book.category}</TableCell>
-                <TableCell>{book.subcategory}</TableCell>
+                <TableCell className="text-[#C7C7CC]">{book.category}</TableCell>
+                <TableCell className="text-[#C7C7CC]">{book.subcategory}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost" className="h-8 w-8 p-0 text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24]">
                         <span className="sr-only">Abrir menú</span>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="bg-[#0e0e0e] border-[#3e3e40]">
                       <DropdownMenuItem
                         onClick={() => handleReserve(book)}
-                        className="cursor-pointer"
+                        className="cursor-pointer text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]"
                       >
                         Reservar
                       </DropdownMenuItem>
@@ -251,14 +219,12 @@ export function BookTable({ books, token }: BookTableProps) {
         </Table>
       </div>
 
-      {/* Vista móvil */}
       <div className="md:hidden">
         {currentBooks.map(renderBookCard)}
       </div>
 
-      {/* Controles de paginación */}
       <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+        <div className="flex-1 text-sm text-[#C7C7CC]">
           Página {currentPage} de {totalPages}
         </div>
         <div className="flex items-center space-x-2">
@@ -267,7 +233,7 @@ export function BookTable({ books, token }: BookTableProps) {
             size="sm"
             onClick={prevPage}
             disabled={currentPage === 1}
-            className="px-2 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            className="px-2 py-2 bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24] border-[#3e3e40]"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -277,12 +243,11 @@ export function BookTable({ books, token }: BookTableProps) {
             size="sm"
             onClick={nextPage}
             disabled={currentPage === totalPages}
-            className="px-2 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            className="px-2 py-2 bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24] border-[#3e3e40]"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        {/* Selector de libros por página */}
         <Select
           value={booksPerPage.toString()}
           onValueChange={(value) => {
@@ -290,12 +255,12 @@ export function BookTable({ books, token }: BookTableProps) {
             goToPage(1)
           }}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] border-[#3e3e40] bg-[#0e0e0e] text-[#C7C7CC]">
             <SelectValue placeholder="Seleccionar filas por página" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-[#0e0e0e] border-[#3e3e40]">
             {[10, 20, 30, 40, 50].map((pageSize) => (
-              <SelectItem key={pageSize} value={pageSize.toString()}>
+              <SelectItem key={pageSize} value={pageSize.toString()} className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]">
                 Mostrar {pageSize}
               </SelectItem>
             ))}
@@ -303,14 +268,15 @@ export function BookTable({ books, token }: BookTableProps) {
         </Select>
       </div>
 
-      {/* Modal de reserva */}
       <ReservationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmReservation}
         selectedBook={selectedBook}
+        copies={copies}
       />
     </>
   )
 }
+
 
