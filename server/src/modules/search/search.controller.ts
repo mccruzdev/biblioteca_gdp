@@ -16,7 +16,7 @@ import { Roles } from 'src/decorators/roles/roles.decorator';
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
-  @Get('author/:author')
+  @Get('books-by-author/:author')
   @Roles('READER')
   @ApiOperation({ summary: 'Obtener libros paginados por autor' })
   @ApiQuery({
