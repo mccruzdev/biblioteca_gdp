@@ -17,6 +17,11 @@ const paginateSubcategory: PaginateFunction = paginator({
   limit: 10,
 });
 
+const paginateTitle: PaginateFunction = paginator({
+  path: 'search/books-by-title',
+  limit: 10,
+});
+
 @Injectable()
 export class SearchService {
   constructor(private prisma: PrismaService) {}
@@ -75,6 +80,17 @@ export class SearchService {
         },
       },
       { page, limit, path: `search/books-by-subcategory/${subcategory}` },
+    );
+  }
+
+  async getBooksByTitle(page: number, limit: number, title: string) {
+    return paginateTitle(
+      this.prisma.book,
+      {
+        select: this.customSelect,
+        where: { title: { contains: title } },
+      },
+      { page, limit, path: `search/books-by-title/${title}` },
     );
   }
 }

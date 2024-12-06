@@ -138,4 +138,45 @@ export class SearchController {
   ) {
     return this.searchService.getBooksBySubcategory(page, limit, subcategory);
   }
+
+  @Get('books-by-title/:title')
+  @Roles('READER')
+  @ApiOperation({ summary: 'Obtener libros paginados por titulo' })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Número de la página',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Resultados por página',
+    required: false,
+  })
+  @ApiParam({
+    name: 'title',
+    type: String,
+    description: 'Titulo',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Libros del autor',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos invalidos',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
+  })
+  getBooksByTitle(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Param('title') title: string,
+  ) {
+    return this.searchService.getBooksByTitle(page, limit, title);
+  }
 }
