@@ -26,22 +26,27 @@ export function DashboardCatalog() {
   }, [data])
 
   return (
-    <>
+    <div className="dashboard-catalog">
       <section className="mb-6">
         <h1 className="text-2xl font-bold text-white mb-2">BIBLIOTECA</h1>
         <p className="text-gray-400">
           ¡Bienvenido! Explora y reserva tus libros favoritos
         </p>
       </section>
-      <section className="Catalog-content-section">
-        <div className="border-b border-gray-100 py-1">
-          <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
+      <div className="outer-container bg-secondary-bg rounded-lg p-6">
+        <p className="text-white mb-4">Buscar</p>
+        <div className="inner-container bg-[#0e0e0e] rounded-lg p-6">
+          <section className="Catalog-content-section">
+            <div className="border-b border-gray-100 py-1">
+              <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
+            </div>
+            <div className="pt-3">
+            {paginatedBooks && <BookTable books={paginatedBooks.data} token={data || ''} />}
+            </div>
+          </section>
         </div>
-        <div className="pt-3">
-        {paginatedBooks && <BookTable books={paginatedBooks.data} token={data || ''} />}
-        </div>
-      </section>
+      </div>
       <Toaster />
-    </>
+    </div>
   )
 }

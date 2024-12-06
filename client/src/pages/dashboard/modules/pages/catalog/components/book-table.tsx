@@ -206,7 +206,7 @@ export function BookTable({ books, token }: BookTableProps) {
                     <DropdownMenuContent align="end" className="bg-[#0e0e0e] border-[#3e3e40]">
                       <DropdownMenuItem
                         onClick={() => handleReserve(book)}
-                        className="cursor-pointer text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]"
+                        className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90 focus:bg-[#FFBC24] focus:text-[#010101]"
                       >
                         Reservar
                       </DropdownMenuItem>
