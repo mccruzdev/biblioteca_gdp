@@ -12,7 +12,7 @@ export default function NewBook() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">Agregar</Button>
+                <Button className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:opacity-80 focus:bg-[#FFBC24] focus:text-[#010101]" variant="outline">Agregar</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

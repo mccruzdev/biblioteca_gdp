@@ -29,23 +29,37 @@ export function DashboardBooks() {
 
   return (
     <>
-      <section className="mb-6 pt-2 flex justify-between ">
-        <div>
+      <div className="dashboard-catalog">
+        <section className="mb-6 pt-2">
           <h1 className="text-2xl font-bold text-white mb-2">BIBLIOTECA</h1>
           <p className="text-gray-400">
-            ¡Bienvenido! Explora y reserva tus libros favoritos
+            ¡Bienvenido! Aquí podrás Agregar, Editar y Eliminar los Libros.
           </p>
+        </section>
+        <div className="outer-container bg-secondary-bg rounded-lg p-6">
+          <div className="mb-4 pt-2 pb-1 flex justify-between ">
+            <p className="text-white mb-4">Buscar</p>
+            <NewBook />
+          </div>
+          <div className="inner-container bg-[#0e0e0e] rounded-lg p-6">
+            <section className="Catalog-content-section">
+              <div className="border-b border-gray-100 py-1">
+                <h2 className="text-xl font-bold text-white">
+                  Catálogo de Libros
+                </h2>
+              </div>
+              <div className="pt-3">
+                {paginatedBooks && (
+                  <BookTableCrud
+                    books={paginatedBooks.data}
+                    token={data || ""}
+                  />
+                )}
+              </div>
+            </section>
+          </div>
         </div>
-        <NewBook />
-      </section>
-      <section className="Catalog-content-section">
-        <div className="border-b border-gray-100 py-1">
-          <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
-        </div>
-        <div className="pt-3">
-          {paginatedBooks && <BookTableCrud books={paginatedBooks?.data} />}
-        </div>
-      </section>
+      </div>
     </>
   );
 }
