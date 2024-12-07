@@ -1,5 +1,5 @@
 import "./catalog.sass";
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
@@ -14,6 +14,7 @@ export function DashboardCatalog() {
   const [paginatedBooks, setPaginatedBooks] = useState<PaginatedI<BookI> | null>(null)
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const searchBarRef = useRef<{ clearSearch: () => void }>(null);
 
   useEffect(() => {
     if (token) {
@@ -44,7 +45,6 @@ export function DashboardCatalog() {
       }
     } catch (error) {
       console.error('Error fetching books:', error);
-      // Aquí podrías mostrar un toast de error
     } finally {
       setIsLoading(false);
     }
@@ -54,9 +54,12 @@ export function DashboardCatalog() {
     fetchBooks(searchTerm, searchType);
   };
 
-  const handleReset = () => {
+  const handleReset = (clearSearchBar: boolean = false) => {
     setIsSearching(false);
     fetchBooks();
+    if (clearSearchBar) {
+      searchBarRef.current?.clearSearch();
+    }
   };
 
   return (
@@ -67,9 +70,9 @@ export function DashboardCatalog() {
           ¡Bienvenido! Explora y reserva tus libros favoritos
         </p>
       </section>
-      <div className="outer-container bg-secondary-bg rounded-lg p-6">
-        <SearchBar onSearch={handleSearch} onReset={handleReset} />
-        <div className="inner-container bg-[#0e0e0e] rounded-lg p-6">
+      <div className="outer-container bg-secondary-bg rounded-lg p-4 md:p-6">
+        <SearchBar onSearch={handleSearch} onReset={() => handleReset(true)} ref={searchBarRef} />
+        <div className="inner-container bg-[#0e0e0e] rounded-lg p-4 md:p-6 mt-4">
           <section className="Catalog-content-section">
             <div className="border-b border-gray-100 py-1">
               <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
@@ -83,7 +86,7 @@ export function DashboardCatalog() {
                 <div className="text-center">
                   <p className="text-gray-400 mb-4">No se encontraron libros que coincidan con tu búsqueda.</p>
                   {isSearching && (
-                    <Button onClick={handleReset} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                    <Button onClick={() => handleReset(true)} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
                       Mostrar todos los libros
                     </Button>
                   )}
@@ -97,3 +100,4 @@ export function DashboardCatalog() {
     </div>
   )
 }
+

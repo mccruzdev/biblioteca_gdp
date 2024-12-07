@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '../../../../../../components/ui/input';
 import { Button } from '../../../../../../components/ui/button';
@@ -9,9 +9,16 @@ interface SearchBarProps {
     onReset: () => void;
 }
 
-export function SearchBar({ onSearch, onReset }: SearchBarProps) {
+export const SearchBar = forwardRef<{ clearSearch: () => void }, SearchBarProps>(({ onSearch, onReset }, ref) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchType, setSearchType] = useState('title');
+
+    useImperativeHandle(ref, () => ({
+        clearSearch: () => {
+            setSearchTerm('');
+            setSearchType('title');
+        }
+    }));
 
     const handleSearch = () => {
         if (searchTerm.trim() === '') {
@@ -33,9 +40,9 @@ export function SearchBar({ onSearch, onReset }: SearchBarProps) {
     };
 
     return (
-        <div className="flex space-x-2 mb-4">
+        <div className="flex flex-col space-y-2 mb-4 sm:flex-row sm:space-y-0 sm:space-x-2">
             <Select value={searchType} onValueChange={setSearchType}>
-                <SelectTrigger className="w-[180px] bg-[#141414] border-[#3e3e40] text-[#C7C7CC]">
+                <SelectTrigger className="w-full sm:w-[180px] bg-[#141414] border-[#3e3e40] text-[#C7C7CC]">
                     <SelectValue placeholder="Buscar por..." />
                 </SelectTrigger>
                 <SelectContent className="bg-[#0e0e0e] border-[#3e3e40]">
@@ -52,7 +59,7 @@ export function SearchBar({ onSearch, onReset }: SearchBarProps) {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="flex-grow bg-[#141414] border-[#3e3e40] text-[#C7C7CC] placeholder-[#6e6e6e] pr-8"
+                    className="w-full bg-[#141414] border-[#3e3e40] text-[#C7C7CC] placeholder-[#6e6e6e] pr-8"
                 />
                 {searchTerm && (
                     <button
@@ -64,14 +71,17 @@ export function SearchBar({ onSearch, onReset }: SearchBarProps) {
                     </button>
                 )}
             </div>
-            <Button onClick={handleSearch} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
-                <Search className="h-4 w-4 mr-2" />
-                Buscar
-            </Button>
-            <Button onClick={onReset} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
-                Mostrar todos
-            </Button>
+            <div className="flex space-x-2">
+                <Button onClick={handleSearch} className="flex-1 sm:flex-none bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                    <Search className="h-4 w-4 mr-2" />
+                    Buscar
+                </Button>
+                <Button onClick={handleClear} className="flex-1 sm:flex-none bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                    Mostrar todos
+                </Button>
+            </div>
         </div>
     );
-}
+});
+
 
