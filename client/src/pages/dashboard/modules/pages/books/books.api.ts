@@ -33,5 +33,26 @@ export const booksApi = {
             console.error('Error en createBook:', error);
             throw error;
         }
+    },
+
+    deleteBook: async (bookId: string, token: string) => {
+        try {
+            const response = await fetch(`${BACKEND_SERVER}/book/${bookId}`, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al eliminar el libro');
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Error en deleteBook:', error);
+            throw error;
+        }
     }
 };

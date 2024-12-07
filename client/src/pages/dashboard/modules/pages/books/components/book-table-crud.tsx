@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../../../../comp
 import { usePagination } from "../../catalog/hooks/use-pagination"
 //import { catalogApi, Copy, CreateReservationDTO } from "../catalog.api"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../../../components/ui/dialog"
+import { ButtonDelete } from "../delete/button-delete"
 
 
 interface BookTableProps {
@@ -228,12 +229,12 @@ export function BookTableCrud({ books, token }: BookTableProps) {
                                             >
                                                 Editar
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => handleDelete(book)}
-                                                className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:opacity-70 focus:bg-[#FFBC24] focus:text-[#010101] mb-1"
-                                            >
-                                                Eliminar
-                                            </DropdownMenuItem>
+                                            <ButtonDelete 
+                                                book={book} 
+                                                onDeleted={() => {
+                                                    window.location.reload();
+                                                }}
+                                            />
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
@@ -319,7 +320,8 @@ export function BookTableCrud({ books, token }: BookTableProps) {
                     </DialogHeader>
                     <DialogFooter>
                         <Button onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-                        <Button onClick={() => {/* lógica para eliminar el libro */}}>Eliminar</Button>
+                        <Button onClick={() => {
+                            }}>Eliminar</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
