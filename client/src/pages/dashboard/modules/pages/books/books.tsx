@@ -7,6 +7,7 @@ import { BACKEND_SERVER } from "../../../../../config/api";
 import { useTokenUC } from "../../../../../context/user/user.hook";
 import { BookTableCrud } from "./components/book-table-crud";
 import NewBook from "../books/new/button-book";
+import { Toaster } from "../../../../../components/ui/toaster";
 
 export function DashboardBooks() {
   const { data } = useTokenUC();
@@ -59,6 +60,7 @@ export function DashboardBooks() {
             </section>
           </div>
         </div>
+        <Toaster/>
       </div>
     </>
   );
