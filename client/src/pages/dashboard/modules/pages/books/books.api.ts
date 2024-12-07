@@ -1,20 +1,37 @@
 import { BACKEND_SERVER } from "../../../../../config/api";
-import { useTokenUC } from "../../../../../context/user/user.hook";
 
-export async function createBook (bookData: any){
-    const { data: token } = useTokenUC();
-    const res =  await fetch(`${BACKEND_SERVER}/book`, {
-        method : 'POST',
-        headers: {
-            'Content-Type' : 'application/json',
-            'Authorization' : `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-            ...bookData,
-            pages: parseInt(bookData.pages)
-        })
-    })
-    const data = await res.json()
-    console.log(data)
-
+export interface bookDTO {
+    title: string;
+    pages: number;
+    authors: {name: string}[];
+    category: string;
+    subcategory: string;
 }
+
+export const booksApi = {
+    createBook: async (data: bookDTO, token: string) => {
+        try {
+            const response = await fetch(`${BACKEND_SERVER}/book`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            const responseText = await response.text();
+            console.log('Respuesta del servidor:', responseText); // Debug
+
+            if (!response.ok) {
+                const errorData = responseText ? JSON.parse(responseText) : { message: 'Error desconocido' };
+                throw new Error(errorData.message || 'Error al crear el libro');
+            }
+
+            return responseText ? JSON.parse(responseText) : null;
+        } catch (error) {
+            console.error('Error en createBook:', error);
+            throw error;
+        }
+    }
+};
