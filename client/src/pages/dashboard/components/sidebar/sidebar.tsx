@@ -1,3 +1,4 @@
+import { useAuthUC } from "../../../../context/user/user.hook";
 import { NavLink } from "./components/nav-link";
 import { navItems } from "./links";
 import "./sidebar.sass";
@@ -7,6 +8,8 @@ interface Props {
 }
 
 export function Sidebar({ isCollapsed }: Props) {
+  const { user } = useAuthUC();
+
   return (
     <aside className={`Sidebar${isCollapsed ? " Sidebar--collapsed" : ""}`}>
       <div className="Sidebar-logo">
@@ -17,11 +20,14 @@ export function Sidebar({ isCollapsed }: Props) {
       </div>
       <nav className="Sidebar-nav">
         <ul className="Sidebar-nav-list">
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <NavLink item={item} isCollapsed={isCollapsed} />
-            </li>
-          ))}
+          {navItems.map((item) => {
+            if (!item.roles || (user && item.roles.includes(user.role)))
+              return (
+                <li key={item.href}>
+                  <NavLink item={item} isCollapsed={isCollapsed} />
+                </li>
+              );
+          })}
         </ul>
       </nav>
     </aside>

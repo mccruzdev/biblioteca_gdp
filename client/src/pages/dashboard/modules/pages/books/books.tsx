@@ -4,17 +4,21 @@ import { useEffect, useState } from "react";
 import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
-import { useTokenUC } from "../../../../../context/user/user.hook";
+import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 import { BookTableCrud } from "./components/book-table-crud";
 import NewBook from "../books/new/button-book";
 import { Toaster } from "../../../../../components/ui/toaster";
+import { NotAuthorized } from "../../../../../components/not-authorized/not-authorized";
 
 export function DashboardBooks() {
+  const { user } = useAuthUC();
   const { data } = useTokenUC();
   const [paginatedBooks, setPaginatedBooks] =
     useState<PaginatedI<BookI> | null>(null);
 
   useEffect(() => {
+    if (user?.role === "READER") return;
+
     (async () => {
       if (!data) return; // TODO: Redirect to login
       const { response, json } = await fetchJSON<PaginatedI<BookI>>(
@@ -26,7 +30,10 @@ export function DashboardBooks() {
         setPaginatedBooks(json);
       }
     })();
-  }, [data]);
+  }, [user, data]);
+
+  if (!user) return <p>Loading...</p>;
+  if (user.role === "READER") return <NotAuthorized path="/dashboard" />;
 
   return (
     <>
@@ -60,7 +67,7 @@ export function DashboardBooks() {
             </section>
           </div>
         </div>
-        <Toaster/>
+        <Toaster />
       </div>
     </>
   );
