@@ -51,11 +51,15 @@ export function BookTable({ books, token }: BookTableProps) {
   }
 
   const handleConfirmReservation = async (date: Date, time: string, selectedCopy: Copy) => {
-    if (!selectedBook || !selectedCopy) return;
+    if (!selectedBook) return;
 
     try {
+      const reservationDate = new Date(date);
+      const [hours, minutes] = time.split(':').map(Number);
+      reservationDate.setHours(hours, minutes);
+
       const reservationData: CreateReservationDTO = {
-        dueDate: new Date(date.setHours(parseInt(time.split(':')[0]))).toISOString(),
+        dueDate: reservationDate.toISOString(),
         status: 'PENDING',
         copies: [selectedCopy.id]
       };
@@ -64,7 +68,7 @@ export function BookTable({ books, token }: BookTableProps) {
 
       toast({
         title: "Reserva confirmada",
-        description: `Has reservado "${selectedBook.title}" (Copia: ${selectedCopy.code}) para el ${format(date, 'dd/MM/yyyy', { locale: es })} a las ${time}.`,
+        description: `Has reservado "${selectedBook.title}" (Copia: ${selectedCopy.code || 'N/A'}) para el ${format(reservationDate, 'dd/MM/yyyy HH:mm', { locale: es })}.`,
         action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
       })
 
@@ -206,7 +210,7 @@ export function BookTable({ books, token }: BookTableProps) {
                     <DropdownMenuContent align="end" className="bg-[#0e0e0e] border-[#3e3e40]">
                       <DropdownMenuItem
                         onClick={() => handleReserve(book)}
-                        className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90 focus:bg-[#FFBC24] focus:text-[#010101]"
+                        className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90 focus:bg-[#FFBC24] focus:text-[#010101] transition-opacity duration-200 hover:opacity-80"
                       >
                         Reservar
                       </DropdownMenuItem>

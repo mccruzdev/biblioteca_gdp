@@ -1,32 +1,32 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
+import { DonorDto } from './dto/donor.dto';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { AuthorDTO } from './dto/author.dto';
+import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 
 const paginate: PaginateFunction = paginator({
-  path: 'author',
+  path: 'donor',
   limit: 10,
 });
 
 @Injectable()
-export class AuthorService {
+export class DonorService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllAuthors(page: number, limit: number) {
-    return paginate(this.prisma.author, {}, { page, limit, path: 'author' });
+  async getAllDonors(page: number, limit: number) {
+    return paginate(this.prisma.donor, {}, { page, limit, path: 'donor' });
   }
 
-  async createAuthor(data: AuthorDTO) {
+  async createDonor(data: DonorDto) {
     try {
-      await this.prisma.author.create({ data });
+      await this.prisma.donor.create({ data });
     } catch {
       throw new HttpException('Datos invalidos', HttpStatus.CONFLICT);
     }
   }
 
-  async updateAuthor(id: number, data: AuthorDTO) {
+  async updateDonor(id: number, data: DonorDto) {
     try {
-      await this.prisma.author.update({ where: { id }, data });
+      await this.prisma.donor.update({ where: { id }, data });
     } catch {
       throw new HttpException(
         'Datos invalidos o ID no encontrado',
@@ -35,9 +35,9 @@ export class AuthorService {
     }
   }
 
-  async deleteAuthor(id: number) {
+  async deleteDonor(id: number) {
     try {
-      await this.prisma.author.delete({ where: { id } });
+      await this.prisma.donor.delete({ where: { id } });
     } catch {
       throw new HttpException('ID no encontrado', HttpStatus.NOT_FOUND);
     }
