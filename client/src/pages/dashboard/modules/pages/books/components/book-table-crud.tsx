@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react'
 import { BookI } from "../../../../../../types"
 //import { format } from "date-fns"
@@ -7,12 +8,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Button } from "../../../../../../components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../../../../components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../../../components/ui/select"
-//import { useToast } from "../../../../../../hooks/use-toast"
+import { useToast } from "../../../../../../hooks/use-toast"
 //import { ToastAction } from "../../../../../../components/ui/toast"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../../../components/ui/card"
 import { usePagination } from "../../catalog/hooks/use-pagination"
 //import { catalogApi, Copy, CreateReservationDTO } from "../catalog.api"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../../../components/ui/dialog"
+import { booksApi } from "../books.api"
+import { Label } from "../../../../../../components/ui/label"
+import { Input } from "../../../../../../components/ui/input"
 
 
 interface BookTableProps {
@@ -25,8 +29,8 @@ export function BookTableCrud({ books, token }: BookTableProps) {
     const [selectedBook, setSelectedBook] = useState<BookI | null>(null)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-    // const { toast } = useToast()
+    const { register, handleSubmit, reset } = useForm()
+    const { toast } = useToast()
 
     const {
         currentPage,
@@ -39,6 +43,13 @@ export function BookTableCrud({ books, token }: BookTableProps) {
 
     const handleEdit = (book: BookI) => {
         setSelectedBook(book)
+        reset({
+            title: book.title,
+            pages: book.pages,
+            author: book.authors[0]?.name || "",
+            category: book.category,
+            subcategory: book.subcategory,
+        })
         setIsEditModalOpen(true)
     }
 
@@ -47,51 +58,77 @@ export function BookTableCrud({ books, token }: BookTableProps) {
         setIsDeleteModalOpen(true)
     }
 
-/*
-    const handleReserve = async (book: BookI) => {
+    /*
+        const handleReserve = async (book: BookI) => {
+            try {
+                const data = await catalogApi.getCopies(book.id, token);
+                setCopies(data);
+                setSelectedBook(book);
+                setIsModalOpen(true);
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
+                    variant: "destructive",
+                });
+            }
+        }
+    
+        const handleConfirmReservation = async (date: Date, time: string, selectedCopy: Copy) => {
+            if (!selectedBook || !selectedCopy) return;
+    
+            try {
+                const reservationData: CreateReservationDTO = {
+                    dueDate: new Date(date.setHours(parseInt(time.split(':')[0]))).toISOString(),
+                    status: 'PENDING',
+                    copies: [selectedCopy.id]
+                };
+    
+                await catalogApi.createReservation(reservationData, token);
+    
+                toast({
+                    title: "Reserva confirmada",
+                    description: `Has reservado "${selectedBook.title}" (Copia: ${selectedCopy.code}) para el ${format(date, 'dd/MM/yyyy', { locale: es })} a las ${time}.`,
+                    action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
+                })
+    
+                setIsModalOpen(false)
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: error instanceof Error ? error.message : "Hubo un problema al crear la reserva. Por favor, inténtalo de nuevo.",
+                    variant: "destructive",
+                })
+            }
+        }
+    
+    */
+    const handleEditSubmit = async (data: any) => {
+        if (!selectedBook) return
+
         try {
-            const data = await catalogApi.getCopies(book.id, token);
-            setCopies(data);
-            setSelectedBook(book);
-            setIsModalOpen(true);
+            const bookData = {
+                title: data.title,
+                pages: Number(data.pages),
+                authors: [{ name: data.author }],
+                category: data.category,
+                subcategory: data.subcategory,
+            }
+
+            await booksApi.updateBook(selectedBook.id, bookData, token)
+            toast({
+                title: "Éxito",
+                description: `El libro "${data.title}" ha sido actualizado`,
+            })
+            setIsEditModalOpen(false)
         } catch (error) {
             toast({
                 title: "Error",
-                description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
-                variant: "destructive",
-            });
-        }
-    }
-
-    const handleConfirmReservation = async (date: Date, time: string, selectedCopy: Copy) => {
-        if (!selectedBook || !selectedCopy) return;
-
-        try {
-            const reservationData: CreateReservationDTO = {
-                dueDate: new Date(date.setHours(parseInt(time.split(':')[0]))).toISOString(),
-                status: 'PENDING',
-                copies: [selectedCopy.id]
-            };
-
-            await catalogApi.createReservation(reservationData, token);
-
-            toast({
-                title: "Reserva confirmada",
-                description: `Has reservado "${selectedBook.title}" (Copia: ${selectedCopy.code}) para el ${format(date, 'dd/MM/yyyy', { locale: es })} a las ${time}.`,
-                action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
-            })
-
-            setIsModalOpen(false)
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: error instanceof Error ? error.message : "Hubo un problema al crear la reserva. Por favor, inténtalo de nuevo.",
+                description: error instanceof Error ? error.message : "Error al actualizar el libro",
                 variant: "destructive",
             })
         }
     }
-
-*/
 
     const renderPaginationButtons = () => {
         const buttons = []
@@ -293,24 +330,79 @@ export function BookTableCrud({ books, token }: BookTableProps) {
             </div>
 
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] bg-[#0e0e0e] text-[#C7C7CC]">
                     <DialogHeader>
                         <DialogTitle>Editar Libro</DialogTitle>
                         <DialogDescription>
-                            {/* Aquí puedes añadir el formulario de edición */
-
-                            }
+                            Modifica los detalles del libro y guarda los cambios.
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter>
-                        <Button onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                        <Button onClick={() => {/* lógica para guardar cambios */}}>Guardar</Button>
-                    </DialogFooter>
+                    <form onSubmit={handleSubmit(handleEditSubmit)}>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="title" className="text-right">
+                                    Título
+                                </Label>
+                                <Input
+                                    id="title"
+                                    className="col-span-3"
+                                    {...register("title", { required: true })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="pages" className="text-right">
+                                    Páginas
+                                </Label>
+                                <Input
+                                    id="pages"
+                                    type="number"
+                                    className="col-span-3"
+                                    {...register("pages", { required: true, valueAsNumber: true })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="author" className="text-right">
+                                    Autor
+                                </Label>
+                                <Input
+                                    id="author"
+                                    className="col-span-3"
+                                    {...register("author", { required: true })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="category" className="text-right">
+                                    Categoría
+                                </Label>
+                                <Input
+                                    id="category"
+                                    className="col-span-3"
+                                    {...register("category", { required: true })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="subcategory" className="text-right">
+                                    Subcategoría
+                                </Label>
+                                <Input
+                                    id="subcategory"
+                                    className="col-span-3"
+                                    {...register("subcategory", { required: true })}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="secondary" onClick={() => setIsEditModalOpen(false)}>
+                                Cancelar
+                            </Button>
+                            <Button type="submit">Guardar cambios</Button>
+                        </DialogFooter>
+                    </form>
                 </DialogContent>
             </Dialog>
 
             <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] bg-[#0e0e0e] text-[#C7C7CC]">
                     <DialogHeader>
                         <DialogTitle>Eliminar Libro</DialogTitle>
                         <DialogDescription>
@@ -318,12 +410,10 @@ export function BookTableCrud({ books, token }: BookTableProps) {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-                        <Button onClick={() => {/* lógica para eliminar el libro */}}>Eliminar</Button>
+                        <Button onClick={() => setIsDeleteModalOpen(false)} variant="secondary">Cancelar</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
         </>
     )
 }
