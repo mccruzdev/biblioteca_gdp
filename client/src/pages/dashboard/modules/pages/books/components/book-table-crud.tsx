@@ -58,51 +58,6 @@ export function BookTableCrud({ books, token }: BookTableProps) {
         setIsDeleteModalOpen(true)
     }
 
-    /*
-        const handleReserve = async (book: BookI) => {
-            try {
-                const data = await catalogApi.getCopies(book.id, token);
-                setCopies(data);
-                setSelectedBook(book);
-                setIsModalOpen(true);
-            } catch (error) {
-                toast({
-                    title: "Error",
-                    description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
-                    variant: "destructive",
-                });
-            }
-        }
-    
-        const handleConfirmReservation = async (date: Date, time: string, selectedCopy: Copy) => {
-            if (!selectedBook || !selectedCopy) return;
-    
-            try {
-                const reservationData: CreateReservationDTO = {
-                    dueDate: new Date(date.setHours(parseInt(time.split(':')[0]))).toISOString(),
-                    status: 'PENDING',
-                    copies: [selectedCopy.id]
-                };
-    
-                await catalogApi.createReservation(reservationData, token);
-    
-                toast({
-                    title: "Reserva confirmada",
-                    description: `Has reservado "${selectedBook.title}" (Copia: ${selectedCopy.code}) para el ${format(date, 'dd/MM/yyyy', { locale: es })} a las ${time}.`,
-                    action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
-                })
-    
-                setIsModalOpen(false)
-            } catch (error) {
-                toast({
-                    title: "Error",
-                    description: error instanceof Error ? error.message : "Hubo un problema al crear la reserva. Por favor, inténtalo de nuevo.",
-                    variant: "destructive",
-                })
-            }
-        }
-    
-    */
     const handleEditSubmit = async (data: any) => {
         if (!selectedBook) return
 
@@ -125,6 +80,25 @@ export function BookTableCrud({ books, token }: BookTableProps) {
             toast({
                 title: "Error",
                 description: error instanceof Error ? error.message : "Error al actualizar el libro",
+                variant: "destructive",
+            })
+        }
+    }
+
+    const handleDeleteConfirm = async () => {
+        if (!selectedBook) return
+
+        try {
+            await booksApi.deleteBook(selectedBook.id, token)
+            toast({
+                title: "Éxito",
+                description: `El libro "${selectedBook.title}" ha sido eliminado`,
+            })
+            setIsDeleteModalOpen(false)
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: error instanceof Error ? error.message : "Error al eliminar el libro",
                 variant: "destructive",
             })
         }
@@ -411,6 +385,7 @@ export function BookTableCrud({ books, token }: BookTableProps) {
                     </DialogHeader>
                     <DialogFooter>
                         <Button onClick={() => setIsDeleteModalOpen(false)} variant="secondary">Cancelar</Button>
+                        <Button onClick={handleDeleteConfirm} variant="destructive">Eliminar</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

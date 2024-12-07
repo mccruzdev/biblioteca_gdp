@@ -47,7 +47,6 @@ export const booksApi = {
             });
 
             const responseText = await response.text();
-            console.log('Respuesta del servidor:', responseText); 
 
             if (!response.ok) {
                 const errorData = responseText ? JSON.parse(responseText) : { message: 'Error desconocido' };
@@ -60,4 +59,27 @@ export const booksApi = {
             throw error;
         }
     },
+
+    deleteBook: async (id: number, token: string) => {
+        try {
+            const response = await fetch(`${BACKEND_SERVER}/book/${id}`, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const responseText = await response.text();
+
+            if (!response.ok) {
+                const errorData = responseText ? JSON.parse(responseText) : { message: 'Error desconocido' };
+                throw new Error(errorData.message || 'Error al eliminar el libro');
+            }
+
+            return responseText ? JSON.parse(responseText) : null;
+        } catch (error) {
+            console.error('Error en deleteBook:', error);
+            throw error;
+        }
+    }
 };
