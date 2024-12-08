@@ -4,32 +4,32 @@ import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useTokenUC } from "../../../../../context/user/user.hook";
-import { BookTable } from "./components/book-table";
-import { SearchBar } from "./components/search-bar";
+import { BookTable } from "../../components/book-table";
+import { SearchBar } from "../../components/search-bar";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 
 export function DashboardCatalog() {
   const { data: token } = useTokenUC()
   const [paginatedBooks, setPaginatedBooks] = useState<PaginatedI<BookI> | null>(null)
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const searchBarRef = useRef<{ clearSearch: () => void }>(null);
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+  const searchBarRef = useRef<{ clearSearch: () => void }>(null)
 
   useEffect(() => {
     if (token) {
-      fetchBooks();
+      fetchBooks()
     }
   }, [token])
 
   const fetchBooks = async (searchTerm?: string, searchType?: string) => {
-    if (!token) return; // TODO: Redirect to login
-    setIsLoading(true);
-    setIsSearching(!!searchTerm);
+    if (!token) return // TODO: Redirect to login
+    setIsLoading(true)
+    setIsSearching(!!searchTerm)
 
-    let url = `${BACKEND_SERVER}/book`;
+    let url = `${BACKEND_SERVER}/book`
     if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}`;
+      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}`
     }
 
     try {
@@ -41,26 +41,26 @@ export function DashboardCatalog() {
       if (response.ok) {
         setPaginatedBooks(json)
       } else {
-        throw new Error('Failed to fetch books');
+        throw new Error('Failed to fetch books')
       }
     } catch (error) {
-      console.error('Error fetching books:', error);
+      console.error('Error fetching books:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
   const handleSearch = (searchTerm: string, searchType: string) => {
-    fetchBooks(searchTerm, searchType);
-  };
+    fetchBooks(searchTerm, searchType)
+  }
 
   const handleReset = (clearSearchBar: boolean = false) => {
-    setIsSearching(false);
-    fetchBooks();
+    setIsSearching(false)
+    fetchBooks()
     if (clearSearchBar) {
-      searchBarRef.current?.clearSearch();
+      searchBarRef.current?.clearSearch()
     }
-  };
+  }
 
   return (
     <div className="dashboard-catalog">
@@ -81,7 +81,7 @@ export function DashboardCatalog() {
               {isLoading ? (
                 <p className="text-center text-gray-400">Cargando...</p>
               ) : paginatedBooks && paginatedBooks.data.length > 0 ? (
-                <BookTable books={paginatedBooks.data} token={token || ''} />
+                <BookTable books={paginatedBooks.data} token={token || ''} mode="reservation" />
               ) : (
                 <div className="text-center">
                   <p className="text-gray-400 mb-4">No se encontraron libros que coincidan con tu búsqueda.</p>

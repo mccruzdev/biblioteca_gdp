@@ -43,3 +43,4 @@ export const catalogApi = {
         return responseText ? JSON.parse(responseText) : null;
     }
 };
+

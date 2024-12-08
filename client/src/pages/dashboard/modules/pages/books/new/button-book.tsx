@@ -8,6 +8,7 @@ import {
 import { Button } from "../../../../../../components/ui/button";
 import { BookForm } from "./book-form";
 import { useState } from "react";
+import { Plus } from "lucide-react";
 
 export default function NewBook() {
   const [open, setOpen] = useState(false);
@@ -16,18 +17,19 @@ export default function NewBook() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:opacity-80 focus:bg-[#FFBC24] focus:text-[#010101]"
-          variant="outline"
+          className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80 focus:ring-2 focus:ring-[#FFBC24] focus:ring-offset-2 focus:ring-offset-[#0e0e0e]"
         >
-          Agregar
+          <Plus className="h-4 w-4 mr-2" />
+          Agregar Libro
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-[#0e0e0e] text-[#C7C7CC] border-[#3e3e40]">
         <DialogHeader>
-          <DialogTitle>Agrega un nuevo libro</DialogTitle>
+          <DialogTitle className="text-[#FFBC24]">Agrega un nuevo libro</DialogTitle>
         </DialogHeader>
         <BookForm onSuccess={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );
 }
+

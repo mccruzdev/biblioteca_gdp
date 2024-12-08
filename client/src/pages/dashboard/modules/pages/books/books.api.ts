@@ -3,7 +3,7 @@ import { BACKEND_SERVER } from "../../../../../config/api";
 export interface bookDTO {
     title: string;
     pages: number;
-    authors: {name: string}[];
+    authors: { name: string }[];
     category: string;
     subcategory: string;
 }
@@ -83,3 +83,4 @@ export const booksApi = {
         }
     }
 };
+
