@@ -1,11 +1,15 @@
 import "./not-authorized.sass";
 import { Link } from "react-router-dom";
 
-export function NotAuthorized() {
+interface Props {
+  path?: string;
+}
+
+export function NotAuthorized({ path = "/" }: Props) {
   return (
     <main className="NotAuthorized">
       <h1>No Authorizado</h1>
-      <Link to="/">Inicio</Link>
+      <Link to={path}>Inicio</Link>
     </main>
   );
 }
