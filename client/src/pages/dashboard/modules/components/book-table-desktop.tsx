@@ -14,50 +14,50 @@ interface BookTableDesktopProps {
 
 export function BookTableDesktop({ books, mode, onEdit, onDelete, onReserve }: BookTableDesktopProps) {
     return (
-        <div className="hidden md:block rounded-lg border border-[#3e3e40] bg-[#0e0e0e] p-4">
+        <div className="book-table__desktop">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-b-[#3e3e40]">
-                        <TableHead className="w-[100px] text-[#C7C7CC]">Id</TableHead>
-                        <TableHead className="text-[#C7C7CC]">Título</TableHead>
-                        <TableHead className="text-[#C7C7CC]">Páginas</TableHead>
-                        <TableHead className="text-[#C7C7CC]">Autor</TableHead>
-                        <TableHead className="text-[#C7C7CC]">Categoría</TableHead>
-                        <TableHead className="text-[#C7C7CC]">Subcategoría</TableHead>
-                        <TableHead className="text-right text-[#C7C7CC]">Acciones</TableHead>
+                    <TableRow>
+                        <TableHead>Id</TableHead>
+                        <TableHead>Título</TableHead>
+                        <TableHead>Páginas</TableHead>
+                        <TableHead>Autor</TableHead>
+                        <TableHead>Categoría</TableHead>
+                        <TableHead>Subcategoría</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {books.map((book) => (
-                        <TableRow key={book.id} className="border-b-[#3e3e40]">
-                            <TableCell className="font-medium text-[#C7C7CC]">{book.id}</TableCell>
-                            <TableCell className="text-[#C7C7CC]">{book.title}</TableCell>
-                            <TableCell className="text-[#C7C7CC]">{book.pages}</TableCell>
-                            <TableCell className="text-[#C7C7CC]">
+                        <TableRow key={book.id}>
+                            <TableCell>{book.id}</TableCell>
+                            <TableCell>{book.title}</TableCell>
+                            <TableCell>{book.pages}</TableCell>
+                            <TableCell>
                                 {book.authors[0] ? book.authors[0].name : "Desconocido"}
                             </TableCell>
-                            <TableCell className="text-[#C7C7CC]">{book.category}</TableCell>
-                            <TableCell className="text-[#C7C7CC]">{book.subcategory}</TableCell>
+                            <TableCell>{book.category}</TableCell>
+                            <TableCell>{book.subcategory}</TableCell>
                             <TableCell className="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0 text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24]">
+                                        <Button variant="ghost" className="book-table__dropdown-trigger">
                                             <span className="sr-only">Abrir menú</span>
                                             <MoreHorizontal className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="bg-[#0e0e0e] border-[#3e3e40]">
+                                    <DropdownMenuContent align="end" className="book-table__dropdown-content">
                                         {mode === 'crud' ? (
                                             <>
                                                 <DropdownMenuItem
                                                     onClick={() => onEdit(book)}
-                                                    className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:opacity-70 focus:bg-[#FFBC24] focus:text-[#010101] mb-1"
+                                                    className="book-table__dropdown-item"
                                                 >
                                                     Editar
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => onDelete(book)}
-                                                    className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:opacity-70 focus:bg-[#FFBC24] focus:text-[#010101] mb-1"
+                                                    className="book-table__dropdown-item"
                                                 >
                                                     Eliminar
                                                 </DropdownMenuItem>
@@ -65,7 +65,7 @@ export function BookTableDesktop({ books, mode, onEdit, onDelete, onReserve }: B
                                         ) : (
                                             <DropdownMenuItem
                                                 onClick={() => onReserve(book)}
-                                                className="cursor-pointer bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90 focus:bg-[#FFBC24] focus:text-[#010101]"
+                                                className="book-table__dropdown-item"
                                             >
                                                 Reservar
                                             </DropdownMenuItem>

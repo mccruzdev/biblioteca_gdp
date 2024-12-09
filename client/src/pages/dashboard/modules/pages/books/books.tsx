@@ -6,7 +6,7 @@ import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 import { BookTable } from "../../components/book-table";
-import NewBook from "../books/new/button-book";
+import NewBook from "./new/button-new-book";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { SearchBar } from "../../components/search-bar";
 import { Button } from "../../../../../components/ui/button";

@@ -40,45 +40,45 @@ export const SearchBar = forwardRef<{ clearSearch: () => void }, SearchBarProps>
     };
 
     return (
-        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 w-full">
-            <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 w-full sm:flex-grow">
+        <div className="search-bar__container">
+            <div className="search-bar__input-container">
                 <Select value={searchType} onValueChange={setSearchType}>
-                    <SelectTrigger className="w-full sm:w-[200px] md:w-[250px] bg-[#141414] border-[#3e3e40] text-[#C7C7CC]">
+                    <SelectTrigger className="search-bar__select search-bar__select-trigger">
                         <SelectValue placeholder="Buscar por..." />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0e0e0e] border-[#3e3e40]">
-                        <SelectItem value="title" className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]">Título</SelectItem>
-                        <SelectItem value="author" className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]">Autor</SelectItem>
-                        <SelectItem value="category" className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]">Categoría</SelectItem>
-                        <SelectItem value="subcategory" className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]">Subcategoría</SelectItem>
+                    <SelectContent className="search-bar__select-content">
+                        <SelectItem value="title" className="search-bar__select-item">Título</SelectItem>
+                        <SelectItem value="author" className="search-bar__select-item">Autor</SelectItem>
+                        <SelectItem value="category" className="search-bar__select-item">Categoría</SelectItem>
+                        <SelectItem value="subcategory" className="search-bar__select-item">Subcategoría</SelectItem>
                     </SelectContent>
                 </Select>
-                <div className="relative flex-grow">
+                <div className="search-bar__input-wrapper">
                     <Input
                         type="text"
                         placeholder="Buscar libros..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className="w-full bg-[#141414] border-[#3e3e40] text-[#C7C7CC] placeholder-[#6e6e6e] pr-8"
+                        className="search-bar__input"
                     />
                     {searchTerm && (
                         <button
                             onClick={handleClear}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#6e6e6e] hover:text-[#FFBC24]"
+                            className="search-bar__clear-button"
                             type="button"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="search-bar__icon" />
                         </button>
                     )}
                 </div>
             </div>
-            <div className="flex space-x-2 w-full sm:w-auto sm:flex-shrink-0">
-                <Button onClick={handleSearch} className="flex-1 sm:flex-none bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
-                    <Search className="h-4 w-4 mr-2" />
+            <div className="search-bar__buttons">
+                <Button onClick={handleSearch} className="search-bar__button search-bar__button--search">
+                    <Search className="search-bar__icon" />
                     Buscar
                 </Button>
-                <Button onClick={handleClear} className="flex-1 sm:flex-none bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24] border-[#3e3e40]">
+                <Button onClick={handleClear} className="search-bar__button search-bar__button--reset">
                     Mostrar todos
                 </Button>
             </div>

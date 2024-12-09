@@ -30,83 +30,81 @@ export function EditBookModal({ isOpen, onClose, onSubmit, book }: EditBookModal
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px] bg-[#0e0e0e] text-[#C7C7CC]">
+            <DialogContent className="edit-book-modal__content">
                 <DialogHeader>
                     <DialogTitle>Editar Libro</DialogTitle>
                     <DialogDescription>
                         Modifica los detalles del libro y guarda los cambios.
                     </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="title" className="text-right">
-                                Título
-                            </Label>
-                            <Input
-                                id="title"
-                                className="col-span-3"
-                                {...register("title", { required: true })}
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="pages" className="text-right">
-                                Páginas
-                            </Label>
-                            <Input
-                                id="pages"
-                                type="number"
-                                min="1"
-                                className="col-span-3"
-                                {...register("pages", {
-                                    required: true,
-                                    validate: (value) => parseInt(value) > 0
-                                })}
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="author" className="text-right">
-                                Autor
-                            </Label>
-                            <Input
-                                id="author"
-                                className="col-span-3"
-                                {...register("author", { required: true })}
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="category" className="text-right">
-                                Categoría
-                            </Label>
-                            <Input
-                                id="category"
-                                className="col-span-3"
-                                {...register("category", { required: true })}
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="subcategory" className="text-right">
-                                Subcategoría
-                            </Label>
-                            <Input
-                                id="subcategory"
-                                className="col-span-3"
-                                {...register("subcategory", { required: true })}
-                            />
-                        </div>
+                <form onSubmit={handleSubmit(onSubmit)} className="edit-book-modal__form">
+                    <div className="edit-book-modal__field">
+                        <Label htmlFor="title" className="edit-book-modal__label">
+                            Título
+                        </Label>
+                        <Input
+                            id="title"
+                            className="edit-book-modal__input"
+                            {...register("title", { required: true })}
+                        />
                     </div>
-                    <DialogFooter>
+                    <div className="edit-book-modal__field">
+                        <Label htmlFor="pages" className="edit-book-modal__label">
+                            Páginas
+                        </Label>
+                        <Input
+                            id="pages"
+                            type="number"
+                            min="1"
+                            className="edit-book-modal__input"
+                            {...register("pages", {
+                                required: true,
+                                validate: (value) => parseInt(value) > 0
+                            })}
+                        />
+                    </div>
+                    <div className="edit-book-modal__field">
+                        <Label htmlFor="author" className="edit-book-modal__label">
+                            Autor
+                        </Label>
+                        <Input
+                            id="author"
+                            className="edit-book-modal__input"
+                            {...register("author", { required: true })}
+                        />
+                    </div>
+                    <div className="edit-book-modal__field">
+                        <Label htmlFor="category" className="edit-book-modal__label">
+                            Categoría
+                        </Label>
+                        <Input
+                            id="category"
+                            className="edit-book-modal__input"
+                            {...register("category", { required: true })}
+                        />
+                    </div>
+                    <div className="edit-book-modal__field">
+                        <Label htmlFor="subcategory" className="edit-book-modal__label">
+                            Subcategoría
+                        </Label>
+                        <Input
+                            id="subcategory"
+                            className="edit-book-modal__input"
+                            {...register("subcategory", { required: true })}
+                        />
+                    </div>
+                    <DialogFooter className="edit-book-modal__footer">
                         <Button
                             type="button"
                             variant="secondary"
                             onClick={onClose}
-                            className="bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24] border-[#3e3e40]"
+                            className="edit-book-modal__button edit-book-modal__button--cancel"
                         >
                             Cancelar
                         </Button>
                         <Button
                             type="submit"
-                            className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90"
+                            className="edit-book-modal__button edit-book-modal__button--save"
                         >
                             Guardar cambios
                         </Button>

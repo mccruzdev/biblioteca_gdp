@@ -69,21 +69,21 @@ export function BookForm({ onSuccess }: BookFormProps) {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="book-form__container">
       <div>
-        <Label htmlFor="title" className="text-right text-[#C7C7CC]">Título</Label>
+        <Label htmlFor="title" className="book-form__label">Título</Label>
         <Input
           id="title"
           {...register("title", { required: "El título es requerido" })}
-          className="mt-1 bg-[#141414] border-[#3e3e40] text-[#C7C7CC] focus:border-[#FFBC24] focus:ring-[#FFBC24]"
+          className="book-form__input"
         />
         {errors.title && (
-          <p className="text-red-500 text-sm mt-1">{errors.title.message as string}</p>
+          <p className="book-form__error">{errors.title.message as string}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="pages" className="text-right text-[#C7C7CC]">Páginas</Label>
+        <Label htmlFor="pages" className="book-form__label">Páginas</Label>
         <Input
           id="pages"
           type="number"
@@ -95,53 +95,53 @@ export function BookForm({ onSuccess }: BookFormProps) {
             valueAsNumber: true,
             onChange: (e) => handlePagesChange(e)
           })}
-          className="mt-1 bg-[#141414] border-[#3e3e40] text-[#C7C7CC] focus:border-[#FFBC24] focus:ring-[#FFBC24] [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:hover:bg-[#FFBC24]/20"
+          className="book-form__input-number"
         />
         {errors.pages && (
-          <p className="text-red-500 text-sm mt-1">{errors.pages.message as string}</p>
+          <p className="book-form__error">{errors.pages.message as string}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="authors" className="text-right text-[#C7C7CC]">Autor</Label>
+        <Label htmlFor="authors" className="book-form__label">Autor</Label>
         <Input
           id="authors"
           {...register("authors", { required: "El autor es requerido" })}
-          className="mt-1 bg-[#141414] border-[#3e3e40] text-[#C7C7CC] focus:border-[#FFBC24] focus:ring-[#FFBC24]"
+          className="book-form__input"
         />
         {errors.authors && (
-          <p className="text-red-500 text-sm mt-1">{errors.authors.message as string}</p>
+          <p className="book-form__error">{errors.authors.message as string}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="category" className="text-right text-[#C7C7CC]">Categoría</Label>
+        <Label htmlFor="category" className="book-form__label">Categoría</Label>
         <Input
           id="category"
           {...register("category", { required: "La categoría es requerida" })}
-          className="mt-1 bg-[#141414] border-[#3e3e40] text-[#C7C7CC] focus:border-[#FFBC24] focus:ring-[#FFBC24]"
+          className="book-form__input"
         />
         {errors.category && (
-          <p className="text-red-500 text-sm mt-1">{errors.category.message as string}</p>
+          <p className="book-form__error">{errors.category.message as string}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="subcategory" className="text-right text-[#C7C7CC]">Subcategoría</Label>
+        <Label htmlFor="subcategory" className="book-form__label">Subcategoría</Label>
         <Input
           id="subcategory"
           {...register("subcategory", { required: "La subcategoría es requerida" })}
-          className="mt-1 bg-[#141414] border-[#3e3e40] text-[#C7C7CC] focus:border-[#FFBC24] focus:ring-[#FFBC24]"
+          className="book-form__input"
         />
         {errors.subcategory && (
-          <p className="text-red-500 text-sm mt-1">{errors.subcategory.message as string}</p>
+          <p className="book-form__error">{errors.subcategory.message as string}</p>
         )}
       </div>
 
       <div className="pt-3">
         <Button
           type="submit"
-          className="w-full bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80 focus:ring-2 focus:ring-[#FFBC24] focus:ring-offset-2 focus:ring-offset-[#0e0e0e] transition-colors"
+          className="book-form__submit"
         >
           Guardar
         </Button>

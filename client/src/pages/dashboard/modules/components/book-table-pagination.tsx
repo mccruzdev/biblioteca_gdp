@@ -23,22 +23,21 @@ export function BookTablePagination({
 }: BookTablePaginationProps) {
     const renderPaginationButtons = () => {
         const buttons = []
-        const isMobile = window.innerWidth < 640 
-        const maxButtons = isMobile ? 5 : 7 
+        const maxButtons = 7
         let startPage, endPage
 
         if (totalPages <= maxButtons) {
             startPage = 1
             endPage = totalPages
-        } else if (currentPage <= 2) {
+        } else if (currentPage <= 3) {
             startPage = 2
-            endPage = isMobile ? 4 : 5
-        } else if (currentPage >= totalPages - 1) {
-            startPage = isMobile ? totalPages - 3 : totalPages - 4
+            endPage = 5
+        } else if (currentPage >= totalPages - 2) {
+            startPage = totalPages - 4
             endPage = totalPages - 1
         } else {
             startPage = currentPage - 1
-            endPage = isMobile ? currentPage + 1 : currentPage + 2
+            endPage = currentPage + 2
         }
 
         buttons.push(
@@ -47,7 +46,7 @@ export function BookTablePagination({
                 variant={1 === currentPage ? "default" : "outline"}
                 size="sm"
                 onClick={() => onPageChange(1)}
-                className="px-2 py-1 text-xs bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90"
+                className="book-table__pagination-button book-table__pagination-button--active"
             >
                 1
             </Button>
@@ -65,9 +64,9 @@ export function BookTablePagination({
                         variant={i === currentPage ? "default" : "outline"}
                         size="sm"
                         onClick={() => onPageChange(i)}
-                        className={`px-1 sm:px-2 py-1 text-xs ${i === currentPage
-                            ? "bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90"
-                            : "bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24]"
+                        className={`book-table__pagination-button ${i === currentPage
+                            ? "book-table__pagination-button--active"
+                            : "book-table__pagination-button--inactive"
                             }`}
                     >
                         {i}
@@ -87,7 +86,7 @@ export function BookTablePagination({
                     variant={totalPages === currentPage ? "default" : "outline"}
                     size="sm"
                     onClick={() => onPageChange(totalPages)}
-                    className="px-2 py-1 text-xs bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90"
+                    className="book-table__pagination-button book-table__pagination-button--active"
                 >
                     {totalPages}
                 </Button>
@@ -98,17 +97,17 @@ export function BookTablePagination({
     }
 
     return (
-        <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-2 py-4">
-            <div className="flex-1 text-sm text-[#C7C7CC]">
+        <div className="book-table__pagination">
+            <div className="book-table__pagination-info">
                 Página {currentPage} de {totalPages}
             </div>
-            <div className="flex items-center space-x-1 overflow-x-auto pb-2 max-w-full">
+            <div className="book-table__pagination-buttons">
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={onPrevPage}
                     disabled={currentPage === 1}
-                    className="px-2 py-2 bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24] border-[#3e3e40]"
+                    className="book-table__pagination-button book-table__pagination-button--inactive"
                 >
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -118,22 +117,22 @@ export function BookTablePagination({
                     size="sm"
                     onClick={onNextPage}
                     disabled={currentPage === totalPages}
-                    className="px-2 py-2 bg-[#141414] text-[#C7C7CC] hover:bg-[#141414] hover:text-[#FFBC24] hover:border-[#FFBC24] border-[#3e3e40]"
+                    className="book-table__pagination-button book-table__pagination-button--inactive"
                 >
                     <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
-            <div className="w-full sm:w-auto">
+            <div className="book-table__pagination-select">
                 <Select
                     value={booksPerPage.toString()}
                     onValueChange={onBooksPerPageChange}
                 >
-                    <SelectTrigger className="w-full sm:w-[180px] border-[#3e3e40] bg-[#0e0e0e] text-[#C7C7CC]">
+                    <SelectTrigger className="book-table__pagination-select-trigger">
                         <SelectValue placeholder="Filas por página" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0e0e0e] border-[#3e3e40]">
+                    <SelectContent className="book-table__pagination-select-content">
                         {[10, 20, 30, 40, 50].map((pageSize) => (
-                            <SelectItem key={pageSize} value={pageSize.toString()} className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]">
+                            <SelectItem key={pageSize} value={pageSize.toString()} className="book-table__pagination-select-item">
                                 Mostrar {pageSize}
                             </SelectItem>
                         ))}

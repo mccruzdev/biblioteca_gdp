@@ -11,14 +11,14 @@ interface DeleteBookModalProps {
 export function DeleteBookModal({ isOpen, onClose, onConfirm }: DeleteBookModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px] bg-[#0e0e0e] text-[#C7C7CC]">
+            <DialogContent className="delete-book-modal__content">
                 <DialogHeader>
                     <DialogTitle>Eliminar Libro</DialogTitle>
                     <DialogDescription>
                         ¿Estás seguro de que deseas eliminar este libro?
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
+                <DialogFooter className="delete-book-modal__footer">
                     <Button onClick={onClose} variant="secondary">Cancelar</Button>
                     <Button onClick={onConfirm} variant="destructive">Eliminar</Button>
                 </DialogFooter>

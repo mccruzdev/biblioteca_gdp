@@ -12,9 +12,9 @@ interface BookTableMobileProps {
 
 export function BookTableMobile({ books, mode, onEdit, onDelete, onReserve }: BookTableMobileProps) {
     return (
-        <div className="md:hidden">
+        <div className="book-table__mobile">
             {books.map((book) => (
-                <Card key={book.id} className="mb-4 border-[#3e3e40] bg-[#0e0e0e] text-[#C7C7CC]">
+                <Card key={book.id} className="book-table__card">
                     <CardHeader>
                         <CardTitle>{book.title}</CardTitle>
                     </CardHeader>
@@ -26,15 +26,15 @@ export function BookTableMobile({ books, mode, onEdit, onDelete, onReserve }: Bo
                         <p><strong>Subcategoría:</strong> {book.subcategory}</p>
                         {mode === 'crud' ? (
                             <>
-                                <Button onClick={() => onEdit(book)} className="mt-2 mr-2 bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90">
+                                <Button onClick={() => onEdit(book)} className="book-table__button">
                                     Editar
                                 </Button>
-                                <Button onClick={() => onDelete(book)} className="mt-2 bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90">
+                                <Button onClick={() => onDelete(book)} className="book-table__button">
                                     Eliminar
                                 </Button>
                             </>
                         ) : (
-                            <Button onClick={() => onReserve(book)} className="mt-2 bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/90">
+                            <Button onClick={() => onReserve(book)} className="book-table__button">
                                 Reservar
                             </Button>
                         )}
