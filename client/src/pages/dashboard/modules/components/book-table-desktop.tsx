@@ -51,13 +51,13 @@ export function BookTableDesktop({ books, mode, onEdit, onDelete, onReserve }: B
                                             <>
                                                 <DropdownMenuItem
                                                     onClick={() => onEdit(book)}
-                                                    className="book-table__dropdown-item"
+                                                    className="book-table__dropdown-item mb-1"
                                                 >
                                                     Editar
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => onDelete(book)}
-                                                    className="book-table__dropdown-item"
+                                                    className="book-table__dropdown-item mb-1"
                                                 >
                                                     Eliminar
                                                 </DropdownMenuItem>
