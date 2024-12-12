@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from "../../../../components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
+import { useEffect, useState } from 'react'
 
 interface BookTablePaginationProps {
     currentPage: number
@@ -21,7 +22,43 @@ export function BookTablePagination({
     onNextPage,
     onBooksPerPageChange,
 }: BookTablePaginationProps) {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkIfMobile = () => setIsMobile(window.innerWidth < 768)
+        checkIfMobile()
+        window.addEventListener('resize', checkIfMobile)
+        return () => window.removeEventListener('resize', checkIfMobile)
+    }, [])
+
     const renderPaginationButtons = () => {
+        if (isMobile) {
+            return (
+                <>
+                    <Button
+                        key={1}
+                        variant={1 === currentPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => onPageChange(1)}
+                        className="book-table__pagination-button book-table__pagination-button--active"
+                    >
+                        1
+                    </Button>
+                    {totalPages > 1 && (
+                        <Button
+                            key={totalPages}
+                            variant={totalPages === currentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => onPageChange(totalPages)}
+                            className="book-table__pagination-button book-table__pagination-button--active"
+                        >
+                            {totalPages}
+                        </Button>
+                    )}
+                </>
+            )
+        }
+
         const buttons = []
         const maxButtons = 7
         let startPage, endPage
