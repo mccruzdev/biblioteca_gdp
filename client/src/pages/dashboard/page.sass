@@ -27,7 +27,7 @@ body
     margin-top: 0.5rem
     background-color: styles.$accent-color
     color: styles.$primary-bg
-    margin-right: 0.25rem 
+    margin-right: 0.25rem
     &:hover
       background-color: darken(styles.$accent-color, 10%)
 
@@ -77,7 +77,6 @@ body
       gap: 0.25rem
       overflow-x: auto
       padding-bottom: 0.5rem
-      
 
     &-button
       padding: 0.5rem
@@ -138,15 +137,17 @@ body
     width: 100%
 
     @media (min-width: 640px)
-      width: 200px
+      width: 150px
 
     @media (min-width: 768px)
-      width: 250px
+      width: 200px
 
     &-trigger
       background-color: styles.$secondary-bg
       border-color: styles.$border-color
       color: styles.$text-color
+      font-size: 0.875rem
+      padding: 0.5rem
 
     &-content
       background-color: styles.$bg
@@ -154,6 +155,7 @@ body
 
     &-item
       color: styles.$text-color
+      font-size: 0.875rem
       &:focus
         background-color: styles.$secondary-bg
         color: styles.$accent-color
@@ -163,6 +165,8 @@ body
     background-color: styles.$secondary-bg
     border-color: styles.$border-color
     color: styles.$text-color
+    font-size: 0.875rem
+    padding: 0.5rem
 
     &::placeholder
       color: #6e6e6e
@@ -191,6 +195,9 @@ body
 
   &__button
     flex: 1
+    font-size: 0.875rem
+    padding: 0.5rem
+    min-height: 2.5rem
 
     @media (min-width: 640px)
       flex: none
@@ -213,4 +220,26 @@ body
   &__icon
     height: 1rem
     width: 1rem
-    margin-right: 0.5rem
+    margin-right: 0.25rem
+
+  &__button-text
+    @media (max-width: 359px)
+      display: none
+
+    @media (min-width: 360px)
+      display: inline
+
+  @media (max-width: 639px)
+    &__select,
+    &__input,
+    &__button
+      font-size: 0.75rem
+      padding: 0.375rem
+
+    &__button
+      min-height: 2rem
+
+    &__icon
+      height: 0.875rem
+      width: 0.875rem
+      margin-right: 0.125rem
