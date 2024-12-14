@@ -11,6 +11,7 @@ import { LoanModule } from './modules/loan/loan.module';
 import { AuthorModule } from './modules/author/author.module';
 import { DonorModule } from './modules/donor/donor.module';
 import { SearchModule } from './modules/search/search.module';
+import { DonationModule } from './modules/donation/donation.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SearchModule } from './modules/search/search.module';
     BooksModule,
     ConfigModule.forRoot(),
     CopyModule,
+    DonationModule,
     DonorModule,
     LoanModule,
     LocationModule,

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
+import { transformBooks } from 'src/transformers/book';
 
 const paginateAuthor: PaginateFunction = paginator({
   path: 'search/books-by-author',
@@ -44,6 +45,7 @@ export class SearchService {
         where: { authors: { some: { name: { contains: author } } } },
       },
       { page, limit, path: `search/books-by-author/${author}` },
+      transformBooks,
     );
   }
 
@@ -61,6 +63,7 @@ export class SearchService {
         },
       },
       { page, limit, path: `search/books-by-category/${category}` },
+      transformBooks,
     );
   }
 
@@ -80,6 +83,7 @@ export class SearchService {
         },
       },
       { page, limit, path: `search/books-by-subcategory/${subcategory}` },
+      transformBooks,
     );
   }
 
@@ -91,6 +95,7 @@ export class SearchService {
         where: { title: { contains: title } },
       },
       { page, limit, path: `search/books-by-title/${title}` },
+      transformBooks,
     );
   }
 }
