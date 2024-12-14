@@ -8,17 +8,19 @@ import { ToastAction } from "../../../../components/ui/toast"
 import { usePagination } from "../hooks/use-pagination"
 import { catalogApi, Copy, CreateReservationDTO } from "../pages/catalog/catalog.api"
 import { booksApi } from "../pages/books/books.api"
+import { loanApi, CreateLoanDTO } from "../pages/loan/loan.api"
 import { BookTableDesktop } from "./book-table-desktop"
 import { BookTableMobile } from "./book-table-mobile"
 import { BookTablePagination } from "./book-table-pagination"
 import { ReservationModal } from "../pages/catalog/reserve/reservation-book-modal"
 import { EditBookModal } from "../pages/books/edit/edit-book-modal"
 import { DeleteBookModal } from "../pages/books/delete/delete-book-modal"
+import { LoanModal } from "../pages/loan/loan/loan-book-modal"
 
 interface BookTableProps {
-  books: BookI[]
-  token: string
-  mode: 'crud' | 'reservation'
+  books: BookI[];
+  token: string;
+  mode: "crud" | "reservation" | "loan";
 }
 
 export function BookTable({ books, token, mode }: BookTableProps) {
@@ -27,6 +29,7 @@ export function BookTable({ books, token, mode }: BookTableProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false)
+  const [isLoanModalOpen, setIsLoanModalOpen] = useState(false)
   const [copies, setCopies] = useState<Copy[]>([])
   const { toast } = useToast()
 
@@ -63,6 +66,21 @@ export function BookTable({ books, token, mode }: BookTableProps) {
       })
     }
   }
+
+  const handleLoan = async (book: BookI) => {
+    try {
+      const data = await catalogApi.getCopies(book.id, token)
+      setCopies(data)
+      setSelectedBook(book)
+      setIsLoanModalOpen(true)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    }
+  };
 
   const handleEditSubmit = async (data: any) => {
     if (!selectedBook) return
@@ -142,6 +160,38 @@ export function BookTable({ books, token, mode }: BookTableProps) {
     }
   }
 
+  const handleConfirmLoan = async (date: Date, time: string, selectedCopy: Copy) => {
+    if (!selectedBook) return
+
+    try {
+      const loanDate = new Date(date)
+      const [hours, minutes] = time.split(':').map(Number)
+      loanDate.setHours(hours, minutes)
+
+      const LoanData: CreateLoanDTO = {
+        dueDate: loanDate.toISOString(),
+        status: 'ACTIVE',
+        copies: [selectedCopy.id]
+      }
+
+      await loanApi.createLoan(LoanData, token)
+
+      toast({
+        title: "Préstamo confirmado",
+        description: `Préstamo de "${selectedBook.title}" (Copia: ${selectedCopy.code || 'N/A'}) para el ${format(loanDate, 'dd/MM/yyyy HH:mm', { locale: es })}.`,
+        action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
+      })
+
+      setIsLoanModalOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Hubo un problema al crear el préstamo. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
     <>
       <BookTableDesktop
@@ -150,6 +200,7 @@ export function BookTable({ books, token, mode }: BookTableProps) {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onReserve={handleReserve}
+        onLoan={handleLoan}
       />
 
       <BookTableMobile
@@ -158,6 +209,7 @@ export function BookTable({ books, token, mode }: BookTableProps) {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onReserve={handleReserve}
+        onLoan={handleLoan}
       />
 
       <BookTablePagination
@@ -190,6 +242,14 @@ export function BookTable({ books, token, mode }: BookTableProps) {
         isOpen={isReservationModalOpen}
         onClose={() => setIsReservationModalOpen(false)}
         onConfirm={handleConfirmReservation}
+        selectedBook={selectedBook}
+        copies={copies}
+      />
+
+      <LoanModal
+        isOpen={isLoanModalOpen}
+        onClose={() => setIsLoanModalOpen(false)}
+        onConfirm={handleConfirmLoan}
         selectedBook={selectedBook}
         copies={copies}
       />

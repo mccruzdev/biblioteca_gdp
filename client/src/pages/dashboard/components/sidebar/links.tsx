@@ -7,15 +7,15 @@ export const navItems: NavItem[] = [
     href: "/dashboard",
     icon: (props) => <Icon type="catalog" {...props} />,
   },
-  // {
-  //   label: "Préstamos",
-  //   href: "/dashboard/loan",
-  //   icon: (props) => <Icon type="loan" {...props} />,
-  //   children: [
-  //     { label: "Préstamos", href: "/dashboard/loan" },
-  //     { label: "Historial de Préstamos", href: "/dashboard/loan-history" },
-  //   ],
-  // },
+  {
+    label: "Préstamos",
+    href: "/dashboard/loan",
+    icon: (props) => <Icon type="loan" {...props} />,
+    children: [
+      { label: "Préstamos", href: "/dashboard/loan" },
+      { label: "Historial de Préstamos", href: "/dashboard/loan-history" },
+    ],
+  },
   {
     label: "Libros",
     href: "/dashboard/books",

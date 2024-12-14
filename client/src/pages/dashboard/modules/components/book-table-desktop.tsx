@@ -6,13 +6,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 interface BookTableDesktopProps {
     books: BookI[]
-    mode: 'crud' | 'reservation'
+    mode: 'crud' | 'reservation' | 'loan'
     onEdit: (book: BookI) => void
     onDelete: (book: BookI) => void
     onReserve: (book: BookI) => void
+    onLoan: (book: BookI) => void
 }
 
-export function BookTableDesktop({ books, mode, onEdit, onDelete, onReserve }: BookTableDesktopProps) {
+export function BookTableDesktop({ books, mode, onEdit, onDelete, onReserve, onLoan }: BookTableDesktopProps) {
     return (
         <div className="book-table__desktop">
             <Table>
@@ -47,7 +48,7 @@ export function BookTableDesktop({ books, mode, onEdit, onDelete, onReserve }: B
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="book-table__dropdown-content">
-                                        {mode === 'crud' ? (
+                                        {mode === 'crud' && (
                                             <>
                                                 <DropdownMenuItem
                                                     onClick={() => onEdit(book)}
@@ -62,12 +63,21 @@ export function BookTableDesktop({ books, mode, onEdit, onDelete, onReserve }: B
                                                     Eliminar
                                                 </DropdownMenuItem>
                                             </>
-                                        ) : (
+                                        )}
+                                        {mode === 'reservation' && (
                                             <DropdownMenuItem
                                                 onClick={() => onReserve(book)}
                                                 className="book-table__dropdown-item"
                                             >
                                                 Reservar
+                                            </DropdownMenuItem>
+                                        )}
+                                        {mode === 'loan' && (
+                                            <DropdownMenuItem
+                                                onClick={() => onLoan(book)}
+                                                className="book-table__dropdown-item"
+                                            >
+                                                Préstamo
                                             </DropdownMenuItem>
                                         )}
                                     </DropdownMenuContent>
