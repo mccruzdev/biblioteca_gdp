@@ -3,6 +3,7 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { BookDTO } from './dto/book.dto';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { Author, ParseBook } from 'src/types';
+import { transformBook, transformBooks } from 'src/transformers/book';
 
 const paginate: PaginateFunction = paginator({
   path: 'book',
@@ -36,15 +37,11 @@ export class BooksService {
   };
 
   async getAllBooks(page: number, limit: number) {
-    const transformBookData = (books: ParseBook[]) => {
-      return books.map((book: any) => this._getParseBook(book));
-    };
-
     return await paginate(
       this.prisma.book,
       { select: this.customSelect },
       { page, path: 'book', limit },
-      transformBookData,
+      transformBooks,
     );
   }
 
@@ -55,7 +52,7 @@ export class BooksService {
     });
 
     if (!book) throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
-    return this._getParseBook(book);
+    return transformBook(book);
   }
 
   async createBook(book: BookDTO) {
@@ -205,20 +202,5 @@ export class BooksService {
     }
 
     return authors;
-  }
-
-  _getParseBook(book: ParseBook) {
-    return {
-      id: book.id,
-      title: book.title,
-      pages: book.pages,
-      authors: book.authors.map((author: any) => ({
-        id: author.id,
-        name: author.name,
-        email: author.email,
-      })),
-      subcategory: book.Subcategory?.name || null,
-      category: book.Subcategory?.Category?.name || null,
-    };
   }
 }

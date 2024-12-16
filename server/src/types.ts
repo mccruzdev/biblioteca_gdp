@@ -54,5 +54,10 @@ export interface ParseBook {
   title: string;
   pages?: number;
   authors?: Author[];
-  Subcategory?: any | null;
+  Subcategory?: {
+    name: string;
+    Category?: {
+      name: string;
+    };
+  };
 }

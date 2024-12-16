@@ -1,9 +1,11 @@
+export type UserRoleT = "READER" | "LIBRARIAN" | "ADMIN";
+
 export interface UserI {
   dni: string;
   names: string;
   lastName: string;
   phoneNumber: string;
-  role: string;
+  role: UserRoleT;
   email: string;
 }
 

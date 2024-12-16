@@ -1,14 +1,16 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Param,
-  ParseIntPipe,
   Post,
-  Put,
+  Body,
+  Param,
+  Delete,
+  ParseIntPipe,
   Query,
+  Put,
 } from '@nestjs/common';
+import { DonorService } from './donor.service';
+import { DonorDto } from './dto/donor.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -18,19 +20,17 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthorService } from './author.service';
 import { Roles } from 'src/decorators/roles/roles.decorator';
-import { AuthorDTO } from './dto/author.dto';
 
-@ApiTags('Author')
+@ApiTags('Donor')
 @ApiBearerAuth()
-@Controller('author')
-export class AuthorController {
-  constructor(private readonly authorService: AuthorService) {}
+@Controller('donor')
+export class DonorController {
+  constructor(private readonly donorService: DonorService) {}
 
   @Get()
-  @Roles('READER')
-  @ApiOperation({ summary: 'Obtener una lista paginada de autores' })
+  @Roles('LIBRARIAN')
+  @ApiOperation({ summary: 'Obtener una lista paginada de los donantes' })
   @ApiQuery({
     name: 'page',
     type: Number,
@@ -45,7 +45,7 @@ export class AuthorController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista paginada de todos los autores',
+    description: 'Lista paginada de todas las donaciones',
   })
   @ApiResponse({
     status: 400,
@@ -56,15 +56,15 @@ export class AuthorController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  getAllAuthors(@Query('page') page = 1, @Query('limit') limit = 10) {
-    return this.authorService.getAllAuthors(Number(page), Number(limit));
+  getAllDonors(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.donorService.getAllDonors(Number(page), Number(limit));
   }
 
   @Post()
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Crear un nuevo autor' })
+  @ApiOperation({ summary: 'Crear un nuevo donante' })
   @ApiBody({
-    type: AuthorDTO,
+    type: DonorDto,
     examples: {
       example: {
         value: {
@@ -87,20 +87,20 @@ export class AuthorController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  createAuthor(@Body() data: AuthorDTO) {
-    return this.authorService.createAuthor(data);
+  createDonor(@Body() data: DonorDto) {
+    return this.donorService.createDonor(data);
   }
 
   @Put(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Actualizar autor' })
+  @ApiOperation({ summary: 'Actualizar donante' })
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'ID del autor a actualizar',
+    description: 'ID del donante a actualizar',
   })
   @ApiBody({
-    type: AuthorDTO,
+    type: DonorDto,
     examples: {
       example: {
         value: {
@@ -112,7 +112,7 @@ export class AuthorController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Autor actualizado correctamente',
+    description: 'Donante actualizado correctamente',
   })
   @ApiResponse({
     status: 400,
@@ -125,23 +125,23 @@ export class AuthorController {
   })
   @ApiResponse({
     status: 404,
-    description: 'ID del autor no encontrado',
+    description: 'ID del donante no encontrado',
   })
-  updateAuthor(@Param('id', ParseIntPipe) id: number, @Body() data: AuthorDTO) {
-    return this.authorService.updateAuthor(id, data);
+  updateDonor(@Param('id', ParseIntPipe) id: number, @Body() data: DonorDto) {
+    return this.donorService.updateDonor(id, data);
   }
 
   @Delete(':id')
   @Roles('LIBRARIAN')
-  @ApiOperation({ summary: 'Eliminar autor' })
+  @ApiOperation({ summary: 'Eliminar donante' })
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'ID del autor a eliminar',
+    description: 'ID del donante a eliminar',
   })
   @ApiResponse({
     status: 200,
-    description: 'Autor eliminado correctamente',
+    description: 'Donante eliminado correctamente',
   })
   @ApiResponse({
     status: 400,
@@ -154,9 +154,9 @@ export class AuthorController {
   })
   @ApiResponse({
     status: 404,
-    description: 'ID del autor no encontrado',
+    description: 'ID del donante no encontrado',
   })
-  deleteAuthor(@Param('id', ParseIntPipe) id: number) {
-    return this.authorService.deleteAuthor(id);
+  deleteDonor(@Param('id', ParseIntPipe) id: number) {
+    return this.donorService.deleteDonor(id);
   }
 }

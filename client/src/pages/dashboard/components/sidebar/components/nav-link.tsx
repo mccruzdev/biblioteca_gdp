@@ -1,3 +1,4 @@
+import { UserRoleT } from "@/types";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -7,6 +8,7 @@ export interface NavItem {
   href: string;
   icon: React.ElementType;
   children?: { label: string; href: string }[];
+  roles?: UserRoleT[];
 }
 
 export const NavLink: React.FC<{ item: NavItem; isCollapsed: boolean }> = ({

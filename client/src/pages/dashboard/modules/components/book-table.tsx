@@ -1,163 +1,259 @@
-import React, { useState, useMemo } from "react";
-import { Table, Button, Dropdown } from "flowbite-react";
-import { MoreHorizontal, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { BookI } from "../../../../types";
+import "../../page.sass"
+import { useState } from "react"
+import { BookI } from "../../../../types"
+import { format } from "date-fns"
+import { es } from 'date-fns/locale'
+import { useToast } from "../../../../hooks/use-toast"
+import { ToastAction } from "../../../../components/ui/toast"
+import { usePagination } from "../hooks/use-pagination"
+import { catalogApi, Copy, CreateReservationDTO } from "../pages/catalog/catalog.api"
+import { booksApi } from "../pages/books/books.api"
+import { loanApi, CreateLoanDTO } from "../pages/loan/loan.api"
+import { BookTableDesktop } from "./book-table-desktop"
+import { BookTableMobile } from "./book-table-mobile"
+import { BookTablePagination } from "./book-table-pagination"
+import { ReservationModal } from "../pages/catalog/reserve/reservation-book-modal"
+import { EditBookModal } from "../pages/books/edit/edit-book-modal"
+import { DeleteBookModal } from "../pages/books/delete/delete-book-modal"
+import { LoanModal } from "../pages/loan/loan/loan-book-modal"
 
 interface BookTableProps {
   books: BookI[];
+  token: string;
+  mode: "crud" | "reservation" | "loan";
 }
 
-export const BookTable: React.FC<BookTableProps> = ({ books }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<BookI | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [booksPerPage, setBooksPerPage] = useState(10);
+export function BookTable({ books, token, mode }: BookTableProps) {
+  const [booksPerPage, setBooksPerPage] = useState(10)
+  const [selectedBook, setSelectedBook] = useState<BookI | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false)
+  const [isLoanModalOpen, setIsLoanModalOpen] = useState(false)
+  const [copies, setCopies] = useState<Copy[]>([])
+  const { toast } = useToast()
 
-  const handleReserve = (book: BookI) => {
-    setSelectedBook(book);
-    setIsModalOpen(true);
+  const {
+    currentPage,
+    totalPages,
+    currentItems: currentBooks,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(books, booksPerPage)
+
+  const handleEdit = (book: BookI) => {
+    setSelectedBook(book)
+    setIsEditModalOpen(true)
+  }
+
+  const handleDelete = (book: BookI) => {
+    setSelectedBook(book)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleReserve = async (book: BookI) => {
+    try {
+      const data = await catalogApi.getCopies(book.id, token)
+      setCopies(data)
+      setSelectedBook(book)
+      setIsReservationModalOpen(true)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleLoan = async (book: BookI) => {
+    try {
+      const data = await catalogApi.getCopies(book.id, token)
+      setCopies(data)
+      setSelectedBook(book)
+      setIsLoanModalOpen(true)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    }
   };
 
-  const indexOfLastBook = currentPage * booksPerPage;
-  const indexOfFirstBook = indexOfLastBook - booksPerPage;
-  const currentBooks = useMemo(() => books.slice(indexOfFirstBook, indexOfLastBook), [books, indexOfFirstBook, indexOfLastBook]);
+  const handleEditSubmit = async (data: any) => {
+    if (!selectedBook) return
 
-  const totalPages = Math.ceil(books.length / booksPerPage);
+    try {
+      const bookData = {
+        title: data.title,
+        pages: Number(data.pages),
+        authors: [{ name: data.author }],
+        category: data.category,
+        subcategory: data.subcategory,
+      }
 
-  const nextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
+      await booksApi.updateBook(selectedBook.id, bookData, token)
+      toast({
+        title: "Éxito",
+        description: `El libro "${data.title}" ha sido actualizado`,
+      })
+      setIsEditModalOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al actualizar el libro",
+        variant: "destructive",
+      })
+    }
+  }
 
-  const prevPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
+  const handleDeleteConfirm = async () => {
+    if (!selectedBook) return
+
+    try {
+      await booksApi.deleteBook(selectedBook.id, token)
+      toast({
+        title: "Éxito",
+        description: `El libro "${selectedBook.title}" ha sido eliminado`,
+      })
+      setIsDeleteModalOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al eliminar el libro",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleConfirmReservation = async (date: Date, time: string, selectedCopy: Copy) => {
+    if (!selectedBook) return
+
+    try {
+      const reservationDate = new Date(date)
+      const [hours, minutes] = time.split(':').map(Number)
+      reservationDate.setHours(hours, minutes)
+
+      const reservationData: CreateReservationDTO = {
+        dueDate: reservationDate.toISOString(),
+        status: 'PENDING',
+        copies: [selectedCopy.id]
+      }
+
+      await catalogApi.createReservation(reservationData, token)
+
+      toast({
+        title: "Reserva confirmada",
+        description: `Has reservado "${selectedBook.title}" (Copia: ${selectedCopy.code || 'N/A'}) para el ${format(reservationDate, 'dd/MM/yyyy HH:mm', { locale: es })}.`,
+        action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
+      })
+
+      setIsReservationModalOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Hubo un problema al crear la reserva. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleConfirmLoan = async (date: Date, time: string, selectedCopy: Copy) => {
+    if (!selectedBook) return
+
+    try {
+      const loanDate = new Date(date)
+      const [hours, minutes] = time.split(':').map(Number)
+      loanDate.setHours(hours, minutes)
+
+      const LoanData: CreateLoanDTO = {
+        dueDate: loanDate.toISOString(),
+        status: 'ACTIVE',
+        copies: [selectedCopy.id]
+      }
+
+      await loanApi.createLoan(LoanData, token)
+
+      toast({
+        title: "Préstamo confirmado",
+        description: `Préstamo de "${selectedBook.title}" (Copia: ${selectedCopy.code || 'N/A'}) para el ${format(loanDate, 'dd/MM/yyyy HH:mm', { locale: es })}.`,
+        action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
+      })
+
+      setIsLoanModalOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Hubo un problema al crear el préstamo. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    }
+  }
 
   return (
     <>
-      <div className="overflow-x-auto rounded-lg">
-        <Table striped hoverable className="overflow-x-auto w-full text-sm text-left text-gray-200">
-          <Table.Head className="text-xs uppercase !bg-black text-gray-200">
-            <Table.HeadCell className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500">Id</Table.HeadCell>
-            <Table.HeadCell className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500">Titulo</Table.HeadCell>
-            <Table.HeadCell className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500">Páginas</Table.HeadCell>
-            <Table.HeadCell className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500">Author</Table.HeadCell>
-            <Table.HeadCell className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500">Categoría</Table.HeadCell>
-            <Table.HeadCell className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500">Subcategoría</Table.HeadCell>
-            <Table.HeadCell className="px-3 py-2 cursor-pointer !bg-black hover:!bg-yellow-500">Acciones</Table.HeadCell>
-          </Table.Head>
-          <Table.Body>
-            {currentBooks.map((book) => (
-              <Table.Row key={book.id} className="custom-bg hover:!bg-gray-700">
-                <Table.Cell className="px-3 py-2 whitespace-nowrap">{book.id}</Table.Cell>
-                <Table.Cell className="px-3 py-2 whitespace-nowrap">{book.title}</Table.Cell>
-                <Table.Cell className="px-3 py-2 whitespace-nowrap">{book.pages}</Table.Cell>
-                <Table.Cell className="px-3 py-2 whitespace-nowrap">
-                  {book.authors[0] ? book.authors[0].name : "Desconocido"}
-                </Table.Cell>
-                <Table.Cell className="px-3 py-2 whitespace-nowrap">{book.category}</Table.Cell>
-                <Table.Cell className="px-3 py-2 whitespace-nowrap">{book.subcategory}</Table.Cell>
-                <Table.Cell className="px-3 py-2 whitespace-nowrap text-right">
-                  <Dropdown
-                    className="custom-bg"
-                    label={<MoreHorizontal className="h-4 w-4" />}
-                    dismissOnClick={false}
-                    renderTrigger={() => (
-                      <Button color="black" size="xs">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    )}
-                  >
-                    <Dropdown.Item
-                      onClick={() => handleReserve(book)}
-                      className="hover:bg-yellow-500"
-                    >
-                      Reservar
-                    </Dropdown.Item>
-                  </Dropdown>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </div>
+      <BookTableDesktop
+        books={currentBooks}
+        mode={mode}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onReserve={handleReserve}
+        onLoan={handleLoan}
+      />
 
-      <div className="flex items-center justify-end mt-4 space-x-2">
-        <span className="text-sm text-gray-400 mr-2">
-          Página {currentPage} de {totalPages}
-        </span>
-        <Button
-          onClick={prevPage}
-          disabled={currentPage === 1}
-          className="px-2 py-1 text-sm"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          onClick={nextPage}
-          disabled={currentPage === totalPages}
-          className="px-2 py-1 text-sm"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <select
-          value={booksPerPage}
-          onChange={(e) => {
-            setBooksPerPage(Number(e.target.value));
-            setCurrentPage(1);
-          }}
-          className="bg-gray-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-        >
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Mostrar {pageSize}
-            </option>
-          ))}
-        </select>
-      </div>
+      <BookTableMobile
+        books={currentBooks}
+        mode={mode}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onReserve={handleReserve}
+        onLoan={handleLoan}
+      />
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="custom-bg rounded-lg shadow-lg max-w-md w-full mx-4">
-            <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <h3 className="text-xl font-semibold text-white">
-                Realiza tu reserva
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-              >
-                <X className="h-6 w-6" />
-                <span className="sr-only">Cerrar</span>
-              </button>
-            </div>
-            {selectedBook && (
-              <div className="p-4">
-                <p className="text-sm text-gray-400">
-                  ¿Deseas reservar el libro "{selectedBook.title}"?
-                </p>
-              </div>
-            )}
-            <div className="flex justify-end space-x-3 p-4 border-t border-gray-700">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => {
-                  console.log(`Reservando libro: ${selectedBook?.title}`);
-                  setIsModalOpen(false);
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500"
-              >
-                Reservar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <BookTablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        booksPerPage={booksPerPage}
+        onPageChange={goToPage}
+        onPrevPage={prevPage}
+        onNextPage={nextPage}
+        onBooksPerPageChange={(value) => {
+          setBooksPerPage(Number(value))
+          goToPage(1)
+        }}
+      />
+
+      <EditBookModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={handleEditSubmit}
+        book={selectedBook}
+      />
+
+      <DeleteBookModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
+
+      <ReservationModal
+        isOpen={isReservationModalOpen}
+        onClose={() => setIsReservationModalOpen(false)}
+        onConfirm={handleConfirmReservation}
+        selectedBook={selectedBook}
+        copies={copies}
+      />
+
+      <LoanModal
+        isOpen={isLoanModalOpen}
+        onClose={() => setIsLoanModalOpen(false)}
+        onConfirm={handleConfirmLoan}
+        selectedBook={selectedBook}
+        copies={copies}
+      />
     </>
-  );
-};
+  )
+}
 

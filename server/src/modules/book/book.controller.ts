@@ -89,6 +89,8 @@ export class BooksController {
     return this.booksService.getBookById(id);
   }
 
+  // getBooksByAuthor(@Param('author') author: string) {}
+
   @Post()
   @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Agregar un nuevo libro' })

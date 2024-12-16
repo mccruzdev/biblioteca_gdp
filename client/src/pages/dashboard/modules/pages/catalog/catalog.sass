@@ -14,3 +14,93 @@
 
   .Catalog-content-section
     color: styles.$text-color
+
+.reservation-modal
+  &__content
+    max-width: 295px
+    background-color: styles.$bg
+    border-color: styles.$border-color
+    color: styles.$text-color
+    border-radius: 0.5rem
+
+  &__title
+    color: styles.$accent-color
+
+  &__description
+    color: styles.$text-color
+
+  &__grid
+    display: grid
+    gap: 1rem
+    padding-top: 1rem
+    padding-bottom: 1rem
+
+  &__label
+    color: styles.$text-color
+
+  &__select
+    &-trigger
+      background-color: styles.$secondary-bg
+      border-color: styles.$border-color
+      color: styles.$text-color
+
+    &-content
+      background-color: styles.$bg
+      border-color: styles.$border-color
+
+    &-item
+      color: styles.$text-color
+      &:focus
+        background-color: styles.$secondary-bg
+        color: styles.$accent-color
+
+  &__date-button
+    width: 100%
+    justify-content: flex-start
+    text-align: left
+    font-weight: normal
+    background-color: styles.$secondary-bg
+    border-color: styles.$border-color
+    color: styles.$text-color
+
+  &__calendar
+    background-color: styles.$bg
+    color: styles.$text-color
+
+    &-day
+      &--selected
+        background-color: styles.$accent-color
+        color: styles.$primary-bg
+        &:hover
+          background-color: styles.$accent-color
+          color: styles.$primary-bg
+
+      &--today
+        background-color: styles.$secondary-bg
+        color: styles.$accent-color
+        font-weight: bold
+
+  &__calendar-accept
+    width: 100%
+    background-color: styles.$accent-color
+    color: styles.$primary-bg
+    &:hover
+      background-color: darken(styles.$accent-color, 10%)
+      color: styles.$primary-bg
+
+  &__footer-button
+    &--cancel
+      background-color: styles.$secondary-bg
+      border-color: styles.$border-color
+      color: styles.$text-color
+      &:hover
+        background-color: darken(styles.$secondary-bg, 10%)
+        color: styles.$accent-color
+
+    &--confirm
+      background-color: styles.$accent-color
+      color: styles.$primary-bg
+      margin-bottom: 0.35rem 
+      &:hover
+        background-color: darken(styles.$accent-color, 10%)
+        color: styles.$primary-bg

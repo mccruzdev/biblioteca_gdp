@@ -6,13 +6,13 @@ export type Copy = {
     condition: string;
 };
 
-export interface CreateReservationDTO {
+export interface CreateLoanDTO {
     dueDate: string;
     status: string;
     copies: number[];
 }
 
-export const catalogApi = {
+export const loanApi = {
     getCopies: async (bookId: number, token: string): Promise<Copy[]> => {
         const response = await fetch(`${BACKEND_SERVER}/copy/${bookId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -24,8 +24,8 @@ export const catalogApi = {
         return data.data;
     },
 
-    createReservation: async (data: CreateReservationDTO, token: string) => {
-        const response = await fetch(`${BACKEND_SERVER}/reservation`, {
+    createLoan: async (data: CreateLoanDTO, token: string) => {
+        const response = await fetch(`${BACKEND_SERVER}/loan`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export const catalogApi = {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(errorText || 'Failed to create reservation');
+            throw new Error(errorText || 'Failed to create loan');
         }
 
         const responseText = await response.text();
