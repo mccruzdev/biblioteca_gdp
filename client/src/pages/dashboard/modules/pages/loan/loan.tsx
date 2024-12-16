@@ -5,7 +5,6 @@ import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useTokenUC } from "../../../../../context/user/user.hook";
 import { BookTable } from "../../components/book-table";
-import { SearchBar } from "../../components/search-bar";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 
@@ -50,10 +49,6 @@ export function DashboardLoan() {
     }
   }
 
-  const handleSearch = (searchTerm: string, searchType: string) => {
-    fetchBooks(searchTerm, searchType)
-  }
-
   const handleReset = (clearSearchBar: boolean = false) => {
     setIsSearching(false)
     fetchBooks()
@@ -71,7 +66,6 @@ export function DashboardLoan() {
         </p>
       </section>
       <div className="outer-container bg-secondary-bg rounded-lg p-4 md:p-6">
-        <SearchBar onSearch={handleSearch} onReset={() => handleReset(true)} ref={searchBarRef} />
         <div className="inner-container bg-[#0e0e0e] rounded-lg p-4 md:p-6 mt-4">
           <section className="Catalog-content-section">
             <div className="border-b border-gray-100 py-1">
