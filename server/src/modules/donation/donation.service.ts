@@ -132,81 +132,61 @@ export class DonationService {
 
   async updateDonation(id: number, data: DonationDTO) {
     try {
-      let locationIds: number[] = [];
-
-      for (let i = 0; i < data.copies.length; i++) {
-        const copy = data.copies[i];
-
-        const _location = await this.prisma.location.findFirst({
-          where: {
-            shelf: copy.location.shelf,
-            shelfColor: copy.location.shelfColor,
-            shelfLevel: copy.location.shelfLevel,
-          },
+      const locationPromises = data.copies.map(async (copy) => {
+        const existingLocation = await this.prisma.location.findFirst({
+          where: copy.location,
         });
+        return existingLocation
+          ? existingLocation.id
+          : (await this.prisma.location.create({ data: copy.location })).id;
+      });
 
-        if (_location) {
-          locationIds.push(_location.id);
-          return;
-        }
-
-        const newLocation = await this.prisma.location.create({
-          data: copy.location,
+      const publisherPromises = data.copies.map(async (copy) => {
+        const existingPublisher = await this.prisma.publisher.findFirst({
+          where: copy.publisher,
         });
-        locationIds.push(newLocation.id);
-      }
+        return existingPublisher
+          ? existingPublisher.id
+          : (await this.prisma.publisher.create({ data: copy.publisher })).id;
+      });
 
-      let publisherIds: number[] = [];
-
-      for (let i = 0; i < data.copies.length; i++) {
-        const copy = data.copies[i];
-
-        const _publisher = await this.prisma.publisher.findFirst({
-          where: { name: copy.publisher.name, email: copy.publisher.email },
-        });
-
-        if (_publisher) {
-          publisherIds.push(_publisher.id);
-          return;
-        }
-
-        const newPublisher = await this.prisma.publisher.create({
-          data: copy.publisher,
-        });
-        publisherIds.push(newPublisher.id);
-      }
+      const [locationIds, publisherIds] = await Promise.all([
+        Promise.all(locationPromises),
+        Promise.all(publisherPromises),
+      ]);
 
       await this.prisma.donation.update({
-        where: { id },
         data: {
           donorId: data.donorId,
           description: data.description,
           copies: {
             deleteMany: {},
-            create: data.copies.map((copy, index) => {
-              return {
+            createMany: {
+              data: data.copies.map((copy, index) => ({
                 code: copy.code,
                 condition: copy.condition,
+                bookId: copy.bookId,
                 locationId: locationIds[index],
                 publisherId: publisherIds[index],
-                bookId: copy.bookId,
-              };
-            }),
+              })),
+            },
           },
         },
+        where: { id },
       });
     } catch {
-      throw new HttpException('Duplicated data', HttpStatus.CONFLICT);
+      throw new HttpException('Hay datos duplicados', HttpStatus.CONFLICT);
     }
   }
 
   async deleteDonation(id: number) {
     try {
-      await this.prisma.donation.delete({
-        where: { id },
-      });
+      await this.prisma.donation.delete({ where: { id } });
     } catch {
-      throw new HttpException('Donation ID not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'ID de donación no encontrado',
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }
