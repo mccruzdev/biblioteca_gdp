@@ -15,13 +15,13 @@ import { DonationModule } from './modules/donation/donation.module';
 
 @Module({
   imports: [
+    DonationModule,
     AuthModule,
     AuthorModule,
     BookCategoryModule,
     BooksModule,
     ConfigModule.forRoot(),
     CopyModule,
-    DonationModule,
     DonorModule,
     LoanModule,
     LocationModule,

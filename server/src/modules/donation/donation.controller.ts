@@ -60,6 +60,50 @@ export class DonationController {
     return this.donationService.getAllDonations(Number(page), Number(limit));
   }
 
+  @Get(':id/copies')
+  @Roles('LIBRARIAN')
+  @ApiOperation({
+    summary: 'Obtener una lista paginada de las copias de la donación',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Id de la donación',
+    required: true,
+  })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Número de la página',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Resultados por página',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista paginada de copias de la donación',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Parámetros invalidos',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden: You do not have permission to access this resource',
+  })
+  donationBooks(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.donationService.donationBooks(id, Number(page), Number(limit));
+  }
+
   @Post()
   @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Crear una nueva donación' })
