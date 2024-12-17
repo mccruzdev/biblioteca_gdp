@@ -1,39 +1,42 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "../../../../components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
+import { Copy } from "../pages/loan/loan.api";
 
 interface Reservation {
-    id: string;
-    bookTitle: string;
-    copyCode: string;
-    createdAt: string;
-    reservationDate: string;
+    id: number;
+    created: string;
+    dueDate: string;
     status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+    copies: Copy[];
+    bookTitle?: string;
+    bookId?: number;
 }
 
 interface ReservationTableMobileProps {
     reservations: Reservation[];
-    onCancel: (reservation: Reservation) => void;
+    onLoan: (reservation: Reservation) => void;
 }
 
-export function ReservationTableMobile({ reservations, onCancel }: ReservationTableMobileProps) {
+export function ReservationTableMobile({ reservations, onLoan }: ReservationTableMobileProps) {
     return (
         <div className="reservation-table__mobile">
             {reservations.map((reservation) => (
                 <Card key={reservation.id} className="reservation-table__card mb-4">
                     <CardHeader>
-                        <CardTitle>{reservation.bookTitle}</CardTitle>
+                        <CardTitle>Reserva #{reservation.id}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p><strong>ID Reserva:</strong> {reservation.id}</p>
-                        <p><strong>Copia:</strong> {reservation.copyCode}</p>
-                        <p><strong>Fecha de Creación:</strong> {reservation.createdAt}</p>
-                        <p><strong>Fecha de Reserva:</strong> {reservation.reservationDate}</p>
+                        <p><strong>ID Libro:</strong> {reservation.bookId || 'N/A'}</p>
+                        <p><strong>Libro:</strong> {reservation.bookTitle || 'Cargando...'}</p>
+                        <p><strong>Fecha de Creación:</strong> {new Date(reservation.created).toLocaleString()}</p>
+                        <p><strong>Fecha de Reserva:</strong> {new Date(reservation.dueDate).toLocaleString()}</p>
                         <p><strong>Estado:</strong> {reservation.status}</p>
+                        <p><strong>Copia:</strong> {reservation.copies[0]?.code || 'N/A'}</p>
                         <Button
-                            onClick={() => onCancel(reservation)}
+                            onClick={() => onLoan(reservation)}
                             className="reservation-table__button mt-2"
                         >
-                            Cancelar Reserva
+                            Préstamo
                         </Button>
                     </CardContent>
                 </Card>

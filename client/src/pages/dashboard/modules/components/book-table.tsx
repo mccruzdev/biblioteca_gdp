@@ -15,7 +15,6 @@ import { BookTablePagination } from "./book-table-pagination"
 import { ReservationModal } from "../pages/catalog/reserve/reservation-book-modal"
 import { EditBookModal } from "../pages/books/edit/edit-book-modal"
 import { DeleteBookModal } from "../pages/books/delete/delete-book-modal"
-import { LoanModal } from "../pages/loan/loan/loan-book-modal"
 
 interface BookTableProps {
   books: BookI[];
@@ -242,14 +241,6 @@ export function BookTable({ books, token, mode }: BookTableProps) {
         isOpen={isReservationModalOpen}
         onClose={() => setIsReservationModalOpen(false)}
         onConfirm={handleConfirmReservation}
-        selectedBook={selectedBook}
-        copies={copies}
-      />
-
-      <LoanModal
-        isOpen={isLoanModalOpen}
-        onClose={() => setIsLoanModalOpen(false)}
-        onConfirm={handleConfirmLoan}
         selectedBook={selectedBook}
         copies={copies}
       />

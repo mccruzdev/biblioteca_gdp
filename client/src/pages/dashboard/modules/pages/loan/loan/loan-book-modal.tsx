@@ -1,184 +1,90 @@
-import { useState } from "react"
-import { format, isBefore, startOfDay } from "date-fns"
-import { es } from 'date-fns/locale'
-import { CalendarIcon, Check } from 'lucide-react'
-import { BookI } from "../../../../../../types"
-import { Calendar } from "../../../../../../components/ui/calendar"
-import { cn } from "../../../../../../lib/utils"
+import { useState } from 'react'
 import { Button } from "../../../../../../components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../../../components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../../../components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "../../../../../../components/ui/popover"
-import { Label } from "../../../../../../components/ui/label"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "../../../../../../components/ui/dialog"
+import { useToast } from "../../../../../../hooks/use-toast"
+import { loanApi, CreateLoanDTO } from '../loan.api'
 
-type Copy = {
-    id: number;
-    code: string | null;
-    condition: string;
-};
-
-interface LoanModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onConfirm: (date: Date, time: string, selectedCopy: Copy) => void;
-    selectedBook: BookI | null;
-    copies: Copy[];
+interface LoanConfirmationModalProps {
+    isOpen: boolean
+    onClose: () => void
+    reservation: {
+        id: number
+        bookId?: number
+        bookTitle?: string
+        dueDate: string
+        copies: { id: number }[]
+    }
+    token: string
+    onSuccess: () => void
 }
 
-export function LoanModal({ isOpen, onClose, onConfirm, selectedBook, copies }: LoanModalProps) {
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-    const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined)
-    const [selectedCopy, setSelectedCopy] = useState<Copy | null>(null)
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+export function LoanConfirmationModal({
+    isOpen,
+    onClose,
+    reservation,
+    token,
+    onSuccess
+}: LoanConfirmationModalProps) {
+    const [isLoading, setIsLoading] = useState(false)
+    const { toast } = useToast()
 
-    const handleDateSelect = (date: Date | undefined) => {
-        setSelectedDate(date)
-        setIsCalendarOpen(false)
-    }
+    const handleConfirm = async () => {
+        setIsLoading(true)
+        try {
+            const loanData: CreateLoanDTO = {
+                dueDate: reservation.dueDate,
+                status: 'ACTIVE',
+                copies: [reservation.copies[0].id]
+            };
 
-    const handleConfirm = () => {
-        if (selectedDate && selectedTime && selectedCopy) {
-            onConfirm(selectedDate, selectedTime, selectedCopy)
+            console.log('Loan data:', loanData);
+
+            const result = await loanApi.createLoan(loanData, token);
+            console.log('Create loan result:', result);
+
+            toast({
+                title: "Préstamo registrado",
+                description: `El préstamo para el libro "${reservation.bookTitle}" ha sido registrado exitosamente.`,
+            })
+            onSuccess()
+        } catch (error) {
+            console.error('Error registering loan:', error)
+            toast({
+                title: "Error",
+                description: "Hubo un problema al registrar el préstamo. Por favor, inténtelo de nuevo.",
+                variant: "destructive"
+            })
+        } finally {
+            setIsLoading(false)
+            onClose()
         }
-    }
-
-    const isDateDisabled = (date: Date) => {
-        return isBefore(date, startOfDay(new Date()))
     }
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="loan-modal__content">
+            <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="loan-modal__title">Realiza tu reserva</DialogTitle>
-                    <DialogDescription className="loan-modal__description">
-                        {selectedBook && (
-                            <p>Selecciona la fecha, hora y copia para el libro "{selectedBook.title}"</p>
-                        )}
+                    <DialogTitle>Confirmar Préstamo</DialogTitle>
+                    <DialogDescription>
+                        ¿Está seguro que desea registrar el préstamo para el libro "{reservation.bookTitle}" (ID: {reservation.bookId})?
                     </DialogDescription>
                 </DialogHeader>
-                <div className="loan-modal__grid">
-                    <div className="grid gap-2">
-                        <Label htmlFor="copy" className="loan-modal__label">Copia del libro</Label>
-                        <Select
-                            value={selectedCopy?.id.toString()}
-                            onValueChange={(value) => setSelectedCopy(copies.find(c => c.id === parseInt(value)) || null)}
-                        >
-                            <SelectTrigger id="copy" className="loan-modal__select-trigger">
-                                <SelectValue placeholder="Selecciona una copia" />
-                            </SelectTrigger>
-                            <SelectContent className="loan-modal__select-content">
-                                {copies.map((copy) => (
-                                    <SelectItem
-                                        key={copy.id}
-                                        value={copy.id.toString()}
-                                        className="loan-modal__select-item"
-                                    >
-                                        {`Código: ${copy.code || 'N/A'} - Condición: ${copy.condition}`}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="date" className="loan-modal__label">Fecha de recojo</Label>
-                        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    id="date"
-                                    variant={"outline"}
-                                    className={cn(
-                                        "loan-modal__date-button",
-                                        !selectedDate && "text-muted-foreground"
-                                    )}
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {selectedDate ? format(selectedDate, "PPP", { locale: es }) : <span>Selecciona una fecha</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 loan-modal__select-content" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={handleDateSelect}
-                                    initialFocus
-                                    disabled={isDateDisabled}
-                                    className="loan-modal__calendar"
-                                    classNames={{
-                                        day_selected: "loan-modal__calendar-day--selected",
-                                        day_today: "loan-modal__calendar-day--today",
-                                    }}
-                                />
-                                {selectedDate && (
-                                    <div className="p-2 flex justify-end">
-                                        <Button
-                                            size="sm"
-                                            className="loan-modal__calendar-accept"
-                                            onClick={() => setIsCalendarOpen(false)}
-                                        >
-                                            <Check className="mr-2 h-4 w-4" />
-                                            Aceptar
-                                        </Button>
-                                    </div>
-                                )}
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="time" className="loan-modal__label">Hora de recojo</Label>
-                        <Select value={selectedTime} onValueChange={setSelectedTime}>
-                            <SelectTrigger id="time" className="loan-modal__select-trigger">
-                                <SelectValue placeholder="Selecciona una hora" />
-                            </SelectTrigger>
-                            <SelectContent className="loan-modal__select-content">
-                                {[...Array(10)].map((_, i) => {
-                                    const hour = 7 + Math.floor(i / 2);
-                                    const minute = i % 2 === 0 ? '00' : '30';
-                                    return (
-                                        <SelectItem
-                                            key={`${hour}:${minute}`}
-                                            value={`${hour}:${minute}`}
-                                            className="loan-modal__select-item"
-                                        >
-                                            {`${hour.toString().padStart(2, '0')}:${minute}`}
-                                        </SelectItem>
-                                    );
-                                })}
-                                {[...Array(5)].map((_, i) => {
-                                    const hour = 15 + Math.floor(i / 2);
-                                    const minute = i % 2 === 0 ? '00' : '30';
-                                    return (
-                                        <SelectItem
-                                            key={`${hour}:${minute}`}
-                                            value={`${hour}:${minute}`}
-                                            className="loan-modal__select-item"
-                                        >
-                                            {`${hour.toString().padStart(2, '0')}:${minute}`}
-                                        </SelectItem>
-                                    );
-                                })}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
                 <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="loan-modal__footer-button--cancel"
-                    >
+                    <Button variant="outline" onClick={onClose} disabled={isLoading}>
                         Cancelar
                     </Button>
-                    <Button
-                        onClick={handleConfirm}
-                        disabled={!selectedDate || !selectedTime || !selectedCopy}
-                        className="loan-modal__footer-button--confirm"
-                    >
-                        Préstamo
+                    <Button onClick={handleConfirm} disabled={isLoading}>
+                        {isLoading ? "Procesando..." : "Confirmar Préstamo"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     )
 }
-

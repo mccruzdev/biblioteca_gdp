@@ -43,4 +43,3 @@ export const loanApi = {
         return responseText ? JSON.parse(responseText) : null;
     }
 };
-

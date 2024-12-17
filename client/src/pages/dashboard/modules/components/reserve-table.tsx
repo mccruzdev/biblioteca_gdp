@@ -1,74 +1,81 @@
-import { useState } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { useState, useEffect } from "react"
 import { ReservationTableDesktop } from "./reserve-table-desktop";
 import { ReservationTableMobile } from "./reserve-table-mobile";
+import { ReservationTablePagination } from "./reserve-table-pagination";
+import { usePagination } from "../hooks/use-pagination";
+import { Copy } from "../pages/loan/loan.api";
 
 interface Reservation {
-    id: string;
-    bookTitle: string;
-    copyCode: string;
-    createdAt: string;
-    reservationDate: string;
+    id: number;
+    created: string;
+    dueDate: string;
     status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+    copies: Copy[];
+    bookTitle?: string;
+    bookId?: number;
 }
 
-// Example data
-const exampleReservations: Reservation[] = [
-    {
-        id: "1",
-        bookTitle: "El Quijote",
-        copyCode: "QUI001",
-        createdAt: "2023-06-01 10:00",
-        reservationDate: "2023-06-15 14:00",
-        status: "PENDING"
-    },
-    {
-        id: "2",
-        bookTitle: "Cien años de soledad",
-        copyCode: "CAS001",
-        createdAt: "2023-06-02 11:30",
-        reservationDate: "2023-06-16 15:30",
-        status: "ACTIVE"
-    },
-    {
-        id: "3",
-        bookTitle: "1984",
-        copyCode: "ORW001",
-        createdAt: "2023-06-03 09:15",
-        reservationDate: "2023-06-17 10:00",
-        status: "COMPLETED"
-    }
-];
+interface ReservationTableProps {
+    reservations: Reservation[];
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+    onLoan: (reservation: Reservation) => void;
+}
 
-export function ReservationTable() {
-    const [reservations, setReservations] = useState<Reservation[]>(exampleReservations)
-    const { toast } = useToast()
+export function ReservationTable({ reservations, currentPage, totalPages, onPageChange, onLoan }: ReservationTableProps) {
+    const [isMobile, setIsMobile] = useState(false)
+    const [reservationsPerPage, setReservationsPerPage] = useState(10)
 
-    const handleCancelReservation = (reservation: Reservation) => {
-        // Here you would typically call an API to cancel the reservation
-        // For this example, we'll just update the local state
-        const updatedReservations = reservations.map(r =>
-            r.id === reservation.id ? { ...r, status: 'CANCELLED' as const } : r
-        )
-        setReservations(updatedReservations)
+    const {
+        currentItems: currentReservations,
+        nextPage,
+        prevPage,
+        goToPage,
+    } = usePagination(reservations, reservationsPerPage)
 
-        toast({
-            title: "Reserva cancelada",
-            description: `La reserva para "${reservation.bookTitle}" ha sido cancelada.`,
-        })
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768) // Adjust this breakpoint as needed
+        }
+
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+
+        return () => {
+            window.removeEventListener('resize', checkMobile)
+        }
+    }, [])
+
+    const handleReservationsPerPageChange = (value: string) => {
+        setReservationsPerPage(Number(value))
+        goToPage(1)
     }
 
     return (
         <div className="reservation-table">
-            <ReservationTableDesktop
-                reservations={reservations}
-                onCancel={handleCancelReservation}
-            />
-            <ReservationTableMobile
-                reservations={reservations}
-                onCancel={handleCancelReservation}
+            {isMobile ? (
+                <ReservationTableMobile
+                    reservations={currentReservations}
+                    onLoan={onLoan}
+                />
+            ) : (
+                <ReservationTableDesktop
+                    reservations={currentReservations}
+                    onLoan={onLoan}
+                />
+            )}
+            <ReservationTablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                reservationsPerPage={reservationsPerPage}
+                onPageChange={onPageChange}
+                onPrevPage={prevPage}
+                onNextPage={nextPage}
+                onReservationsPerPageChange={handleReservationsPerPageChange}
             />
         </div>
     )
 }
+
 
