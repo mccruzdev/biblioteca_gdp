@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { fetchJSON } from "../../../../../services/fetch";
 import { useTokenUC } from "../../../../../context/user/user.hook";
-import { ReservationTable } from "../../components/reserve-table";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { LoanConfirmationModal } from "./loan/loan-book-modal";
 import { loanApi, Copy } from "./loan.api";
+import { ItemTable } from "../../components/item-table";
 
 interface Reservation {
   id: number;
@@ -18,6 +18,11 @@ interface Reservation {
   bookId?: number;
 }
 
+interface Item {
+  id: number;
+  status?: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+}
+
 interface PaginatedResponse {
   data: Reservation[];
   total: number;
@@ -27,46 +32,46 @@ interface PaginatedResponse {
 }
 
 export function DashboardLoan() {
-  const { data: token } = useTokenUC()
-  const [reservations, setReservations] = useState<Reservation[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
+  const { data: token } = useTokenUC();
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
   useEffect(() => {
     if (token) {
-      fetchReservations(currentPage)
+      fetchReservations(currentPage);
     }
-  }, [token, currentPage])
+  }, [token, currentPage]);
 
   const fetchReservations = async (page: number) => {
-    if (!token) return // TODO: Redirect to login
-    setIsLoading(true)
+    if (!token) return; // TODO: Redirect to login
+    setIsLoading(true);
     try {
       const { response, json } = await fetchJSON<PaginatedResponse>(
         `${BACKEND_SERVER}/reservation?page=${page}&limit=10`,
         { authorization: token }
-      )
+      );
 
       if (response.ok) {
-        setReservations(json.data)
-        setTotalPages(json.lastPage)
-        fetchBookDetails(json.data)
+        setReservations(json.data);
+        setTotalPages(json.lastPage);
+        fetchBookDetails(json.data);
       } else {
-        throw new Error('Failed to fetch reservations')
+        throw new Error('Failed to fetch reservations');
       }
     } catch (error) {
-      console.error('Error fetching reservations:', error)
+      console.error('Error fetching reservations:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const fetchBookDetails = async (reservationsData: Reservation[]) => {
     const updatedReservations = await Promise.all(
       reservationsData.map(async (reservation) => {
-        const copyId = reservation.copies[0]?.id
+        const copyId = reservation.copies[0]?.id;
         if (copyId) {
           try {
             const result = await fetchJSON<{ title: string; id: number }>(
@@ -80,26 +85,26 @@ export function DashboardLoan() {
               return { ...reservation, bookTitle: json.title, bookId: json.id, copies };
             }
           } catch (error) {
-            console.error(`Error fetching book details for copy ${copyId}:`, error)
+            console.error(`Error fetching book details for copy ${copyId}:`, error);
           }
         }
-        return reservation
+        return reservation;
       })
-    )
-    setReservations(updatedReservations)
-  }
+    );
+    setReservations(updatedReservations);
+  };
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-  }
-
-  const handleLoanConfirmation = (reservation: Reservation) => {
-    setSelectedReservation(reservation)
-  }
+  const handleLoanConfirmation = (item: Item) => {
+    if ('status' in item) {
+      setSelectedReservation(item as Reservation);
+    } else {
+      console.error('Invalid item type for loan confirmation');
+    }
+  };
 
   const handleLoanSuccess = () => {
-    fetchReservations(currentPage)
-  }
+    fetchReservations(currentPage);
+  };
 
   return (
     <div className="dashboard-catalog">
@@ -119,11 +124,11 @@ export function DashboardLoan() {
               {isLoading ? (
                 <p className="text-center text-gray-400">Cargando...</p>
               ) : (
-                <ReservationTable
-                  reservations={reservations}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
+                <ItemTable
+                  items={reservations}
+                  token={token as string}
+                  mode="reservations"
+                  viewMode="loan"
                   onLoan={handleLoanConfirmation}
                 />
               )}
@@ -142,6 +147,6 @@ export function DashboardLoan() {
       )}
       <Toaster />
     </div>
-  )
+  );
 }
 

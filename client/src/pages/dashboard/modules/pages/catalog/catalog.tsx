@@ -4,10 +4,10 @@ import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useTokenUC } from "../../../../../context/user/user.hook";
-import { BookTable } from "../../components/book-table";
 import { SearchBar } from "../../components/search-bar";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
+import { ItemTable } from "../../components/item-table";
 
 export function DashboardCatalog() {
   const { data: token } = useTokenUC()
@@ -81,7 +81,7 @@ export function DashboardCatalog() {
               {isLoading ? (
                 <p className="text-center text-gray-400">Cargando...</p>
               ) : paginatedBooks && paginatedBooks.data.length > 0 ? (
-                <BookTable books={paginatedBooks.data} token={token || ''} mode="reservation" />
+                <ItemTable items={paginatedBooks.data} token={token || ''} mode="books" viewMode="catalog" />
               ) : (
                 <div className="text-center">
                   <p className="text-gray-400 mb-4">No se encontraron libros que coincidan con tu búsqueda.</p>

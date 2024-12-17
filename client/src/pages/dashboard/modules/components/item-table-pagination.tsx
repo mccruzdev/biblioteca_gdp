@@ -3,25 +3,27 @@ import { Button } from "../../../../components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 import { useEffect, useState } from 'react'
 
-interface ReservationTablePaginationProps {
+interface ItemTablePaginationProps {
     currentPage: number
     totalPages: number
-    reservationsPerPage: number
+    itemsPerPage: number
     onPageChange: (page: number) => void
     onPrevPage: () => void
     onNextPage: () => void
-    onReservationsPerPageChange: (value: string) => void
+    onItemsPerPageChange: (value: string) => void
+    mode: 'books' | 'reservations'
 }
 
-export function ReservationTablePagination({
+export function ItemTablePagination({
     currentPage,
     totalPages,
-    reservationsPerPage,
+    itemsPerPage,
     onPageChange,
     onPrevPage,
     onNextPage,
-    onReservationsPerPageChange,
-}: ReservationTablePaginationProps) {
+    onItemsPerPageChange,
+    mode
+}: ItemTablePaginationProps) {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -40,7 +42,7 @@ export function ReservationTablePagination({
                         variant={1 === currentPage ? "default" : "outline"}
                         size="sm"
                         onClick={() => onPageChange(1)}
-                        className="reservation-table__pagination-button reservation-table__pagination-button--active"
+                        className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
                     >
                         1
                     </Button>
@@ -50,7 +52,7 @@ export function ReservationTablePagination({
                             variant={totalPages === currentPage ? "default" : "outline"}
                             size="sm"
                             onClick={() => onPageChange(totalPages)}
-                            className="reservation-table__pagination-button reservation-table__pagination-button--active"
+                            className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
                         >
                             {totalPages}
                         </Button>
@@ -83,7 +85,7 @@ export function ReservationTablePagination({
                 variant={1 === currentPage ? "default" : "outline"}
                 size="sm"
                 onClick={() => onPageChange(1)}
-                className="reservation-table__pagination-button reservation-table__pagination-button--active"
+                className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
             >
                 1
             </Button>
@@ -101,9 +103,9 @@ export function ReservationTablePagination({
                         variant={i === currentPage ? "default" : "outline"}
                         size="sm"
                         onClick={() => onPageChange(i)}
-                        className={`reservation-table__pagination-button ${i === currentPage
-                            ? "reservation-table__pagination-button--active"
-                            : "reservation-table__pagination-button--inactive"
+                        className={`${mode}-table__pagination-button ${i === currentPage
+                            ? `${mode}-table__pagination-button--active`
+                            : `${mode}-table__pagination-button--inactive`
                             }`}
                     >
                         {i}
@@ -123,7 +125,7 @@ export function ReservationTablePagination({
                     variant={totalPages === currentPage ? "default" : "outline"}
                     size="sm"
                     onClick={() => onPageChange(totalPages)}
-                    className="reservation-table__pagination-button reservation-table__pagination-button--active"
+                    className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
                 >
                     {totalPages}
                 </Button>
@@ -134,17 +136,17 @@ export function ReservationTablePagination({
     }
 
     return (
-        <div className="reservation-table__pagination">
-            <div className="reservation-table__pagination-info">
+        <div className={`${mode}-table__pagination`}>
+            <div className={`${mode}-table__pagination-info`}>
                 Página {currentPage} de {totalPages}
             </div>
-            <div className="reservation-table__pagination-buttons">
+            <div className={`${mode}-table__pagination-buttons`}>
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={onPrevPage}
                     disabled={currentPage === 1}
-                    className="reservation-table__pagination-button reservation-table__pagination-button--inactive"
+                    className={`${mode}-table__pagination-button ${mode}-table__pagination-button--inactive`}
                 >
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -154,22 +156,22 @@ export function ReservationTablePagination({
                     size="sm"
                     onClick={onNextPage}
                     disabled={currentPage === totalPages}
-                    className="reservation-table__pagination-button reservation-table__pagination-button--inactive"
+                    className={`${mode}-table__pagination-button ${mode}-table__pagination-button--inactive`}
                 >
                     <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
-            <div className="reservation-table__pagination-select">
+            <div className={`${mode}-table__pagination-select`}>
                 <Select
-                    value={reservationsPerPage.toString()}
-                    onValueChange={onReservationsPerPageChange}
+                    value={itemsPerPage.toString()}
+                    onValueChange={onItemsPerPageChange}
                 >
-                    <SelectTrigger className="reservation-table__pagination-select-trigger">
+                    <SelectTrigger className={`${mode}-table__pagination-select-trigger`}>
                         <SelectValue placeholder="Filas por página" />
                     </SelectTrigger>
-                    <SelectContent className="reservation-table__pagination-select-content">
+                    <SelectContent className={`${mode}-table__pagination-select-content`}>
                         {[10, 20, 30, 40, 50].map((pageSize) => (
-                            <SelectItem key={pageSize} value={pageSize.toString()} className="reservation-table__pagination-select-item">
+                            <SelectItem key={pageSize} value={pageSize.toString()} className={`${mode}-table__pagination-select-item`}>
                                 Mostrar {pageSize}
                             </SelectItem>
                         ))}
@@ -179,4 +181,3 @@ export function ReservationTablePagination({
         </div>
     )
 }
-
