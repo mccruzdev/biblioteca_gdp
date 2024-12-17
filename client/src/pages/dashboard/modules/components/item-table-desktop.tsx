@@ -1,34 +1,38 @@
 import { MoreHorizontal } from 'lucide-react'
-import { BookI } from "../../../../types"
+import { BookI, Loan, Item } from "../../../../types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Button } from "../../../../components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
-import { Copy } from '../pages/loan/loan.api'
-
-interface Reservation {
-    id: number;
-    created: string;
-    dueDate: string;
-    status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-    copies: Copy[];
-    bookTitle?: string;
-    bookId?: number;
-}
-
-type Item = BookI | Reservation;
 
 interface ItemTableDesktopProps {
     items: Item[];
-    mode: 'books' | 'reservations';
-    viewMode: 'books' | 'catalog' | 'loan';
+    mode: 'books' | 'reservations' | 'loans';
+    viewMode: 'books' | 'catalog' | 'loan' | 'loan-history';
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
     onReserve?: (item: BookI) => void;
     onLoan: (item: Item) => void;
+    onReturn?: (item: Loan) => void;
+    onConvertToLoan: (item: Item) => void;
+    onReservationStatus: (item: Item) => void;
+    onLoanStatus: (item: Item) => void;
 }
 
-export function ItemTableDesktop({ items, mode, viewMode, onEdit, onDelete, onReserve, onLoan }: ItemTableDesktopProps) {
+export function ItemTableDesktop({
+    items,
+    mode,
+    viewMode,
+    onEdit,
+    onDelete,
+    onReserve,
+    onLoan,
+    onReturn,
+    onConvertToLoan,
+    onReservationStatus,
+    onLoanStatus
+}: ItemTableDesktopProps) {
     const isBook = (item: Item): item is BookI => 'title' in item;
+    const isLoan = (item: Item): item is Loan => 'loanDate' in item;
 
     return (
         <div className={`${mode}-table__desktop`}>
@@ -48,8 +52,8 @@ export function ItemTableDesktop({ items, mode, viewMode, onEdit, onDelete, onRe
                             <>
                                 <TableHead>ID Libro</TableHead>
                                 <TableHead>Libro</TableHead>
-                                <TableHead>Fecha de Creación</TableHead>
-                                <TableHead>Fecha de Reserva</TableHead>
+                                <TableHead>{mode === 'loans' ? 'Fecha de Préstamo' : 'Fecha de Creación'}</TableHead>
+                                <TableHead>Fecha de Vencimiento</TableHead>
                                 <TableHead>Estado</TableHead>
                                 <TableHead>Copia</TableHead>
                             </>
@@ -75,7 +79,7 @@ export function ItemTableDesktop({ items, mode, viewMode, onEdit, onDelete, onRe
                                 <>
                                     <TableCell>{item.bookId || 'N/A'}</TableCell>
                                     <TableCell>{item.bookTitle || 'Cargando...'}</TableCell>
-                                    <TableCell>{new Date(item.created).toLocaleString()}</TableCell>
+                                    <TableCell>{new Date(isLoan(item) ? item.loanDate : item.created).toLocaleString()}</TableCell>
                                     <TableCell>{new Date(item.dueDate).toLocaleString()}</TableCell>
                                     <TableCell>{item.status}</TableCell>
                                     <TableCell>{item.copies[0]?.code || 'N/A'}</TableCell>
@@ -103,7 +107,7 @@ export function ItemTableDesktop({ items, mode, viewMode, onEdit, onDelete, onRe
                                                 {onDelete && (
                                                     <DropdownMenuItem
                                                         onClick={() => onDelete(item)}
-                                                        className={`${mode}-table__dropdown-item mb-1`}
+                                                        className={`${mode}-table__dropdown-item`}
                                                     >
                                                         Eliminar
                                                     </DropdownMenuItem>
@@ -119,11 +123,35 @@ export function ItemTableDesktop({ items, mode, viewMode, onEdit, onDelete, onRe
                                             </DropdownMenuItem>
                                         )}
                                         {viewMode === 'loan' && (
+                                            <>
+                                                <DropdownMenuItem
+                                                    onClick={() => onConvertToLoan(item)}
+                                                    className={`${mode}-table__dropdown-item mb-1`}
+                                                >
+                                                    Convertir a préstamo
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => onReservationStatus(item)}
+                                                    className={`${mode}-table__dropdown-item`}
+                                                >
+                                                    Estado reserva
+                                                </DropdownMenuItem>
+                                            </>
+                                        )}
+                                        {viewMode === 'loan-history' && (
                                             <DropdownMenuItem
-                                                onClick={() => onLoan(item)}
+                                                onClick={() => onLoanStatus(item)}
                                                 className={`${mode}-table__dropdown-item`}
                                             >
-                                                {mode === 'books' ? 'Préstamo' : 'Convertir a préstamo'}
+                                                Estado préstamo
+                                            </DropdownMenuItem>
+                                        )}
+                                        {mode === 'loans' && onReturn && (
+                                            <DropdownMenuItem
+                                                onClick={() => onReturn(item as Loan)}
+                                                className={`${mode}-table__dropdown-item`}
+                                            >
+                                                Devolver
                                             </DropdownMenuItem>
                                         )}
                                     </DropdownMenuContent>
@@ -136,3 +164,4 @@ export function ItemTableDesktop({ items, mode, viewMode, onEdit, onDelete, onRe
         </div>
     )
 }
+

@@ -1,32 +1,36 @@
-import { BookI } from "../../../../types"
+import { BookI, Loan, Item } from "../../../../types"
 import { Button } from "../../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
-import { Copy } from "../pages/loan/loan.api"
-
-interface Reservation {
-    id: number;
-    created: string;
-    dueDate: string;
-    status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-    copies: Copy[];
-    bookTitle?: string;
-    bookId?: number;
-}
-
-type Item = BookI | Reservation;
 
 interface ItemTableMobileProps {
     items: Item[];
-    mode: 'books' | 'reservations';
-    viewMode: 'books' | 'catalog' | 'loan';
+    mode: 'books' | 'reservations' | 'loans';
+    viewMode: 'books' | 'catalog' | 'loan' | 'loan-history';
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
     onReserve?: (item: BookI) => void;
     onLoan: (item: Item) => void;
+    onReturn?: (item: Loan) => void;
+    onConvertToLoan: (item: Item) => void;
+    onReservationStatus: (item: Item) => void;
+    onLoanStatus: (item: Item) => void;
 }
 
-export function ItemTableMobile({ items, mode, viewMode, onEdit, onDelete, onReserve, onLoan }: ItemTableMobileProps) {
+export function ItemTableMobile({
+    items,
+    mode,
+    viewMode,
+    onEdit,
+    onDelete,
+    onReserve,
+    onLoan,
+    onReturn,
+    onConvertToLoan,
+    onReservationStatus,
+    onLoanStatus
+}: ItemTableMobileProps) {
     const isBook = (item: Item): item is BookI => 'title' in item;
+    const isLoan = (item: Item): item is Loan => 'loanDate' in item;
 
     return (
         <div className={`${mode}-table__mobile`}>
@@ -34,7 +38,7 @@ export function ItemTableMobile({ items, mode, viewMode, onEdit, onDelete, onRes
                 <Card key={item.id} className={`${mode}-table__card mb-4`}>
                     <CardHeader>
                         <CardTitle>
-                            {isBook(item) ? item.title : `Reserva #${item.id}`}
+                            {isBook(item) ? item.title : `${mode === 'loans' ? 'Préstamo' : 'Reserva'} #${item.id}`}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -50,8 +54,8 @@ export function ItemTableMobile({ items, mode, viewMode, onEdit, onDelete, onRes
                             <>
                                 <p><strong>ID Libro:</strong> {item.bookId || 'N/A'}</p>
                                 <p><strong>Libro:</strong> {item.bookTitle || 'Cargando...'}</p>
-                                <p><strong>Fecha de Creación:</strong> {new Date(item.created).toLocaleString()}</p>
-                                <p><strong>Fecha de Reserva:</strong> {new Date(item.dueDate).toLocaleString()}</p>
+                                <p><strong>{mode === 'loans' ? 'Fecha de Préstamo' : 'Fecha de Creación'}:</strong> {new Date(isLoan(item) ? item.loanDate : item.created).toLocaleString()}</p>
+                                <p><strong>Fecha de Vencimiento:</strong> {new Date(item.dueDate).toLocaleString()}</p>
                                 <p><strong>Estado:</strong> {item.status}</p>
                                 <p><strong>Copia:</strong> {item.copies[0]?.code || 'N/A'}</p>
                             </>
@@ -77,11 +81,35 @@ export function ItemTableMobile({ items, mode, viewMode, onEdit, onDelete, onRes
                                 </Button>
                             )}
                             {viewMode === 'loan' && (
+                                <>
+                                    <Button
+                                        onClick={() => onConvertToLoan(item)}
+                                        className={`${mode}-table__button`}
+                                    >
+                                        Convertir a préstamo
+                                    </Button>
+                                    <Button
+                                        onClick={() => onReservationStatus(item)}
+                                        className={`${mode}-table__button`}
+                                    >
+                                        Estado reserva
+                                    </Button>
+                                </>
+                            )}
+                            {viewMode === 'loan-history' && (
                                 <Button
-                                    onClick={() => onLoan(item)}
+                                    onClick={() => onLoanStatus(item)}
                                     className={`${mode}-table__button`}
                                 >
-                                    {mode === 'books' ? 'Préstamo' : 'Convertir a préstamo'}
+                                    Estado préstamo
+                                </Button>
+                            )}
+                            {mode === 'loans' && onReturn && (
+                                <Button
+                                    onClick={() => onReturn(item as Loan)}
+                                    className={`${mode}-table__button`}
+                                >
+                                    Devolver
                                 </Button>
                             )}
                         </div>
@@ -91,3 +119,4 @@ export function ItemTableMobile({ items, mode, viewMode, onEdit, onDelete, onRes
         </div>
     )
 }
+

@@ -1,3 +1,5 @@
+import { Copy } from "./pages/dashboard/modules/pages/loan/loan.api";
+
 export type UserRoleT = "READER" | "LIBRARIAN" | "ADMIN";
 
 export interface UserI {
@@ -33,3 +35,25 @@ export interface BookI {
   subcategory: string | null;
   category: string | null;
 }
+
+export interface Reservation {
+  id: number;
+  created: string;
+  dueDate: string;
+  status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  copies: Copy[];
+  bookTitle?: string;
+  bookId?: number;
+}
+
+export interface Loan {
+  id: number;
+  loanDate: string;
+  dueDate: string;
+  status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  copies: Copy[];
+  bookTitle?: string;
+  bookId?: number;
+}
+
+export type Item = BookI | Reservation | Loan;

@@ -11,7 +11,7 @@ interface ItemTablePaginationProps {
     onPrevPage: () => void
     onNextPage: () => void
     onItemsPerPageChange: (value: string) => void
-    mode: 'books' | 'reservations'
+    mode: 'books' | 'reservations' | 'loans'
 }
 
 export function ItemTablePagination({
