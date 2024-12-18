@@ -20,7 +20,7 @@ interface ItemTableProps {
     items: Item[];
     token: string;
     mode: "books" | "reservations" | "loans";
-    viewMode: "books" | "catalog" | "loan" | "loan-history"; // Update 1
+    viewMode: "books" | "catalog" | "loan" | "loan-history"; 
     onLoan?: (item: Item) => void;
     onReturn?: (item: Loan) => void;
 }

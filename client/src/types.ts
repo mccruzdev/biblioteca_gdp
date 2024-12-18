@@ -1,4 +1,4 @@
-import { Copy } from "./pages/dashboard/modules/pages/loan/loan.api";
+//import { Copy } from "./pages/dashboard/modules/pages/loan/loan.api";
 
 export type UserRoleT = "READER" | "LIBRARIAN" | "ADMIN";
 
@@ -36,14 +36,20 @@ export interface BookI {
   category: string | null;
 }
 
+export type Copy = {
+  id: number;
+  code: string | null;
+  condition: string;
+};
+
 export interface Reservation {
   id: number;
   created: string;
   dueDate: string;
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   copies: Copy[];
-  bookTitle?: string;
-  bookId?: number;
+  bookTitle: string;
+  bookId: number;
 }
 
 export interface Loan {
