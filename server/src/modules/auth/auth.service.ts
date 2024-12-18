@@ -180,11 +180,15 @@ export class AuthService {
         password: true,
         role: true,
         emailVerified: true,
+        isDisabled: true,
       },
     });
 
     if (!userRes)
       throw new HttpException('User not exists.', HttpStatus.NOT_FOUND);
+
+    if (userRes.isDisabled)
+      throw new HttpException('User is disabled.', HttpStatus.FORBIDDEN);
 
     if (needEmailVerification && !userRes.emailVerified)
       throw new HttpException('Email not confirmed', HttpStatus.FORBIDDEN);

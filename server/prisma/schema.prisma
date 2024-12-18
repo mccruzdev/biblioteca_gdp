@@ -151,6 +151,8 @@ model User {
   emailVerified     Boolean       @default(false)
   verificationToken String?       @unique
   tokenExpiration   DateTime?
+  isDisabled        Boolean       @default(false)
+  isSuperUser       Boolean       @default(false)
   loans             Loan[]
   reservations      Reservation[]
 }
