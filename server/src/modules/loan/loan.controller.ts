@@ -68,7 +68,7 @@ export class LoanController {
   @Get('/me')
   @Roles('READER')
   @ApiOperation({
-    summary: 'Obtener una lista paginada de todos los prestamos',
+    summary: 'Obtener una lista paginada de todos los prestamos del usuario',
   })
   @ApiQuery({
     name: 'page',

@@ -85,7 +85,15 @@ Ejecuta el siguiente comando para crear las migraciones:
 npx prisma migrate dev --name Initial
 ```
 
-## Ejecución de la Aplicación   
+### Crear el superusuario
+
+Puedes editar el archivo `scripts/create-superuser.ts`
+
+```bash
+npm run create:superuser
+```
+
+## Ejecución de la Aplicación
 
 Para ejecutar la aplicación en modo de desarrollo, utiliza el siguiente comando:
 
