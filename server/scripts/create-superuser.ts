@@ -5,13 +5,11 @@ async function createSuperuser() {
   const prisma = new PrismaClient();
 
   try {
-    const email = 'admin@example.com'; // Email del superusuario
-    const password = 'SuperSecurePassword123'; // Contraseña del superusuario
+    const email = 'admin@example.com';
+    const password = 'SuperSecurePassword123';
 
     // Verifica si ya existe un usuario con este email
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await prisma.user.findUnique({where: { email },});
 
     if (existingUser) {
       console.log(`Ya existe un usuario con el email: ${email}`);
@@ -24,12 +22,12 @@ async function createSuperuser() {
     // Crear el superusuario
     const superuser = await prisma.user.create({
       data: {
-        dni: '000000000', // Identificador ficticio
+        dni: '00000000',
         names: 'Super',
         lastName: 'User',
-        phoneNumber: '000000000', // Número ficticio
+        phoneNumber: '000000000',
         password: hashedPassword,
-        role: 'ADMIN', // Asegúrate de que este rol exista en tu sistema
+        role: 'ADMIN',
         email,
         emailVerified: true,
         isDisabled: false,

@@ -113,3 +113,19 @@ export interface ParseCopy {
 export interface ParseCopies {
   copies: ParseCopy[];
 }
+
+export interface ParseLoan {
+  id: number;
+  loanDate: Date;
+  dueDate: Date;
+  status: string;
+  copies: ParseCopy[];
+}
+
+export interface ParseReservation {
+  id: number;
+  created: Date;
+  dueDate: Date;
+  status: string;
+  copies: ParseCopy[];
+}
