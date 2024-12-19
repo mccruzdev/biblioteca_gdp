@@ -5,6 +5,7 @@ import { TokenManager } from 'src/common/token/token';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { CreateLoanDTO } from './dto/create-loan.dto';
 import { UpdateLoanDTO } from './dto/update-loan.dto';
+import { transformLoans } from 'src/transformers/loan';
 
 const paginateAll: PaginateFunction = paginator({
   path: 'loan',
@@ -34,6 +35,26 @@ export class LoanService {
         id: true,
         code: true,
         condition: true,
+        Location: true,
+        Publisher: true,
+        Book: {
+          select: {
+            id: true,
+            title: true,
+            pages: true,
+            authors: true,
+            Subcategory: {
+              select: {
+                name: true,
+                Category: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   };
@@ -43,6 +64,7 @@ export class LoanService {
       this.prisma.loan,
       { select: this.selectLoan },
       { page, limit, path: 'loan' },
+      transformLoans,
     );
   }
 
@@ -60,6 +82,7 @@ export class LoanService {
         where: { userId: data.id },
       },
       { page, limit, path: 'loan/me' },
+      transformLoans,
     );
   }
 

@@ -5,6 +5,7 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { CreateReservationDTO } from './dto/create-reservation.dto';
 import { UpdateReservationDTO } from './dto/update-reservation.dto';
+import { transformReservations } from 'src/transformers/reservation';
 
 const paginateAll: PaginateFunction = paginator({
   path: 'reservation',
@@ -34,6 +35,26 @@ export class ReservationService {
         id: true,
         code: true,
         condition: true,
+        Location: true,
+        Publisher: true,
+        Book: {
+          select: {
+            id: true,
+            title: true,
+            pages: true,
+            authors: true,
+            Subcategory: {
+              select: {
+                name: true,
+                Category: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   };
@@ -43,6 +64,7 @@ export class ReservationService {
       this.prisma.reservation,
       { select: this.selectReservation },
       { page, limit, path: 'reservation' },
+      transformReservations,
     );
   }
 
@@ -60,6 +82,7 @@ export class ReservationService {
         where: { userId: data.id },
       },
       { page, limit, path: 'reservation' },
+      transformReservations,
     );
   }
 
