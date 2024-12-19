@@ -11,7 +11,6 @@ interface ItemTablePaginationProps {
     onPrevPage: () => void
     onNextPage: () => void
     onItemsPerPageChange: (value: string) => void
-    mode: 'books' | 'reservations' | 'loans'
 }
 
 export function ItemTablePagination({
@@ -22,7 +21,6 @@ export function ItemTablePagination({
     onPrevPage,
     onNextPage,
     onItemsPerPageChange,
-    mode
 }: ItemTablePaginationProps) {
     const [isMobile, setIsMobile] = useState(false);
 
@@ -42,7 +40,7 @@ export function ItemTablePagination({
                         variant={1 === currentPage ? "default" : "outline"}
                         size="sm"
                         onClick={() => onPageChange(1)}
-                        className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
+                        className="item-table__pagination-button item-table__pagination-button--active"
                     >
                         1
                     </Button>
@@ -52,7 +50,7 @@ export function ItemTablePagination({
                             variant={totalPages === currentPage ? "default" : "outline"}
                             size="sm"
                             onClick={() => onPageChange(totalPages)}
-                            className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
+                            className="item-table__pagination-button item-table__pagination-button--active"
                         >
                             {totalPages}
                         </Button>
@@ -85,7 +83,7 @@ export function ItemTablePagination({
                 variant={1 === currentPage ? "default" : "outline"}
                 size="sm"
                 onClick={() => onPageChange(1)}
-                className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
+                className="item-table__pagination-button item-table__pagination-button--active"
             >
                 1
             </Button>
@@ -103,9 +101,9 @@ export function ItemTablePagination({
                         variant={i === currentPage ? "default" : "outline"}
                         size="sm"
                         onClick={() => onPageChange(i)}
-                        className={`${mode}-table__pagination-button ${i === currentPage
-                            ? `${mode}-table__pagination-button--active`
-                            : `${mode}-table__pagination-button--inactive`
+                        className={`item-table__pagination-button ${i === currentPage
+                            ? `item-table__pagination-button--active`
+                            : `item-table__pagination-button--inactive`
                             }`}
                     >
                         {i}
@@ -125,7 +123,7 @@ export function ItemTablePagination({
                     variant={totalPages === currentPage ? "default" : "outline"}
                     size="sm"
                     onClick={() => onPageChange(totalPages)}
-                    className={`${mode}-table__pagination-button ${mode}-table__pagination-button--active`}
+                    className="item-table__pagination-button item-table__pagination-button--active"
                 >
                     {totalPages}
                 </Button>
@@ -136,17 +134,17 @@ export function ItemTablePagination({
     }
 
     return (
-        <div className={`${mode}-table__pagination`}>
-            <div className={`${mode}-table__pagination-info`}>
+        <div className="item-table__pagination">
+            <div className="item-table__pagination-info">
                 Página {currentPage} de {totalPages}
             </div>
-            <div className={`${mode}-table__pagination-buttons`}>
+            <div className="item-table__pagination-buttons">
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={onPrevPage}
                     disabled={currentPage === 1}
-                    className={`${mode}-table__pagination-button ${mode}-table__pagination-button--inactive`}
+                    className="item-table__pagination-button item-table__pagination-button--inactive"
                 >
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -156,22 +154,22 @@ export function ItemTablePagination({
                     size="sm"
                     onClick={onNextPage}
                     disabled={currentPage === totalPages}
-                    className={`${mode}-table__pagination-button ${mode}-table__pagination-button--inactive`}
+                    className="item-table__pagination-button item-table__pagination-button--inactive"
                 >
                     <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
-            <div className={`${mode}-table__pagination-select`}>
+            <div className="item-table__pagination-select">
                 <Select
                     value={itemsPerPage.toString()}
                     onValueChange={onItemsPerPageChange}
                 >
-                    <SelectTrigger className={`${mode}-table__pagination-select-trigger`}>
+                    <SelectTrigger className="item-table__pagination-select-trigger">
                         <SelectValue placeholder="Filas por página" />
                     </SelectTrigger>
-                    <SelectContent className={`${mode}-table__pagination-select-content`}>
+                    <SelectContent className="item-table__pagination-select-content">
                         {[10, 20, 30, 40, 50].map((pageSize) => (
-                            <SelectItem key={pageSize} value={pageSize.toString()} className={`${mode}-table__pagination-select-item`}>
+                            <SelectItem key={pageSize} value={pageSize.toString()} className="item-table__pagination-select-item">
                                 Mostrar {pageSize}
                             </SelectItem>
                         ))}
@@ -181,3 +179,4 @@ export function ItemTablePagination({
         </div>
     )
 }
+

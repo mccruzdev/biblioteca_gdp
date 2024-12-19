@@ -20,7 +20,7 @@ interface ItemTableProps {
     items: Item[];
     token: string;
     mode: "books" | "reservations" | "loans";
-    viewMode: "books" | "catalog" | "loan" | "loan-history"; 
+    viewMode: "books" | "catalog" | "loan" | "loan-history";
     onLoan?: (item: Item) => void;
     onReturn?: (item: Loan) => void;
 }
@@ -218,15 +218,15 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
         }
     }
 
-    const handleConvertToLoan = (item: Item) => { // Update 2
+    const handleConvertToLoan = (item: Item) => {
         console.log("Convertir a préstamo", item);
     };
 
-    const handleReservationStatus = (item: Item) => { // Update 2
+    const handleReservationStatus = (item: Item) => {
         console.log("Cambiar estado de reserva", item);
     };
 
-    const handleLoanStatus = (item: Item) => { // Update 2
+    const handleLoanStatus = (item: Item) => {
         console.log("Cambiar estado de préstamo", item);
     };
 
@@ -242,9 +242,9 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
                     onReserve={viewMode === "catalog" ? handleReserve : undefined}
                     onLoan={handleLoan}
                     onReturn={mode === "loans" ? handleReturn : undefined}
-                    onConvertToLoan={handleConvertToLoan} // Update 3
-                    onReservationStatus={handleReservationStatus} // Update 3
-                    onLoanStatus={handleLoanStatus} // Update 3
+                    onConvertToLoan={handleConvertToLoan}
+                    onReservationStatus={handleReservationStatus}
+                    onLoanStatus={handleLoanStatus}
                 />
             ) : (
                 <ItemTableDesktop
@@ -256,9 +256,9 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
                     onReserve={viewMode === "catalog" ? handleReserve : undefined}
                     onLoan={handleLoan}
                     onReturn={mode === "loans" ? handleReturn : undefined}
-                    onConvertToLoan={handleConvertToLoan} // Update 3
-                    onReservationStatus={handleReservationStatus} // Update 3
-                    onLoanStatus={handleLoanStatus} // Update 3
+                    onConvertToLoan={handleConvertToLoan}
+                    onReservationStatus={handleReservationStatus}
+                    onLoanStatus={handleLoanStatus}
                 />
             )}
             <ItemTablePagination
@@ -272,7 +272,6 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
                     setItemsPerPage(Number(value))
                     goToPage(1)
                 }}
-                mode={mode}
             />
 
             {viewMode === "books" && (

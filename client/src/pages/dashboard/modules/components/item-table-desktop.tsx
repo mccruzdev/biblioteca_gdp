@@ -35,7 +35,7 @@ export function ItemTableDesktop({
     const isLoan = (item: Item): item is Loan => 'loanDate' in item;
 
     return (
-        <div className={`${mode}-table__desktop`}>
+        <div className="item-table__desktop">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -88,18 +88,18 @@ export function ItemTableDesktop({
                             <TableCell className="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className={`${mode}-table__dropdown-trigger`}>
+                                        <Button variant="ghost" className="item-table__dropdown-trigger">
                                             <span className="sr-only">Abrir menú</span>
                                             <MoreHorizontal className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className={`${mode}-table__dropdown-content`}>
+                                    <DropdownMenuContent align="end" className="item-table__dropdown-content">
                                         {viewMode === 'books' && isBook(item) && (
                                             <>
                                                 {onEdit && (
                                                     <DropdownMenuItem
                                                         onClick={() => onEdit(item)}
-                                                        className={`${mode}-table__dropdown-item mb-1`}
+                                                        className="item-table__dropdown-item mb-1"
                                                     >
                                                         Editar
                                                     </DropdownMenuItem>
@@ -107,7 +107,7 @@ export function ItemTableDesktop({
                                                 {onDelete && (
                                                     <DropdownMenuItem
                                                         onClick={() => onDelete(item)}
-                                                        className={`${mode}-table__dropdown-item`}
+                                                        className="item-table__dropdown-item"
                                                     >
                                                         Eliminar
                                                     </DropdownMenuItem>
@@ -117,7 +117,7 @@ export function ItemTableDesktop({
                                         {viewMode === 'catalog' && isBook(item) && onReserve && (
                                             <DropdownMenuItem
                                                 onClick={() => onReserve(item)}
-                                                className={`${mode}-table__dropdown-item`}
+                                                className="item-table__dropdown-item"
                                             >
                                                 Reservar
                                             </DropdownMenuItem>
@@ -126,13 +126,13 @@ export function ItemTableDesktop({
                                             <>
                                                 <DropdownMenuItem
                                                     onClick={() => onConvertToLoan(item)}
-                                                    className={`${mode}-table__dropdown-item mb-1`}
+                                                    className="item-table__dropdown-item mb-1"
                                                 >
                                                     Convertir a préstamo
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => onReservationStatus(item)}
-                                                    className={`${mode}-table__dropdown-item`}
+                                                    className="item-table__dropdown-item"
                                                 >
                                                     Estado reserva
                                                 </DropdownMenuItem>
@@ -141,7 +141,7 @@ export function ItemTableDesktop({
                                         {viewMode === 'loan-history' && (
                                             <DropdownMenuItem
                                                 onClick={() => onLoanStatus(item)}
-                                                className={`${mode}-table__dropdown-item`}
+                                                className="item-table__dropdown-item"
                                             >
                                                 Estado préstamo
                                             </DropdownMenuItem>
@@ -149,7 +149,7 @@ export function ItemTableDesktop({
                                         {mode === 'loans' && onReturn && (
                                             <DropdownMenuItem
                                                 onClick={() => onReturn(item as Loan)}
-                                                className={`${mode}-table__dropdown-item`}
+                                                className="item-table__dropdown-item"
                                             >
                                                 Devolver
                                             </DropdownMenuItem>

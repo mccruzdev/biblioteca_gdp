@@ -33,9 +33,9 @@ export function ItemTableMobile({
     const isLoan = (item: Item): item is Loan => 'loanDate' in item;
 
     return (
-        <div className={`${mode}-table__mobile`}>
+        <div className="item-table__mobile">
             {items.map((item) => (
-                <Card key={item.id} className={`${mode}-table__card mb-4`}>
+                <Card key={item.id} className="item-table__card mb-4">
                     <CardHeader>
                         <CardTitle>
                             {isBook(item) ? item.title : `${mode === 'loans' ? 'Préstamo' : 'Reserva'} #${item.id}`}
@@ -64,19 +64,19 @@ export function ItemTableMobile({
                             {viewMode === 'books' && isBook(item) && (
                                 <>
                                     {onEdit && (
-                                        <Button onClick={() => onEdit(item)} className={`${mode}-table__button`}>
+                                        <Button onClick={() => onEdit(item)} className="item-table__button">
                                             Editar
                                         </Button>
                                     )}
                                     {onDelete && (
-                                        <Button onClick={() => onDelete(item)} className={`${mode}-table__button`}>
+                                        <Button onClick={() => onDelete(item)} className="item-table__button">
                                             Eliminar
                                         </Button>
                                     )}
                                 </>
                             )}
                             {viewMode === 'catalog' && isBook(item) && onReserve && (
-                                <Button onClick={() => onReserve(item)} className={`${mode}-table__button`}>
+                                <Button onClick={() => onReserve(item)} className="item-table__button">
                                     Reservar
                                 </Button>
                             )}
@@ -84,13 +84,13 @@ export function ItemTableMobile({
                                 <>
                                     <Button
                                         onClick={() => onConvertToLoan(item)}
-                                        className={`${mode}-table__button`}
+                                        className="item-table__button"
                                     >
                                         Convertir a préstamo
                                     </Button>
                                     <Button
                                         onClick={() => onReservationStatus(item)}
-                                        className={`${mode}-table__button`}
+                                        className="item-table__button"
                                     >
                                         Estado reserva
                                     </Button>
@@ -99,7 +99,7 @@ export function ItemTableMobile({
                             {viewMode === 'loan-history' && (
                                 <Button
                                     onClick={() => onLoanStatus(item)}
-                                    className={`${mode}-table__button`}
+                                    className="item-table__button"
                                 >
                                     Estado préstamo
                                 </Button>
@@ -107,7 +107,7 @@ export function ItemTableMobile({
                             {mode === 'loans' && onReturn && (
                                 <Button
                                     onClick={() => onReturn(item as Loan)}
-                                    className={`${mode}-table__button`}
+                                    className="item-table__button"
                                 >
                                     Devolver
                                 </Button>
