@@ -45,7 +45,7 @@ export class DonorController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista paginada de todas las donaciones',
+    description: 'Lista paginada de todos los donantes',
   })
   @ApiResponse({
     status: 400,
