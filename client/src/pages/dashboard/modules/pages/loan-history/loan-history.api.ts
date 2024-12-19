@@ -1,26 +1,29 @@
 import { BACKEND_SERVER } from "../../../../../config/api";
+import { LoanStatus } from "@/types";
 
-export type Copy = {
-    id: number;
-    code: string | null;
-    condition: string;
-};
-
-/*export interface CreateLoanDTO {
+export interface UpdateLoanDTO {
     dueDate: string;
-    status: string;
+    status: LoanStatus;
     copies: number[];
-}*/
+}
 
 export const loanHistoryApi = {
-    getCopies: async (bookId: number, token: string): Promise<Copy[]> => {
-        const response = await fetch(`${BACKEND_SERVER}/copy/${bookId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+    updateLoan: async (id: number, data: UpdateLoanDTO, token: string) => {
+        const response = await fetch(`${BACKEND_SERVER}/loan/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
         });
+
         if (!response.ok) {
-            throw new Error('Failed to fetch copies');
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to update loan');
         }
-        const data = await response.json();
-        return data.data;
+
+        const responseText = await response.text();
+        return responseText ? JSON.parse(responseText) : null;
     }
 };

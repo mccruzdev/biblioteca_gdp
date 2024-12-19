@@ -11,6 +11,16 @@ export interface UserI {
   email: string;
 }
 
+/*export interface PaginatedI<T> {
+  total: number;
+  lastPage: number;
+  currentPage: number;
+  limit: number;
+  prev: string | null;
+  next: string | null;
+  data: T[];
+}*/
+
 export interface PaginatedI<T> {
   total: number;
   lastPage: number;
@@ -42,24 +52,74 @@ export type Copy = {
   condition: string;
 };
 
+export enum ReservationStatus {
+  PENDING = 'PENDING',
+  PICKED_UP = 'PICKED_UP',
+  CANCELED = 'CANCELED',
+  EXPIRED = 'EXPIRED'
+}
+
 export interface Reservation {
   id: number;
   created: string;
   dueDate: string;
-  status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  copies: Copy[];
+  status: ReservationStatus;
+  copies: {
+    id: number;
+    code: string;
+    condition: string;
+    location: string | null;
+    publisher: string | null;
+    book: {
+      id: number;
+      title: string;
+      pages: number;
+      authors: {
+        id: number;
+        name: string;
+        email: string | null;
+      }[];
+      subcategory: string | null;
+      category: string | null;
+    };
+  }[];
   bookTitle: string;
   bookId: number;
+}
+
+export enum LoanStatus {
+  ACTIVE = 'ACTIVE',
+  RETURNED = 'RETURNED',
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface Loan {
   id: number;
   loanDate: string;
   dueDate: string;
-  status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  copies: Copy[];
-  bookTitle?: string;
-  bookId?: number;
+  status: LoanStatus;
+  copies: {
+    id: number;
+    code: string;
+    condition: string;
+    location: string | null;
+    publisher: string | null;
+    book: {
+      id: number;
+      title: string;
+      pages: number;
+      authors: {
+        id: number;
+        name: string;
+        email: string | null;
+      }[];
+      subcategory: string | null;
+      category: string | null;
+    };
+  }[];
+  bookTitle: string;
+  bookId: number;
 }
 
 export type Item = BookI | Reservation | Loan;

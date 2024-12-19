@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../../components
 
 interface ItemTableMobileProps {
     items: Item[];
-    mode: 'books' | 'reservations' | 'loans';
+    mode: 'books' | 'reservations' | 'loans' | 'loans-history';
     viewMode: 'books' | 'catalog' | 'loan' | 'loan-history';
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
@@ -60,59 +60,61 @@ export function ItemTableMobile({
                                 <p><strong>Copia:</strong> {item.copies[0]?.code || 'N/A'}</p>
                             </>
                         )}
-                        <div className="mt-4 space-x-2">
-                            {viewMode === 'books' && isBook(item) && (
-                                <>
-                                    {onEdit && (
-                                        <Button onClick={() => onEdit(item)} className="item-table__button">
-                                            Editar
+                        {mode !== 'loans-history' && (
+                            <div className="mt-4 space-x-2">
+                                {viewMode === 'books' && isBook(item) && (
+                                    <>
+                                        {onEdit && (
+                                            <Button onClick={() => onEdit(item)} className="item-table__button">
+                                                Editar
+                                            </Button>
+                                        )}
+                                        {onDelete && (
+                                            <Button onClick={() => onDelete(item)} className="item-table__button">
+                                                Eliminar
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+                                {viewMode === 'catalog' && isBook(item) && onReserve && (
+                                    <Button onClick={() => onReserve(item)} className="item-table__button">
+                                        Reservar
+                                    </Button>
+                                )}
+                                {viewMode === 'loan' && (
+                                    <>
+                                        <Button
+                                            onClick={() => onConvertToLoan(item)}
+                                            className="item-table__button"
+                                        >
+                                            Préstamo
                                         </Button>
-                                    )}
-                                    {onDelete && (
-                                        <Button onClick={() => onDelete(item)} className="item-table__button">
-                                            Eliminar
+                                        <Button
+                                            onClick={() => onReservationStatus(item)}
+                                            className="item-table__button"
+                                        >
+                                            Estado
                                         </Button>
-                                    )}
-                                </>
-                            )}
-                            {viewMode === 'catalog' && isBook(item) && onReserve && (
-                                <Button onClick={() => onReserve(item)} className="item-table__button">
-                                    Reservar
-                                </Button>
-                            )}
-                            {viewMode === 'loan' && (
-                                <>
+                                    </>
+                                )}
+                                {viewMode === 'loan-history' && (
                                     <Button
-                                        onClick={() => onConvertToLoan(item)}
+                                        onClick={() => onLoanStatus(item)}
                                         className="item-table__button"
                                     >
-                                        Convertir a préstamo
+                                        Estado
                                     </Button>
+                                )}
+                                {mode === 'loans' && onReturn && (
                                     <Button
-                                        onClick={() => onReservationStatus(item)}
+                                        onClick={() => onReturn(item as Loan)}
                                         className="item-table__button"
                                     >
-                                        Estado reserva
+                                        Devolver
                                     </Button>
-                                </>
-                            )}
-                            {viewMode === 'loan-history' && (
-                                <Button
-                                    onClick={() => onLoanStatus(item)}
-                                    className="item-table__button"
-                                >
-                                    Estado préstamo
-                                </Button>
-                            )}
-                            {mode === 'loans' && onReturn && (
-                                <Button
-                                    onClick={() => onReturn(item as Loan)}
-                                    className="item-table__button"
-                                >
-                                    Devolver
-                                </Button>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             ))}

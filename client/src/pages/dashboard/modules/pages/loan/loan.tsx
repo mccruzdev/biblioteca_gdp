@@ -1,39 +1,62 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ItemTable } from "../../components/item-table";
-import { Reservation } from "@/types";
-
-const mockReservations: Reservation[] = [
-  {
-    id: 1,
-    created: '2023-05-01',
-    dueDate: '2023-05-15',
-    status: 'PENDING',
-    copies: [{ id: 1, code: 'GG001', condition: 'Good' }],
-    bookTitle: 'The Great Gatsby',
-    bookId: 101
-  },
-  {
-    id: 2,
-    created: '2023-05-10',
-    dueDate: '2023-05-24',
-    status: 'PENDING',
-    copies: [{ id: 2, code: 'TKM001', condition: 'Excellent' }],
-    bookTitle: 'To Kill a Mockingbird',
-    bookId: 102
-  },
-  {
-    id: 3,
-    created: '2023-05-20',
-    dueDate: '2023-06-03',
-    status: 'PENDING',
-    copies: [{ id: 3, code: '1984001', condition: 'Fair' }],
-    bookTitle: '1984',
-    bookId: 103
-  }
-];
+import { Reservation, PaginatedI } from "@/types";
+import { fetchJSON } from "../../../../../services/fetch";
+import { BACKEND_SERVER } from "../../../../../config/api";
+import { useTokenUC } from "../../../../../context/user/user.hook";
+import { Toaster } from "../../../../../components/ui/toaster";
+import { Button } from "../../../../../components/ui/button";
 
 export function DashboardLoan() {
-  const [reservations] = useState<Reservation[]>(mockReservations);
+  const { data: token } = useTokenUC()
+  const [paginatedReservations, setPaginatedReservations] = useState<PaginatedI<Reservation> | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  useEffect(() => {
+    if (token) {
+      fetchReservations()
+    }
+  }, [token, currentPage, itemsPerPage])
+
+  const fetchReservations = async () => {
+    if (!token) return // TODO: Redirect to login
+    setIsLoading(true)
+
+    try {
+      const url = `${BACKEND_SERVER}/reservation?page=${currentPage}&limit=${itemsPerPage}`
+      const { response, json } = await fetchJSON<PaginatedI<Reservation>>(
+        url,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.ok) {
+        setPaginatedReservations(json)
+      } else {
+        throw new Error('Failed to fetch reservations')
+      }
+    } catch (error) {
+      console.error('Error fetching reservations:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage)
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1) // Reset to first page when changing items per page
+  }
 
   return (
     <div className="dashboard-catalog">
@@ -50,17 +73,43 @@ export function DashboardLoan() {
               <h2 className="text-xl font-bold text-white">Reservas</h2>
             </div>
             <div className="pt-3">
-              <ItemTable
-                items={reservations}
-                token="mock-token"
-                mode="reservations"
-                viewMode="loan"
-              />
+              {isLoading ? (
+                <p className="text-center text-gray-400">Cargando...</p>
+              ) : paginatedReservations && paginatedReservations.data.length > 0 ? (
+                <>
+                  <ItemTable
+                    items={paginatedReservations.data.map(reservation => ({
+                      ...reservation,
+                      bookId: reservation.copies[0]?.book.id,
+                      bookTitle: reservation.copies[0]?.book.title
+                    }))}
+                    token={token || ''}
+                    mode="reservations"
+                    viewMode="loan"
+                    currentPage={paginatedReservations.currentPage}
+                    totalPages={paginatedReservations.lastPage}
+                    itemsPerPage={paginatedReservations.limit}
+                    onPageChange={handlePageChange}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    prevPageUrl={paginatedReservations.prev}
+                    nextPageUrl={paginatedReservations.next}
+                  />
+                </>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-400 mb-4">No se encontraron reservas.</p>
+                  <Button onClick={fetchReservations} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                    Recargar reservas
+                  </Button>
+                </div>
+              )}
             </div>
           </section>
         </div>
       </div>
+      <Toaster />
     </div>
-  );
+  )
 }
+
 

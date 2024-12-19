@@ -1,39 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ItemTable } from "../../components/item-table";
-import { Loan } from "@/types";
-
-const mockLoans: Loan[] = [
-  {
-    id: 1,
-    loanDate: '2023-05-01',
-    dueDate: '2023-05-15',
-    status: 'COMPLETED',
-    copies: [{ id: 1, code: 'GG001', condition: 'Good' }],
-    bookTitle: 'The Great Gatsby',
-    bookId: 101
-  },
-  {
-    id: 2,
-    loanDate: '2023-05-10',
-    dueDate: '2023-05-24',
-    status: 'ACTIVE',
-    copies: [{ id: 2, code: 'TKM001', condition: 'Excellent' }],
-    bookTitle: 'To Kill a Mockingbird',
-    bookId: 102
-  },
-  {
-    id: 3,
-    loanDate: '2023-05-20',
-    dueDate: '2023-06-03',
-    status: 'PENDING',
-    copies: [{ id: 3, code: '1984001', condition: 'Fair' }],
-    bookTitle: '1984',
-    bookId: 103
-  }
-];
+import { PaginatedI, Loan } from "@/types";
+import { fetchJSON } from "../../../../../services/fetch";
+import { BACKEND_SERVER } from "../../../../../config/api";
+import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
+import { Toaster } from "../../../../../components/ui/toaster";
+import { Button } from "../../../../../components/ui/button";
 
 export function DashboardLoanHistory() {
-  const [loans] = useState<Loan[]>(mockLoans);
+  const { user } = useAuthUC();
+  const { data: token } = useTokenUC();
+  const [paginatedLoans, setPaginatedLoans] = useState<PaginatedI<Loan> | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  useEffect(() => {
+    if (token && user) {
+      fetchLoans()
+    }
+  }, [token, user, currentPage, itemsPerPage])
+
+  const fetchLoans = async () => {
+    if (!token || !user) return // TODO: Redirect to login
+    setIsLoading(true)
+
+    try {
+      const url = user.role === "READER"
+        ? `${BACKEND_SERVER}/loan/me?page=${currentPage}&limit=${itemsPerPage}`
+        : `${BACKEND_SERVER}/loan?page=${currentPage}&limit=${itemsPerPage}`;
+      const { response, json } = await fetchJSON<PaginatedI<Loan>>(
+        url,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.ok) {
+        setPaginatedLoans(json)
+      } else {
+        throw new Error('Failed to fetch loans')
+      }
+    } catch (error) {
+      console.error('Error fetching loans:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage)
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1)
+  }
 
   return (
     <div className="dashboard-catalog">
@@ -50,17 +76,42 @@ export function DashboardLoanHistory() {
               <h2 className="text-xl font-bold text-white">Historial de Préstamos</h2>
             </div>
             <div className="pt-3">
-              <ItemTable
-                items={loans}
-                token="mock-token"
-                mode="loans"
-                viewMode="loan-history"
-              />
+              {isLoading ? (
+                <p className="text-center text-gray-400">Cargando...</p>
+              ) : paginatedLoans && paginatedLoans.data.length > 0 ? (
+                <>
+                  <ItemTable
+                    items={paginatedLoans.data.map(loan => ({
+                      ...loan,
+                      bookId: loan.copies[0]?.book.id,
+                      bookTitle: loan.copies[0]?.book.title
+                    }))}
+                    token={token || ''}
+                    mode={user?.role === "READER" ? "loans-history" : "loans"}
+                    viewMode="loan-history"
+                    currentPage={paginatedLoans.currentPage}
+                    totalPages={paginatedLoans.lastPage}
+                    itemsPerPage={paginatedLoans.limit}
+                    onPageChange={handlePageChange}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    prevPageUrl={paginatedLoans.prev}
+                    nextPageUrl={paginatedLoans.next}
+                  />
+                </>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-400 mb-4">No se encontraron préstamos.</p>
+                  <Button onClick={fetchLoans} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                    Recargar reservas
+                  </Button>
+                </div>
+              )}
             </div>
           </section>
         </div>
       </div>
+      <Toaster />
     </div>
-  );
+  )
 }
 

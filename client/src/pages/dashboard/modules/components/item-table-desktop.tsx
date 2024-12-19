@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 interface ItemTableDesktopProps {
     items: Item[];
-    mode: 'books' | 'reservations' | 'loans';
+    mode: 'books' | 'reservations' | 'loans' | 'loans-history';
     viewMode: 'books' | 'catalog' | 'loan' | 'loan-history';
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
@@ -52,13 +52,13 @@ export function ItemTableDesktop({
                             <>
                                 <TableHead>ID Libro</TableHead>
                                 <TableHead>Libro</TableHead>
-                                <TableHead>{mode === 'loans' ? 'Fecha de Préstamo' : 'Fecha de Creación'}</TableHead>
+                                <TableHead>{mode === 'loans' || mode === 'loans-history' ? 'Fecha de Préstamo' : 'Fecha de Creación'}</TableHead>
                                 <TableHead>Fecha de Vencimiento</TableHead>
                                 <TableHead>Estado</TableHead>
                                 <TableHead>Copia</TableHead>
                             </>
                         )}
-                        <TableHead className="text-right">Acciones</TableHead>
+                        {mode !== 'loans-history' && <TableHead className="text-right">Acciones</TableHead>}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -85,78 +85,80 @@ export function ItemTableDesktop({
                                     <TableCell>{item.copies[0]?.code || 'N/A'}</TableCell>
                                 </>
                             )}
-                            <TableCell className="text-right">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="item-table__dropdown-trigger">
-                                            <span className="sr-only">Abrir menú</span>
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="item-table__dropdown-content">
-                                        {viewMode === 'books' && isBook(item) && (
-                                            <>
-                                                {onEdit && (
-                                                    <DropdownMenuItem
-                                                        onClick={() => onEdit(item)}
-                                                        className="item-table__dropdown-item mb-1"
-                                                    >
-                                                        Editar
-                                                    </DropdownMenuItem>
-                                                )}
-                                                {onDelete && (
-                                                    <DropdownMenuItem
-                                                        onClick={() => onDelete(item)}
-                                                        className="item-table__dropdown-item"
-                                                    >
-                                                        Eliminar
-                                                    </DropdownMenuItem>
-                                                )}
-                                            </>
-                                        )}
-                                        {viewMode === 'catalog' && isBook(item) && onReserve && (
-                                            <DropdownMenuItem
-                                                onClick={() => onReserve(item)}
-                                                className="item-table__dropdown-item"
-                                            >
-                                                Reservar
-                                            </DropdownMenuItem>
-                                        )}
-                                        {viewMode === 'loan' && (
-                                            <>
+                            {mode !== 'loans-history' && (
+                                <TableCell className="text-right">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="item-table__dropdown-trigger">
+                                                <span className="sr-only">Abrir menú</span>
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="item-table__dropdown-content">
+                                            {viewMode === 'books' && isBook(item) && (
+                                                <>
+                                                    {onEdit && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEdit(item)}
+                                                            className="item-table__dropdown-item mb-1"
+                                                        >
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {onDelete && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onDelete(item)}
+                                                            className="item-table__dropdown-item"
+                                                        >
+                                                            Eliminar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </>
+                                            )}
+                                            {viewMode === 'catalog' && isBook(item) && onReserve && (
                                                 <DropdownMenuItem
-                                                    onClick={() => onConvertToLoan(item)}
-                                                    className="item-table__dropdown-item mb-1"
-                                                >
-                                                    Convertir a préstamo
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() => onReservationStatus(item)}
+                                                    onClick={() => onReserve(item)}
                                                     className="item-table__dropdown-item"
                                                 >
-                                                    Estado reserva
+                                                    Reservar
                                                 </DropdownMenuItem>
-                                            </>
-                                        )}
-                                        {viewMode === 'loan-history' && (
-                                            <DropdownMenuItem
-                                                onClick={() => onLoanStatus(item)}
-                                                className="item-table__dropdown-item"
-                                            >
-                                                Estado préstamo
-                                            </DropdownMenuItem>
-                                        )}
-                                        {mode === 'loans' && onReturn && (
-                                            <DropdownMenuItem
-                                                onClick={() => onReturn(item as Loan)}
-                                                className="item-table__dropdown-item"
-                                            >
-                                                Devolver
-                                            </DropdownMenuItem>
-                                        )}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
+                                            )}
+                                            {viewMode === 'loan' && (
+                                                <>
+                                                    <DropdownMenuItem
+                                                        onClick={() => onConvertToLoan(item)}
+                                                        className="item-table__dropdown-item mb-1"
+                                                    >
+                                                        Convertir a préstamo
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => onReservationStatus(item)}
+                                                        className="item-table__dropdown-item"
+                                                    >
+                                                        Estado reserva
+                                                    </DropdownMenuItem>
+                                                </>
+                                            )}
+                                            {viewMode === 'loan-history' && (
+                                                <DropdownMenuItem
+                                                    onClick={() => onLoanStatus(item)}
+                                                    className="item-table__dropdown-item"
+                                                >
+                                                    Estado préstamo
+                                                </DropdownMenuItem>
+                                            )}
+                                            {mode === 'loans' && onReturn && (
+                                                <DropdownMenuItem
+                                                    onClick={() => onReturn(item as Loan)}
+                                                    className="item-table__dropdown-item"
+                                                >
+                                                    Devolver
+                                                </DropdownMenuItem>
+                                            )}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
+                            )}
                         </TableRow>
                     ))}
                 </TableBody>

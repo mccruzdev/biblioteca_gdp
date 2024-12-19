@@ -1,16 +1,15 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from "../../../../components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
-import { useEffect, useState } from 'react'
 
 interface ItemTablePaginationProps {
     currentPage: number
     totalPages: number
     itemsPerPage: number
     onPageChange: (page: number) => void
-    onPrevPage: () => void
-    onNextPage: () => void
-    onItemsPerPageChange: (value: string) => void
+    onItemsPerPageChange: (value: number) => void
+    prevPageUrl: string | null
+    nextPageUrl: string | null
 }
 
 export function ItemTablePagination({
@@ -18,114 +17,34 @@ export function ItemTablePagination({
     totalPages,
     itemsPerPage,
     onPageChange,
-    onPrevPage,
-    onNextPage,
     onItemsPerPageChange,
+    prevPageUrl,
+    nextPageUrl
 }: ItemTablePaginationProps) {
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        const checkIfMobile = () => setIsMobile(window.innerWidth < 768)
-        checkIfMobile()
-        window.addEventListener('resize', checkIfMobile)
-        return () => window.removeEventListener('resize', checkIfMobile)
-    }, [])
 
     const renderPaginationButtons = () => {
-        if (isMobile) {
-            return (
-                <>
-                    <Button
-                        key={1}
-                        variant={1 === currentPage ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => onPageChange(1)}
-                        className="item-table__pagination-button item-table__pagination-button--active"
-                    >
-                        1
-                    </Button>
-                    {totalPages > 1 && (
-                        <Button
-                            key={totalPages}
-                            variant={totalPages === currentPage ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => onPageChange(totalPages)}
-                            className="item-table__pagination-button item-table__pagination-button--active"
-                        >
-                            {totalPages}
-                        </Button>
-                    )}
-                </>
-            )
-        }
-
         const buttons = []
-        const maxButtons = 7
-        let startPage, endPage
+        const maxButtons = 5
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2))
+        let endPage = Math.min(totalPages, startPage + maxButtons - 1)
 
-        if (totalPages <= maxButtons) {
-            startPage = 1
-            endPage = totalPages
-        } else if (currentPage <= 3) {
-            startPage = 2
-            endPage = 5
-        } else if (currentPage >= totalPages - 2) {
-            startPage = totalPages - 4
-            endPage = totalPages - 1
-        } else {
-            startPage = currentPage - 1
-            endPage = currentPage + 2
-        }
-
-        buttons.push(
-            <Button
-                key={1}
-                variant={1 === currentPage ? "default" : "outline"}
-                size="sm"
-                onClick={() => onPageChange(1)}
-                className="item-table__pagination-button item-table__pagination-button--active"
-            >
-                1
-            </Button>
-        )
-
-        if (startPage > 2) {
-            buttons.push(<span key="start-ellipsis" className="px-1 py-1 text-xs">...</span>)
+        if (endPage - startPage + 1 < maxButtons) {
+            startPage = Math.max(1, endPage - maxButtons + 1)
         }
 
         for (let i = startPage; i <= endPage; i++) {
-            if (i !== 1 && i !== totalPages) {
-                buttons.push(
-                    <Button
-                        key={i}
-                        variant={i === currentPage ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => onPageChange(i)}
-                        className={`item-table__pagination-button ${i === currentPage
-                            ? `item-table__pagination-button--active`
-                            : `item-table__pagination-button--inactive`
-                            }`}
-                    >
-                        {i}
-                    </Button>
-                )
-            }
-        }
-
-        if (endPage < totalPages - 1) {
-            buttons.push(<span key="end-ellipsis" className="px-1 py-1 text-xs">...</span>)
-        }
-
-        if (totalPages > 1) {
             buttons.push(
                 <Button
-                    key={totalPages}
-                    variant={totalPages === currentPage ? "default" : "outline"}
+                    key={i}
+                    variant={i === currentPage ? "default" : "outline"}
                     size="sm"
-                    onClick={() => onPageChange(totalPages)}
-                    className="item-table__pagination-button item-table__pagination-button--active"
+                    onClick={() => onPageChange(i)}
+                    className={`item-table__pagination-button ${i === currentPage
+                        ? `item-table__pagination-button--active`
+                        : `item-table__pagination-button--inactive`
+                        }`}
                 >
-                    {totalPages}
+                    {i}
                 </Button>
             )
         }
@@ -142,8 +61,8 @@ export function ItemTablePagination({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={onPrevPage}
-                    disabled={currentPage === 1}
+                    onClick={() => prevPageUrl && onPageChange(currentPage - 1)}
+                    disabled={!prevPageUrl}
                     className="item-table__pagination-button item-table__pagination-button--inactive"
                 >
                     <ChevronLeft className="h-4 w-4" />
@@ -152,8 +71,8 @@ export function ItemTablePagination({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={onNextPage}
-                    disabled={currentPage === totalPages}
+                    onClick={() => nextPageUrl && onPageChange(currentPage + 1)}
+                    disabled={!nextPageUrl}
                     className="item-table__pagination-button item-table__pagination-button--inactive"
                 >
                     <ChevronRight className="h-4 w-4" />
@@ -162,7 +81,7 @@ export function ItemTablePagination({
             <div className="item-table__pagination-select">
                 <Select
                     value={itemsPerPage.toString()}
-                    onValueChange={onItemsPerPageChange}
+                    onValueChange={(value) => onItemsPerPageChange(Number(value))}
                 >
                     <SelectTrigger className="item-table__pagination-select-trigger">
                         <SelectValue placeholder="Filas por página" />

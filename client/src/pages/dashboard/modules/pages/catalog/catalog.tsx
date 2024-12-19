@@ -14,28 +14,36 @@ export function DashboardCatalog() {
   const [paginatedBooks, setPaginatedBooks] = useState<PaginatedI<BookI> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
   const searchBarRef = useRef<{ clearSearch: () => void }>(null)
 
   useEffect(() => {
     if (token) {
       fetchBooks()
     }
-  }, [token])
+  }, [token, currentPage, itemsPerPage])
 
   const fetchBooks = async (searchTerm?: string, searchType?: string) => {
     if (!token) return // TODO: Redirect to login
     setIsLoading(true)
     setIsSearching(!!searchTerm)
 
-    let url = `${BACKEND_SERVER}/book`
+    let url = `${BACKEND_SERVER}/book?page=${currentPage}&limit=${itemsPerPage}`
     if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}`
+      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`
     }
 
     try {
       const { response, json } = await fetchJSON<PaginatedI<BookI>>(
         url,
-        { authorization: token }
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
       )
 
       if (response.ok) {
@@ -51,15 +59,26 @@ export function DashboardCatalog() {
   }
 
   const handleSearch = (searchTerm: string, searchType: string) => {
+    setCurrentPage(1) 
     fetchBooks(searchTerm, searchType)
   }
 
   const handleReset = (clearSearchBar: boolean = false) => {
     setIsSearching(false)
+    setCurrentPage(1)
     fetchBooks()
     if (clearSearchBar) {
       searchBarRef.current?.clearSearch()
     }
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage)
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1)
   }
 
   return (
@@ -81,7 +100,19 @@ export function DashboardCatalog() {
               {isLoading ? (
                 <p className="text-center text-gray-400">Cargando...</p>
               ) : paginatedBooks && paginatedBooks.data.length > 0 ? (
-                <ItemTable items={paginatedBooks.data} token={token || ''} mode="books" viewMode="catalog" />
+                <ItemTable
+                  items={paginatedBooks.data}
+                  token={token || ''}
+                  mode="books"
+                  viewMode="catalog"
+                  currentPage={paginatedBooks.currentPage}
+                  totalPages={paginatedBooks.lastPage}
+                  itemsPerPage={paginatedBooks.limit}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  prevPageUrl={paginatedBooks.prev}
+                  nextPageUrl={paginatedBooks.next}
+                />
               ) : (
                 <div className="text-center">
                   <p className="text-gray-400 mb-4">No se encontraron libros que coincidan con tu búsqueda.</p>
@@ -100,4 +131,3 @@ export function DashboardCatalog() {
     </div>
   )
 }
-

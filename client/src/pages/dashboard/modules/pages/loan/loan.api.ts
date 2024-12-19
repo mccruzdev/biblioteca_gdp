@@ -1,4 +1,5 @@
 import { BACKEND_SERVER } from "../../../../../config/api";
+import { ReservationStatus } from "@/types";
 
 export type Copy = {
     id: number;
@@ -9,6 +10,12 @@ export type Copy = {
 export interface CreateLoanDTO {
     dueDate: string;
     status: string;
+    copies: number[];
+}
+
+export interface UpdateReservationDTO {
+    dueDate: string;
+    status: ReservationStatus;
     copies: number[];
 }
 
@@ -37,6 +44,25 @@ export const loanApi = {
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(errorText || 'Failed to create loan');
+        }
+
+        const responseText = await response.text();
+        return responseText ? JSON.parse(responseText) : null;
+    },
+
+    updateReservation: async (id: number, data: UpdateReservationDTO, token: string) => {
+        const response = await fetch(`${BACKEND_SERVER}/reservation/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to update reservation');
         }
 
         const responseText = await response.text();

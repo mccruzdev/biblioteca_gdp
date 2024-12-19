@@ -18,6 +18,8 @@ export function DashboardBooks() {
   const [paginatedBooks, setPaginatedBooks] = useState<PaginatedI<BookI> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
   const searchBarRef = useRef<{ clearSearch: () => void }>(null);
 
   useEffect(() => {
@@ -26,40 +28,61 @@ export function DashboardBooks() {
   }, [user, token]);
 
   const fetchBooks = async (searchTerm?: string, searchType?: string) => {
-    if (!token) return; 
-    setIsLoading(true);
-    setIsSearching(!!searchTerm);
+    if (!token) return // TODO: Redirect to login
+    setIsLoading(true)
+    setIsSearching(!!searchTerm)
 
-    let url = `${BACKEND_SERVER}/book`;
+    let url = `${BACKEND_SERVER}/book?page=${currentPage}&limit=${itemsPerPage}`
     if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}`;
+      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`
     }
 
     try {
-      const { response, json } = await fetchJSON<PaginatedI<BookI>>(url, { authorization: token });
+      const { response, json } = await fetchJSON<PaginatedI<BookI>>(
+        url,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
       if (response.ok) {
-        setPaginatedBooks(json);
+        setPaginatedBooks(json)
       } else {
-        throw new Error("Failed to fetch books");
+        throw new Error('Failed to fetch books')
       }
     } catch (error) {
-      console.error("Error fetching books:", error);
+      console.error('Error fetching books:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSearch = (searchTerm: string, searchType: string) => {
-    fetchBooks(searchTerm, searchType);
-  };
+    setCurrentPage(1)
+    fetchBooks(searchTerm, searchType)
+  }
 
   const handleReset = (clearSearchBar: boolean = false) => {
-    setIsSearching(false);
-    fetchBooks();
+    setIsSearching(false)
+    setCurrentPage(1) 
+    fetchBooks()
     if (clearSearchBar) {
-      searchBarRef.current?.clearSearch();
+      searchBarRef.current?.clearSearch()
     }
-  };
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage)
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1) 
+  }
 
   if (!user) return <p>Loading...</p>;
   if (user.role === "READER") return <NotAuthorized path="/dashboard" />;
@@ -88,7 +111,19 @@ export function DashboardBooks() {
               {isLoading ? (
                 <p className="text-center text-gray-400">Cargando...</p>
               ) : paginatedBooks && paginatedBooks.data.length > 0 ? (
-                <ItemTable items={paginatedBooks.data} token={token || ""} mode="books" viewMode="books" />
+                <ItemTable
+                  items={paginatedBooks.data}
+                  token={token || ''}
+                  mode="books"
+                  viewMode="books"
+                  currentPage={paginatedBooks.currentPage}
+                  totalPages={paginatedBooks.lastPage}
+                  itemsPerPage={paginatedBooks.limit}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  prevPageUrl={paginatedBooks.prev}
+                  nextPageUrl={paginatedBooks.next}
+                />
               ) : (
                 <div className="text-center">
                   <p className="text-gray-400 mb-4">No se encontraron libros que coincidan con tu búsqueda.</p>

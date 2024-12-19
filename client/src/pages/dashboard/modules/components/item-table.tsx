@@ -1,13 +1,11 @@
 import "../../page.sass"
 import { useState, useEffect } from "react"
-import { BookI, Reservation, Loan, Item } from "../../../../types"
+import { BookI, Reservation, Loan, Item, ReservationStatus } from "../../../../types"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale'
 import { useToast } from "../../../../hooks/use-toast"
 import { ToastAction } from "../../../../components/ui/toast"
-import { usePagination } from "../hooks/use-pagination"
 import { catalogApi, Copy, CreateReservationDTO } from "../pages/catalog/catalog.api"
-import { loanApi, CreateLoanDTO } from "../pages/loan/loan.api"
 import { booksApi } from "../pages/books/books.api"
 import { ItemTableDesktop } from "./item-table-desktop"
 import { ItemTableMobile } from "./item-table-mobile"
@@ -15,35 +13,54 @@ import { ItemTablePagination } from "./item-table-pagination"
 import { ReservationModal } from "../pages/catalog/reserve/reservation-book-modal"
 import { EditBookModal } from "../pages/books/edit/edit-book-modal"
 import { DeleteBookModal } from "../pages/books/delete/delete-book-modal"
+import { LoanConfirmationModal } from "../pages/loan/loan/loan-confirmation-modal"
+import { ReservationStatusModal } from "../pages/loan/loan/reservation-status-modal"
+import { LoanStatusModal } from "../pages/loan-history/loan-history/loan-status-modal"
 
 interface ItemTableProps {
     items: Item[];
     token: string;
-    mode: "books" | "reservations" | "loans";
+    mode: "books" | "reservations" | "loans" | "loans-history";
     viewMode: "books" | "catalog" | "loan" | "loan-history";
     onLoan?: (item: Item) => void;
     onReturn?: (item: Loan) => void;
+    currentPage: number;
+    totalPages: number;
+    itemsPerPage: number;
+    onPageChange: (page: number) => void;
+    onItemsPerPageChange: (itemsPerPage: number) => void;
+    prevPageUrl: string | null;
+    nextPageUrl: string | null;
+    onReservationConverted?: () => void;
 }
 
-export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: ItemTableProps) {
-    const [itemsPerPage, setItemsPerPage] = useState(10)
+export function ItemTable({
+    items,
+    token,
+    mode,
+    viewMode,
+    onLoan,
+    onReturn,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    onPageChange,
+    onItemsPerPageChange,
+    prevPageUrl,
+    nextPageUrl,
+    onReservationConverted
+}: ItemTableProps) {
     const [selectedItem, setSelectedItem] = useState<Item | null>(null)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [isReservationModalOpen, setIsReservationModalOpen] = useState(false)
     const [isLoanModalOpen, setIsLoanModalOpen] = useState(false)
+    const [isLoanConfirmationModalOpen, setIsLoanConfirmationModalOpen] = useState(false)
+    const [isReservationStatusModalOpen, setIsReservationStatusModalOpen] = useState(false)
+    const [isLoanStatusModalOpen, setIsLoanStatusModalOpen] = useState(false)
     const [copies, setCopies] = useState<Copy[]>([])
     const [isMobile, setIsMobile] = useState(false)
     const { toast } = useToast()
-
-    const {
-        currentPage,
-        totalPages,
-        currentItems,
-        nextPage,
-        prevPage,
-        goToPage,
-    } = usePagination(items, itemsPerPage)
 
     useEffect(() => {
         const checkMobile = () => {
@@ -84,7 +101,7 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
     }
 
     const handleLoan = async (item: Item) => {
-        if ((mode === "reservations" || mode === "loans") && onLoan) {
+        if ((mode === "reservations" || mode === "loans" || mode === "loans-history") && onLoan) {
             onLoan(item)
         } else if ('title' in item) {
             try {
@@ -164,7 +181,7 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
 
             const reservationData: CreateReservationDTO = {
                 dueDate: reservationDate.toISOString(),
-                status: 'PENDING',
+                status: ReservationStatus.PENDING,
                 copies: [selectedCopy.id]
             }
 
@@ -186,55 +203,53 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
         }
     }
 
-    const handleConfirmLoan = async (date: Date, time: string, selectedCopy: Copy) => {
-        if (!selectedItem || !('title' in selectedItem)) return
-
-        try {
-            const loanDate = new Date(date)
-            const [hours, minutes] = time.split(':').map(Number)
-            loanDate.setHours(hours, minutes)
-
-            const LoanData: CreateLoanDTO = {
-                dueDate: loanDate.toISOString(),
-                status: 'ACTIVE',
-                copies: [selectedCopy.id]
-            }
-
-            await loanApi.createLoan(LoanData, token)
-
-            toast({
-                title: "Préstamo confirmado",
-                description: `Préstamo de "${selectedItem.title}" (Copia: ${selectedCopy.code || 'N/A'}) para el ${format(loanDate, 'dd/MM/yyyy HH:mm', { locale: es })}.`,
-                action: <ToastAction altText="Cerrar">Cerrar</ToastAction>,
-            })
-
-            setIsLoanModalOpen(false)
-        } catch (error) {
+    const handleConvertToLoan = (item: Item) => {
+        if ('copies' in item && item.status === ReservationStatus.PENDING) {
+            setSelectedItem(item)
+            setIsLoanConfirmationModalOpen(true)
+        } else {
+            console.error("Attempted to convert a non-pending reservation or non-reservation item to loan")
             toast({
                 title: "Error",
-                description: error instanceof Error ? error.message : "Hubo un problema al crear el préstamo. Por favor, inténtalo de nuevo.",
+                description: "Solo se pueden convertir a préstamo las reservas pendientes.",
                 variant: "destructive",
             })
         }
     }
 
-    const handleConvertToLoan = (item: Item) => {
-        console.log("Convertir a préstamo", item);
-    };
-
     const handleReservationStatus = (item: Item) => {
-        console.log("Cambiar estado de reserva", item);
-    };
+        if ('copies' in item) {
+            setSelectedItem(item)
+            setIsReservationStatusModalOpen(true)
+        } else {
+            console.error("Attempted to change status of a non-reservation item")
+            toast({
+                title: "Error",
+                description: "No se puede cambiar el estado de este elemento.",
+                variant: "destructive",
+            })
+        }
+    }
 
     const handleLoanStatus = (item: Item) => {
-        console.log("Cambiar estado de préstamo", item);
-    };
+        if ('copies' in item && 'loanDate' in item) {
+            setSelectedItem(item)
+            setIsLoanStatusModalOpen(true)
+        } else {
+            console.error("Attempted to change status of a non-loan item")
+            toast({
+                title: "Error",
+                description: "No se puede cambiar el estado de este elemento.",
+                variant: "destructive",
+            })
+        }
+    }
 
     return (
         <div className="item-table">
             {isMobile ? (
                 <ItemTableMobile
-                    items={currentItems}
+                    items={items}
                     mode={mode}
                     viewMode={viewMode}
                     onEdit={viewMode === "books" ? handleEdit : undefined}
@@ -248,7 +263,7 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
                 />
             ) : (
                 <ItemTableDesktop
-                    items={currentItems}
+                    items={items}
                     mode={mode}
                     viewMode={viewMode}
                     onEdit={viewMode === "books" ? handleEdit : undefined}
@@ -265,13 +280,10 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
                 currentPage={currentPage}
                 totalPages={totalPages}
                 itemsPerPage={itemsPerPage}
-                onPageChange={goToPage}
-                onPrevPage={prevPage}
-                onNextPage={nextPage}
-                onItemsPerPageChange={(value) => {
-                    setItemsPerPage(Number(value))
-                    goToPage(1)
-                }}
+                onPageChange={onPageChange}
+                onItemsPerPageChange={onItemsPerPageChange}
+                prevPageUrl={prevPageUrl}
+                nextPageUrl={nextPageUrl}
             />
 
             {viewMode === "books" && (
@@ -298,6 +310,51 @@ export function ItemTable({ items, token, mode, viewMode, onLoan, onReturn }: It
                     onConfirm={handleConfirmReservation}
                     selectedBook={selectedItem as BookI}
                     copies={copies}
+                />
+            )}
+
+            {viewMode === "loan" && selectedItem && 'copies' in selectedItem && (
+                <>
+                    <LoanConfirmationModal
+                        isOpen={isLoanConfirmationModalOpen}
+                        onClose={() => setIsLoanConfirmationModalOpen(false)}
+                        reservation={selectedItem as Reservation}
+                        token={token}
+                        onConfirm={() => {
+                            setIsLoanConfirmationModalOpen(false)
+                            if (onReservationConverted) {
+                                onReservationConverted()
+                            }
+                        }}
+                        bookTitle={selectedItem.copies[0]?.book.title || 'Libro desconocido'}
+                    />
+                    <ReservationStatusModal
+                        isOpen={isReservationStatusModalOpen}
+                        onClose={() => setIsReservationStatusModalOpen(false)}
+                        reservation={selectedItem as Reservation}
+                        token={token}
+                        onConfirm={() => {
+                            setIsReservationStatusModalOpen(false)
+                            if (onReservationConverted) {
+                                onReservationConverted()
+                            }
+                        }}
+                    />
+                </>
+            )}
+
+            {(viewMode === "loan" || viewMode === "loan-history") && selectedItem && 'loanDate' in selectedItem && (
+                <LoanStatusModal
+                    isOpen={isLoanStatusModalOpen}
+                    onClose={() => setIsLoanStatusModalOpen(false)}
+                    loan={selectedItem as Loan}
+                    token={token}
+                    onConfirm={() => {
+                        setIsLoanStatusModalOpen(false)
+                        if (onReservationConverted) {
+                            onReservationConverted()
+                        }
+                    }}
                 />
             )}
         </div>
