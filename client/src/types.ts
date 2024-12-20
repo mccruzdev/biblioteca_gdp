@@ -1,9 +1,17 @@
+export type RolesT = "ADMIN" | "LIBRARIAN" | "READER";
+
+export enum RolesE {
+  ADMIN = "ADMIN",
+  LIBRARIAN = "LIBRARIAN",
+  READER = "READER",
+}
+
 export interface UserI {
   dni: string;
   names: string;
   lastName: string;
   phoneNumber: string;
-  role: string;
+  role: RolesT;
   email: string;
 }
 
@@ -30,4 +38,10 @@ export interface BookI {
   authors: AuthorI[];
   subcategory: string | null;
   category: string | null;
+}
+
+export interface AllDataUserI extends UserI {
+  id: number;
+  emailVerified: boolean;
+  isDisabled: boolean;
 }

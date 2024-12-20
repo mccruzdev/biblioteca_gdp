@@ -25,11 +25,11 @@ export const navItems: NavItem[] = [
       { label: "Ejemplares", href: "/dashboard/ejemplares" },
     ],
   },
-  // {
-  //   label: "Usuarios",
-  //   href: "/dashboard/users",
-  //   icon: (props) => <Icon type="user" {...props} />,
-  // },
+  {
+    label: "Usuarios",
+    href: "/dashboard/users",
+    icon: (props) => <Icon type="user" {...props} />,
+  },
   // {
   //   label: "Gestión",
   //   href: "/dashboard/management",
