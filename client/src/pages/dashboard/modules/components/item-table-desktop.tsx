@@ -25,8 +25,6 @@ export function ItemTableDesktop({
     onEdit,
     onDelete,
     onReserve,
-    onLoan,
-    onReturn,
     onConvertToLoan,
     onReservationStatus,
     onLoanStatus
@@ -145,14 +143,6 @@ export function ItemTableDesktop({
                                                     className="item-table__dropdown-item"
                                                 >
                                                     Estado préstamo
-                                                </DropdownMenuItem>
-                                            )}
-                                            {mode === 'loans' && onReturn && (
-                                                <DropdownMenuItem
-                                                    onClick={() => onReturn(item as Loan)}
-                                                    className="item-table__dropdown-item"
-                                                >
-                                                    Devolver
                                                 </DropdownMenuItem>
                                             )}
                                         </DropdownMenuContent>

@@ -23,8 +23,6 @@ export function ItemTableMobile({
     onEdit,
     onDelete,
     onReserve,
-    onLoan,
-    onReturn,
     onConvertToLoan,
     onReservationStatus,
     onLoanStatus
@@ -103,14 +101,6 @@ export function ItemTableMobile({
                                         className="item-table__button"
                                     >
                                         Estado
-                                    </Button>
-                                )}
-                                {mode === 'loans' && onReturn && (
-                                    <Button
-                                        onClick={() => onReturn(item as Loan)}
-                                        className="item-table__button"
-                                    >
-                                        Devolver
                                     </Button>
                                 )}
                             </div>

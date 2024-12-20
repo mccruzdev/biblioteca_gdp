@@ -1,3 +1,4 @@
+import "./loan-history.sass";
 import { useEffect, useState } from "react";
 import { ItemTable } from "../../components/item-table";
 import { PaginatedI, Loan } from "@/types";

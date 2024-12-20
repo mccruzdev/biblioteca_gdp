@@ -68,21 +68,21 @@ export function ReservationStatusModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="loan-modal__content">
                 <DialogHeader>
-                    <DialogTitle>Cambiar estado de la reserva</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="loan-modal__title">Cambiar estado de la reserva</DialogTitle>
+                    <DialogDescription className="loan-modal__description">
                         Selecciona el nuevo estado para esta reserva.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="py-4">
+                <div className="loan-modal__grid py-4">
                     <Select onValueChange={(value) => setNewStatus(value as ReservationStatus)} defaultValue={reservation.status}>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="loan-modal__select-trigger">
                             <SelectValue placeholder="Selecciona un estado" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="loan-modal__select-content">
                             {Object.values(ReservationStatus).map((status) => (
-                                <SelectItem key={status} value={status}>
+                                <SelectItem key={status} value={status} className="loan-modal__select-item">
                                     {status}
                                 </SelectItem>
                             ))}
@@ -90,10 +90,10 @@ export function ReservationStatusModal({
                     </Select>
                 </div>
                 <DialogFooter>
-                    <Button variant="outline" onClick={onClose} disabled={isLoading}>
+                    <Button variant="outline" onClick={onClose} disabled={isLoading} className="loan-modal__footer-button--cancel">
                         Cancelar
                     </Button>
-                    <Button onClick={handleConfirm} disabled={isLoading || newStatus === reservation.status}>
+                    <Button onClick={handleConfirm} disabled={isLoading || newStatus === reservation.status} className="loan-modal__footer-button--confirm">
                         {isLoading ? "Actualizando..." : "Confirmar cambio"}
                     </Button>
                 </DialogFooter>

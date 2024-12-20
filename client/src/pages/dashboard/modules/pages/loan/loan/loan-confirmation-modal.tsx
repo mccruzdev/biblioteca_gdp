@@ -11,6 +11,8 @@ import {
 import { useToast } from '../../../../../../hooks/use-toast'
 import { loanApi, CreateLoanDTO, UpdateReservationDTO } from '../loan.api'
 import { Reservation, ReservationStatus, LoanStatus } from '../../../../../../types'
+import { Input } from "../../../../../../components/ui/input"
+import { Label } from "../../../../../../components/ui/label"
 
 interface LoanConfirmationModalProps {
   isOpen: boolean
@@ -30,23 +32,22 @@ export function LoanConfirmationModal({
   bookTitle
 }: LoanConfirmationModalProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [loanDuration, setLoanDuration] = useState(14)
   const { toast } = useToast()
 
   const handleConfirm = async () => {
     setIsLoading(true)
     try {
       const dueDate = new Date()
-      dueDate.setDate(dueDate.getDate() + 14) // Set due date to 14 days from now
+      dueDate.setDate(dueDate.getDate() + loanDuration) 
 
-      // Update reservation status
       const updateReservationData: UpdateReservationDTO = {
-        dueDate: reservation.dueDate,
+        dueDate: dueDate.toISOString(),
         status: ReservationStatus.PICKED_UP,
         copies: reservation.copies.map(copy => copy.id)
       }
       await loanApi.updateReservation(reservation.id, updateReservationData, token)
 
-      // Create loan
       const loanData: CreateLoanDTO = {
         dueDate: dueDate.toISOString(),
         status: LoanStatus.ACTIVE,
@@ -74,26 +75,36 @@ export function LoanConfirmationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="loan-modal__content">
         <DialogHeader>
-          <DialogTitle>Confirmar conversión a préstamo</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="loan-modal__title">Confirmar conversión a préstamo</DialogTitle>
+          <DialogDescription className="loan-modal__description">
             ¿Estás seguro de que deseas convertir esta reserva en un préstamo?
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          <p className="text-sm text-gray-500">Detalles del préstamo:</p>
+        <div className="loan-modal__grid">
+          <p className="text-sm text-gray-500 mb-2">Detalles del préstamo:</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Label htmlFor="loanDuration" className="loan-modal__label">Duración del préstamo (días):</Label>
+            <Input
+              id="loanDuration"
+              type="number"
+              min="1"
+              value={loanDuration}
+              onChange={(e) => setLoanDuration(parseInt(e.target.value) || 14)}
+              className="loan-modal__input w-20"
+            />
+          </div>
           <ul className="list-disc list-inside mt-2 space-y-1">
             <li className="text-sm">Libro: <span className="font-medium">{bookTitle || 'Título no disponible'}</span></li>
-            <li className="text-sm">Duración del préstamo: <span className="font-medium">14 días</span></li>
-            <li className="text-sm">Fecha de vencimiento: <span className="font-medium">{new Date(new Date().setDate(new Date().getDate() + 14)).toLocaleDateString('es-ES')}</span></li>
+            <li className="text-sm">Fecha de vencimiento: <span className="font-medium">{new Date(new Date().setDate(new Date().getDate() + loanDuration)).toLocaleDateString('es-ES')}</span></li>
           </ul>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button variant="outline" onClick={onClose} disabled={isLoading} className="loan-modal__footer-button--cancel">
             Cancelar
           </Button>
-          <Button onClick={handleConfirm} disabled={isLoading}>
+          <Button onClick={handleConfirm} disabled={isLoading} className="loan-modal__footer-button--confirm">
             {isLoading ? "Procesando..." : "Confirmar préstamo"}
           </Button>
         </DialogFooter>

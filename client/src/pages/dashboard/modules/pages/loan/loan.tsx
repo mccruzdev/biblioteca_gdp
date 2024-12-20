@@ -1,3 +1,4 @@
+import "./loan.sass";
 import { useEffect, useState } from "react";
 import { ItemTable } from "../../components/item-table";
 import { Reservation, PaginatedI } from "@/types";
