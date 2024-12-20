@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../../components
 
 interface ItemTableMobileProps {
     items: Item[];
-    mode: 'books' | 'reservations' | 'loans' | 'loans-history';
-    viewMode: 'books' | 'catalog' | 'loan' | 'loan-history';
+    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors";
+    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors";
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
     onReserve?: (item: BookI) => void;
@@ -14,6 +14,8 @@ interface ItemTableMobileProps {
     onConvertToLoan: (item: Item) => void;
     onReservationStatus: (item: Item) => void;
     onLoanStatus: (item: Item) => void;
+    onEditDonor: (item: Item) => void;
+    onDeleteDonor: (item: Item) => void;
 }
 
 export function ItemTableMobile({
@@ -25,7 +27,10 @@ export function ItemTableMobile({
     onReserve,
     onConvertToLoan,
     onReservationStatus,
-    onLoanStatus
+    onLoanStatus,
+    onEditDonor,
+    onDeleteDonor
+
 }: ItemTableMobileProps) {
     const isBook = (item: Item): item is BookI => 'title' in item;
     const isLoan = (item: Item): item is Loan => 'loanDate' in item;
@@ -40,7 +45,14 @@ export function ItemTableMobile({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {isBook(item) ? (
+                        {"name" in item? (
+                            <>
+                                <p><strong>ID:</strong> {item.id}</p>
+                                <p><strong>Nombre:</strong> {item.name}</p>
+                                <p><strong>Email:</strong> {item.email}</p>
+                            </>
+                        ):
+                        isBook(item) ? (
                             <>
                                 <p><strong>ID:</strong> {item.id}</p>
                                 <p><strong>Páginas:</strong> {item.pages}</p>
@@ -103,6 +115,26 @@ export function ItemTableMobile({
                                         Estado
                                     </Button>
                                 )}
+                                {viewMode === 'Donors' && (
+                                    <>
+                                    {onEditDonor && (
+                                        <Button
+                                            onClick={() => onEditDonor(item)}
+                                            className="item-table__button"
+                                        >
+                                            Editar
+                                        </Button>
+                                    )}
+                                    {onDeleteDonor && (
+                                        <Button
+                                            onClick={() => onDeleteDonor(item)}
+                                            className="item-table__button"
+                                        >
+                                            Eliminar
+                                        </Button>
+                                    )}
+                                </>
+                            )}
                             </div>
                         )}
                     </CardContent>

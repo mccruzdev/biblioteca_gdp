@@ -6,8 +6,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 interface ItemTableDesktopProps {
     items: Item[];
-    mode: 'books' | 'reservations' | 'loans' | 'loans-history';
-    viewMode: 'books' | 'catalog' | 'loan' | 'loan-history';
+    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors";
+    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors";
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
     onReserve?: (item: BookI) => void;
@@ -16,6 +16,8 @@ interface ItemTableDesktopProps {
     onConvertToLoan: (item: Item) => void;
     onReservationStatus: (item: Item) => void;
     onLoanStatus: (item: Item) => void;
+    onEditDonor:(item: Item) => void; 
+    onDeleteDonor:(item: Item) => void; 
 }
 
 export function ItemTableDesktop({
@@ -27,7 +29,10 @@ export function ItemTableDesktop({
     onReserve,
     onConvertToLoan,
     onReservationStatus,
-    onLoanStatus
+    onLoanStatus,
+    onEditDonor, 
+    onDeleteDonor
+
 }: ItemTableDesktopProps) {
     const isBook = (item: Item): item is BookI => 'title' in item;
     const isLoan = (item: Item): item is Loan => 'loanDate' in item;
@@ -38,7 +43,13 @@ export function ItemTableDesktop({
                 <TableHeader>
                     <TableRow>
                         <TableHead>ID</TableHead>
-                        {mode === 'books' ? (
+                        {mode === 'Donors'?(
+                            <>
+                                <TableHead>Nombre</TableHead>
+                                <TableHead>Email</TableHead>
+                            </>
+                        ):
+                        mode === 'books' ? (
                             <>
                                 <TableHead>Título</TableHead>
                                 <TableHead>Páginas</TableHead>
@@ -63,7 +74,13 @@ export function ItemTableDesktop({
                     {items.map((item) => (
                         <TableRow key={item.id}>
                             <TableCell>{item.id}</TableCell>
-                            {isBook(item) ? (
+                            {"name" in item? (
+                                <>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.email}</TableCell>
+                                </>
+                            ):
+                            isBook(item) ? (
                                 <>
                                     <TableCell>{item.title}</TableCell>
                                     <TableCell>{item.pages}</TableCell>
@@ -144,6 +161,26 @@ export function ItemTableDesktop({
                                                 >
                                                     Estado préstamo
                                                 </DropdownMenuItem>
+                                            )}
+                                            {viewMode === 'Donors' && (
+                                                <>
+                                                    {onEditDonor && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEditDonor(item)}
+                                                            className="item-table__dropdown-item mb-1"
+                                                        >
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {onDeleteDonor && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onDeleteDonor(item)}
+                                                            className="item-table__dropdown-item"
+                                                        >
+                                                            Eliminar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </>
                                             )}
                                         </DropdownMenuContent>
                                     </DropdownMenu>

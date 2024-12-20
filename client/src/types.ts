@@ -122,4 +122,10 @@ export interface Loan {
   bookId: number;
 }
 
-export type Item = BookI | Reservation | Loan;
+export interface DonorsI {
+  id: number;
+  name: string;
+  email: string | null;
+}
+
+export type Item = BookI | Reservation | Loan | DonorsI;
