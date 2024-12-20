@@ -5,7 +5,7 @@ import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
-import NewBook from "./new/button-new-book";
+import { NewBook } from "./new/button-new-book";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { SearchBar } from "../../components/search-bar";
 import { Button } from "../../../../../components/ui/button";
@@ -68,7 +68,7 @@ export function DashboardBooks() {
 
   const handleReset = (clearSearchBar: boolean = false) => {
     setIsSearching(false)
-    setCurrentPage(1) 
+    setCurrentPage(1)
     fetchBooks()
     if (clearSearchBar) {
       searchBarRef.current?.clearSearch()
@@ -81,7 +81,7 @@ export function DashboardBooks() {
 
   const handleItemsPerPageChange = (newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage)
-    setCurrentPage(1) 
+    setCurrentPage(1)
   }
 
   if (!user) return <p>Loading...</p>;

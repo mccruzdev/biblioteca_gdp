@@ -79,6 +79,18 @@
     &__dialog-title
         color: styles.$accent-color
 
+    &__tabs-list
+        background-color: styles.$secondary-bg
+        border-radius: 0.5rem
+        padding: 0.25rem
+
+    &__tab-trigger
+        background-color: transparent
+        color: styles.$text-color
+        &[data-state="active"]
+            background-color: styles.$accent-color
+            color: styles.$primary-bg
+
 .book-form
     &__container
         display: flex
@@ -119,3 +131,16 @@
     &:focus
         outline: 2px solid styles.$accent-color
         outline-offset: 2px
+
+    &__scrollable-container
+        max-height: 70vh
+        overflow-y: auto
+        padding-right: 1rem
+
+    &__input-number
+        &--no-arrows
+            -moz-appearance: textfield
+            &::-webkit-outer-spin-button,
+            &::-webkit-inner-spin-button
+                -webkit-appearance: none
+                margin: 0
