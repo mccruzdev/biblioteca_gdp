@@ -3,7 +3,7 @@ interface Options {
   headers?: object;
   body?: object;
   json?: boolean;
-  authorization?: string;
+  authorization?: string | null;
 }
 
 export async function fetchJSON(

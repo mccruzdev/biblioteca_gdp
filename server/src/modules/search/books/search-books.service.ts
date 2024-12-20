@@ -24,7 +24,7 @@ const paginateTitle: PaginateFunction = paginator({
 });
 
 @Injectable()
-export class SearchService {
+export class SearchBooksService {
   constructor(private prisma: PrismaService) {}
 
   customSelect = {

@@ -2,6 +2,11 @@
 
 export type UserRoleT = "READER" | "LIBRARIAN" | "ADMIN";
 
+export enum UserRoleE {
+  ADMIN = "ADMIN",
+  LIBRARIAN = "LIBRARIAN",
+  READER = "READER",
+}
 export interface UserI {
   dni: string;
   names: string;
@@ -123,3 +128,10 @@ export interface Loan {
 }
 
 export type Item = BookI | Reservation | Loan;
+
+export interface AllDataUserI extends UserI {
+  id: number;
+  emailVerified: boolean;
+  isDisabled: boolean;
+}
+

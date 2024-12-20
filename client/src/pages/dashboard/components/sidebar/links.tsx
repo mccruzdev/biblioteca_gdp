@@ -26,11 +26,12 @@ export const navItems: NavItem[] = [
     ],
     roles: ["LIBRARIAN", "ADMIN"],
   },
-  // {
-  //   label: "Usuarios",
-  //   href: "/dashboard/users",
-  //   icon: (props) => <Icon type="user" {...props} />,
-  // },
+  {
+    label: "Usuarios",
+    href: "/dashboard/users",
+    icon: (props) => <Icon type="user" {...props} />,
+    roles: ["ADMIN"],
+  },
   // {
   //   label: "Gestión",
   //   href: "/dashboard/management",

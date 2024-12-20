@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { SearchService } from './search.service';
+import { SearchBooksService } from './search-books.service';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -13,8 +13,8 @@ import { Roles } from 'src/decorators/roles/roles.decorator';
 @ApiTags('Search')
 @ApiBearerAuth()
 @Controller('search')
-export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+export class SearchBooksController {
+  constructor(private readonly searchService: SearchBooksService) {}
 
   @Get('books-by-author/:author')
   @Roles('READER')
