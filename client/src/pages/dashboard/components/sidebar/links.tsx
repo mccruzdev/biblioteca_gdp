@@ -30,6 +30,7 @@ export const navItems: NavItem[] = [
     label: "Usuarios",
     href: "/dashboard/users",
     icon: (props) => <Icon type="user" {...props} />,
+    roles: ["ADMIN"],
   },
   // {
   //   label: "Gestión",
