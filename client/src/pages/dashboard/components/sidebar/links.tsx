@@ -22,8 +22,9 @@ export const navItems: NavItem[] = [
     icon: (props) => <Icon type="addBook" {...props} />,
     children: [
       { label: "Libros", href: "/dashboard/books" },
-      { label: "Ejemplares", href: "/dashboard/ejemplares" },
+      //{ label: "Ejemplares", href: "/dashboard/ejemplares" }, // preguntar a angel, no recuerdo que era xD
     ],
+    roles: ["LIBRARIAN", "ADMIN"],
   },
   {
     label: "Usuarios",

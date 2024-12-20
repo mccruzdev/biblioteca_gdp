@@ -10,7 +10,7 @@ import { Dashboard } from "./pages/auth/modules/dashboard/dashboard";
 // import AddBooks from "./pages/auth/modules/dashboard/add-books/add-books";
 // import DonationHistory from "./pages/auth/modules/dashboard/donation/donation-history/donation-history";
 // import DonatedBooks from "./pages/auth/modules/dashboard/donation/donated-books/donated-books";
-import { Toaster } from "sonner";
+import { Toaster } from "./components/ui/toaster"
 import { DashboardPage } from "./pages/dashboard/page";
 import { DashboardCatalog } from "./pages/dashboard/modules/pages/catalog/catalog";
 import { DashboardLoan } from "./pages/dashboard/modules/pages/loan/loan";

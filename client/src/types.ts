@@ -1,17 +1,11 @@
-export type RolesT = "ADMIN" | "LIBRARIAN" | "READER";
-
-export enum RolesE {
-  ADMIN = "ADMIN",
-  LIBRARIAN = "LIBRARIAN",
-  READER = "READER",
-}
+export type UserRoleT = "READER" | "LIBRARIAN" | "ADMIN";
 
 export interface UserI {
   dni: string;
   names: string;
   lastName: string;
   phoneNumber: string;
-  role: RolesT;
+  role: UserRoleT;
   email: string;
 }
 
