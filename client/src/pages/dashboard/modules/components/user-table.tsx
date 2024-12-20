@@ -33,6 +33,11 @@ import {
   DialogTitle,
 } from "../../../../components/ui/dialog";
 import { Label } from "../../../../components/ui/label";
+import { useUserDataUDC } from "../../../../context/data/data.hook";
+import { fetchJSON } from "../../../../services/fetch";
+import { BACKEND_SERVER } from "../../../../config/api";
+import { useTokenUC } from "../../../../context/user/user.hook";
+import { useToast } from "../../../../hooks/use-toast";
 
 type UserAvailabilityT = "UNAVAILABLE" | "AVAILABLE";
 enum UserAvailabilityE {
@@ -45,9 +50,12 @@ interface Props {
 }
 
 export function UserTable({ users }: Props) {
+  const { data } = useTokenUC();
+  const { getUsers } = useUserDataUDC();
   const [usersPerPage, setUsersPerPage] = useState(10);
   const [selectedUser, setSelectedUser] = useState<AllDataUserI | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState<{
     role: UserRoleT;
@@ -72,9 +80,37 @@ export function UserTable({ users }: Props) {
     setIsEditModalOpen(true);
   };
 
-  const handleSubmitEdit = (e: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmitEdit = async (e: any) => {
     e.preventDefault();
-    console.log("editar usuario:", selectedUser);
+
+    const { response } = await fetchJSON(
+      `${BACKEND_SERVER}/user/${selectedUser?.id}`,
+      {
+        method: "PUT",
+        authorization: data,
+        body: {
+          role: formData?.role,
+          isDisabled: formData?.availability === "UNAVAILABLE" ? true : false,
+        },
+        json: false,
+      }
+    );
+
+    if (response.ok) {
+      toast({
+        title: "Éxito",
+        description: "El usuario ha sido editado correctamente",
+      });
+      await getUsers();
+    } else {
+      toast({
+        title: "Error",
+        description: "Ha ocurrido un error al editar el usuario",
+      });
+    }
+
+    setIsEditModalOpen(false);
   };
 
   const renderPaginationButtons = () => {
@@ -197,7 +233,13 @@ export function UserTable({ users }: Props) {
                 <TableCell className="text-[#C7C7CC]">
                   {user.phoneNumber}
                 </TableCell>
-                <TableCell className="text-[#C7C7CC]">{user.role}</TableCell>
+                <TableCell className="text-[#C7C7CC]">
+                  {user.role === "ADMIN"
+                    ? "Administrador"
+                    : user.role === "LIBRARIAN"
+                    ? "Bibliotecario"
+                    : "Lector"}
+                </TableCell>
                 <TableCell className="text-[#C7C7CC]">{user.email}</TableCell>
                 <TableCell className="text-[#C7C7CC]">
                   {user.emailVerified ? "✅" : null}

@@ -1,28 +1,9 @@
-import { useEffect, useState } from "react";
 import "./users.sass";
-import { AllDataUserI, PaginatedI } from "../../../../../types";
-import { useTokenUC } from "../../../../../context/user/user.hook";
-import { fetchJSON } from "../../../../../services/fetch";
-import { BACKEND_SERVER } from "../../../../../config/api";
 import { UserTable } from "../../components/user-table";
+import { useUserDataUDC } from "../../../../../context/data/data.hook";
 
 export function DashboardUsers() {
-  const { data } = useTokenUC();
-  const [paginatedUsers, setPaginatedUsers] =
-    useState<PaginatedI<AllDataUserI> | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      if (!data) return;
-
-      const { response, json } = await fetchJSON<PaginatedI<AllDataUserI>>(
-        `${BACKEND_SERVER}/user/all`,
-        { authorization: data }
-      );
-
-      if (response.ok) setPaginatedUsers(json);
-    })();
-  }, [data]);
+  const { paginatedUsers } = useUserDataUDC();
 
   return (
     <>

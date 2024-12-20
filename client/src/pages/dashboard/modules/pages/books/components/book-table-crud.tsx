@@ -58,6 +58,7 @@ export function BookTableCrud({ books, token }: BookTableProps) {
         setIsDeleteModalOpen(true)
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleEditSubmit = async (data: any) => {
         if (!selectedBook) return
 
