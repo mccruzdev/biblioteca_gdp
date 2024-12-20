@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
-import { BooksService } from './book.service';
-import { BooksController } from './book.controller';
+import { ReservationController } from './reservation.controller';
+import { ReservationService } from './reservation.service';
+import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from 'src/guards/roles/roles.guard';
-import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [ConfigModule],
-  controllers: [BooksController],
+  controllers: [ReservationController],
   providers: [
-    BooksService,
+    ReservationService,
     PrismaService,
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
-export class BooksModule {}
+export class ReservationModule {}

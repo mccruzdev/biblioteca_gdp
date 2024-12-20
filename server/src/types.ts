@@ -54,5 +54,78 @@ export interface ParseBook {
   title: string;
   pages?: number;
   authors?: Author[];
-  Subcategory?: any | null;
+  Subcategory?: {
+    name: string;
+    Category?: {
+      name: string;
+    };
+  };
+}
+
+export interface ParseDonation {
+  id: number;
+  date: string;
+  description: string;
+  Donor: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
+export interface ParseCopy {
+  id: number;
+  code: string;
+  condition: string;
+  Location: {
+    id: number;
+    shelf: string;
+    shelfColor: string;
+    shelfLevel: string;
+  };
+  Publisher: {
+    id: number;
+    name: string;
+    email: string;
+    country: string;
+    address: string;
+    phoneNumber: string;
+    website: string;
+  };
+  Book: {
+    id: number;
+    title: string;
+    pages: number;
+    authors: {
+      id: number;
+      name: string;
+      email: string;
+    }[];
+    Subcategory: {
+      name: string;
+      Category: {
+        name: string;
+      };
+    };
+  };
+}
+
+export interface ParseCopies {
+  copies: ParseCopy[];
+}
+
+export interface ParseLoan {
+  id: number;
+  loanDate: Date;
+  dueDate: Date;
+  status: string;
+  copies: ParseCopy[];
+}
+
+export interface ParseReservation {
+  id: number;
+  created: Date;
+  dueDate: Date;
+  status: string;
+  copies: ParseCopy[];
 }
