@@ -11,8 +11,9 @@ import {
 import { useToast } from '../../../../../../hooks/use-toast'
 import { loanApi, CreateLoanDTO, UpdateReservationDTO } from '../loan.api'
 import { Reservation, ReservationStatus, LoanStatus } from '../../../../../../types'
-import { Input } from "../../../../../../components/ui/input"
 import { Label } from "../../../../../../components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../../../components/ui/select"
+import { format, setHours, setMinutes, addMinutes } from 'date-fns'
 
 interface LoanConfirmationModalProps {
   isOpen: boolean
@@ -32,14 +33,35 @@ export function LoanConfirmationModal({
   bookTitle
 }: LoanConfirmationModalProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [loanDuration, setLoanDuration] = useState(14)
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const { toast } = useToast()
+
+  const generateTimeOptions = () => {
+    const now = new Date()
+    const options = []
+    const endTime = setHours(setMinutes(now, 0), 17)
+
+    let currentTime = now
+    currentTime = setMinutes(currentTime, Math.ceil(currentTime.getMinutes() / 30) * 30)
+
+    while (currentTime <= endTime) {
+      options.push(format(currentTime, 'HH:mm'))
+      currentTime = addMinutes(currentTime, 30)
+    }
+
+    return options
+  }
 
   const handleConfirm = async () => {
     setIsLoading(true)
     try {
+      if (!selectedTime) {
+        throw new Error("Por favor, selecciona una hora para el préstamo.")
+      }
+
+      const [hours, minutes] = selectedTime.split(':').map(Number)
       const dueDate = new Date()
-      dueDate.setDate(dueDate.getDate() + loanDuration) 
+      dueDate.setHours(hours, minutes, 0, 0)
 
       const updateReservationData: UpdateReservationDTO = {
         dueDate: dueDate.toISOString(),
@@ -65,7 +87,7 @@ export function LoanConfirmationModal({
       console.error('Error creating loan:', error)
       toast({
         title: "Error",
-        description: "Hubo un problema al crear el préstamo. Por favor, inténtalo de nuevo.",
+        description: error instanceof Error ? error.message : "Hubo un problema al crear el préstamo. Por favor, inténtalo de nuevo.",
         variant: "destructive",
       })
     } finally {
@@ -85,26 +107,31 @@ export function LoanConfirmationModal({
         <div className="loan-modal__grid">
           <p className="text-sm text-gray-500 mb-2">Detalles del préstamo:</p>
           <div className="flex items-center gap-2 mb-2">
-            <Label htmlFor="loanDuration" className="loan-modal__label">Duración del préstamo (días):</Label>
-            <Input
-              id="loanDuration"
-              type="number"
-              min="1"
-              value={loanDuration}
-              onChange={(e) => setLoanDuration(parseInt(e.target.value) || 14)}
-              className="loan-modal__input w-20"
-            />
+            <Label htmlFor="loanTime" className="loan-modal__label">Hora de finalización del préstamo:</Label>
+            <Select onValueChange={setSelectedTime}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Seleccionar hora" />
+              </SelectTrigger>
+              <SelectContent>
+                {generateTimeOptions().map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {time}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <ul className="list-disc list-inside mt-2 space-y-1">
             <li className="text-sm">Libro: <span className="font-medium">{bookTitle || 'Título no disponible'}</span></li>
-            <li className="text-sm">Fecha de vencimiento: <span className="font-medium">{new Date(new Date().setDate(new Date().getDate() + loanDuration)).toLocaleDateString('es-ES')}</span></li>
+            <li className="text-sm">Fecha del préstamo: <span className="font-medium">{new Date().toLocaleDateString('es-ES')}</span></li>
+            <li className="text-sm">Hora de finalización: <span className="font-medium">{selectedTime || 'No seleccionada'}</span></li>
           </ul>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isLoading} className="loan-modal__footer-button--cancel">
             Cancelar
           </Button>
-          <Button onClick={handleConfirm} disabled={isLoading} className="loan-modal__footer-button--confirm">
+          <Button onClick={handleConfirm} disabled={isLoading || !selectedTime} className="loan-modal__footer-button--confirm">
             {isLoading ? "Procesando..." : "Confirmar préstamo"}
           </Button>
         </DialogFooter>
