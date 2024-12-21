@@ -13,7 +13,7 @@ interface EditDonationsModalProps {
 }
 
 export interface DonationDTO {
-    donorId: string;
+    donorId: number;
     description: string;
     copies: {
         code: string;

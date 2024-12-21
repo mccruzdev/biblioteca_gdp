@@ -1,5 +1,28 @@
 import { BACKEND_SERVER } from "../../../../../config/api";
-import { DonationDTO } from "./edit/donation-edit-modal";
+import { BookCondition } from "../books/books.api";
+
+export interface DonationDTO {
+    donorId: number;
+    description: string;
+    copies: {
+        code: string;
+        condition: BookCondition;
+        location: {
+            shelf: string;
+            shelfColor: string;
+            shelfLevel: string;
+        };
+        publisher: {
+            name: string;
+            email: string;
+            country: string;
+            address: string;
+            phoneNumber: string;
+            website: string;
+        };
+        bookId: number;
+    }[];
+}
 
 export const donationsApi = {
     createDonation: async (data: DonationDTO, token: string) => {
