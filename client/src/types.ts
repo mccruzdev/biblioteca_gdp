@@ -127,11 +127,31 @@ export interface Loan {
   bookId: number;
 }
 
-export type Item = BookI | Reservation | Loan;
+export interface DonorsI {
+  id: number;
+  name: string;
+  email: string | null;
+}
+
+export interface DonationsI{
+  id: number;
+  date:string;
+  description: string;
+  donor: {
+    id: number;
+    name: string;
+    email: string;
+    };
+}
 
 export interface AllDataUserI extends UserI {
   id: number;
   emailVerified: boolean;
   isDisabled: boolean;
 }
+
+export type Item = BookI | Reservation | Loan | DonorsI | DonationsI;
+
+
+
 

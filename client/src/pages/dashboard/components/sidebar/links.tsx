@@ -37,9 +37,13 @@ export const navItems: NavItem[] = [
   //   href: "/dashboard/management",
   //   icon: (props) => <Icon type="management" {...props} />,
   // },
-  // {
-  //   label: "Donaciones",
-  //   href: "/dashboard/donations",
-  //   icon: (props) => <Icon type="gift" {...props} />,
-  // },
+  {
+    label: "Donaciones",
+    href: "/dashboard/donations",
+    icon: (props) => <Icon type="gift" {...props} />,
+    children: [
+      { label: "Donaciones", href: "/dashboard/donations" },
+      { label: "Donadores", href: "/dashboard/donors" },
+    ],
+  },
 ];

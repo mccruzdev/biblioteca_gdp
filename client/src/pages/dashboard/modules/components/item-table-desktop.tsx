@@ -1,13 +1,13 @@
 import { MoreHorizontal } from 'lucide-react'
-import { BookI, Loan, Item } from "../../../../types"
+import { BookI, Loan, Item, DonationsI, DonorsI } from "../../../../types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Button } from "../../../../components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 
 interface ItemTableDesktopProps {
     items: Item[];
-    mode: 'books' | 'reservations' | 'loans' | 'loans-history';
-    viewMode: 'books' | 'catalog' | 'loan' | 'loan-history';
+    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors" | "Donations";
+    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors" | "Donations";
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
     onReserve?: (item: BookI) => void;
@@ -16,6 +16,10 @@ interface ItemTableDesktopProps {
     onConvertToLoan: (item: Item) => void;
     onReservationStatus: (item: Item) => void;
     onLoanStatus: (item: Item) => void;
+    onEditDonor:(item: Item) => void; 
+    onDeleteDonor:(item: Item) => void; 
+    // onEditDonation: (item: Item) => void;
+    onDeleteDonation: (item: Item) => void;
 }
 
 export function ItemTableDesktop({
@@ -27,10 +31,17 @@ export function ItemTableDesktop({
     onReserve,
     onConvertToLoan,
     onReservationStatus,
-    onLoanStatus
+    onLoanStatus,
+    onEditDonor, 
+    onDeleteDonor,
+    // onEditDonation,
+    onDeleteDonation
+
 }: ItemTableDesktopProps) {
     const isBook = (item: Item): item is BookI => 'title' in item;
     const isLoan = (item: Item): item is Loan => 'loanDate' in item;
+    const isDonations = (item: Item): item is DonationsI => 'donor' in item;
+    const isDonors = (item: Item): item is DonorsI => 'name' in item;
 
     return (
         <div className="item-table__desktop">
@@ -38,7 +49,20 @@ export function ItemTableDesktop({
                 <TableHeader>
                     <TableRow>
                         <TableHead>ID</TableHead>
-                        {mode === 'books' ? (
+                        {mode === 'Donations'?(
+                            <>
+                                <TableHead>Fecha de Donación</TableHead>
+                                <TableHead>Descripción</TableHead>
+                                <TableHead>Donador</TableHead>
+                            </>
+                        ):
+                        mode === 'Donors'?(
+                            <>
+                                <TableHead>Nombre</TableHead>
+                                <TableHead>Email</TableHead>
+                            </>
+                        ):
+                        mode === 'books' ? (
                             <>
                                 <TableHead>Título</TableHead>
                                 <TableHead>Páginas</TableHead>
@@ -63,7 +87,20 @@ export function ItemTableDesktop({
                     {items.map((item) => (
                         <TableRow key={item.id}>
                             <TableCell>{item.id}</TableCell>
-                            {isBook(item) ? (
+                            {isDonations(item) ? (
+                                <>
+                                    <TableCell>{item.date}</TableCell>
+                                    <TableCell>{item.description}</TableCell>
+                                    <TableCell>{item.donor.name}</TableCell>
+                                </>
+                            ):
+                            isDonors(item) ? (
+                                <>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.email}</TableCell>
+                                </>
+                            ):
+                            isBook(item) ? (
                                 <>
                                     <TableCell>{item.title}</TableCell>
                                     <TableCell>{item.pages}</TableCell>
@@ -144,6 +181,46 @@ export function ItemTableDesktop({
                                                 >
                                                     Estado préstamo
                                                 </DropdownMenuItem>
+                                            )}
+                                            {viewMode === 'Donors' && (
+                                                <>
+                                                    {onEditDonor && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEditDonor(item)}
+                                                            className="item-table__dropdown-item mb-1"
+                                                        >
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {onDeleteDonor && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onDeleteDonor(item)}
+                                                            className="item-table__dropdown-item"
+                                                        >
+                                                            Eliminar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </>
+                                            )}
+                                            {viewMode === 'Donations' && (
+                                                <>
+                                                    {/* {onEditDonation && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEditDonation(item)}
+                                                            className="item-table__dropdown-item mb-1"
+                                                        >
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                    )} */}
+                                                    {onDeleteDonation && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onDeleteDonation(item)}
+                                                            className="item-table__dropdown-item"
+                                                        >
+                                                            Eliminar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </>
                                             )}
                                         </DropdownMenuContent>
                                     </DropdownMenu>

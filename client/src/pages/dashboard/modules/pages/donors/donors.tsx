@@ -1,7 +1,7 @@
-import "./donation.sass";
+import "./donors.sass";
 
 import { useRef, useEffect, useState } from "react";
-import { DonationsI, PaginatedI } from "../../../../../types";
+import { DonorsI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
 import { useTokenUC } from "../../../../../context/user/user.hook";
@@ -9,11 +9,11 @@ import { useTokenUC } from "../../../../../context/user/user.hook";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 import { ItemTable } from "../../components/item-table";
-import { NewDonation } from "./new/button-new-donation";
+import { NewDonor } from "./new/button-new-donor";
 
-export function DashboardDonation() {
+export function DashboardDonors() {
   const { data: token } = useTokenUC()
-  const [paginatedDonations, setPaginatedDonations] = useState<PaginatedI<DonationsI> | null>(null)
+  const [paginatedDonors, setPaginatedDonors] = useState<PaginatedI<DonorsI> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -22,22 +22,22 @@ export function DashboardDonation() {
 
   useEffect(() => {
     if (token) {
-      fetchDonations()
+      fetchDonors()
     }
   }, [token, currentPage, itemsPerPage])
 
-  const fetchDonations = async (searchTerm?: string, searchType?: string) => {
+  const fetchDonors = async (searchTerm?: string, searchType?: string) => {
     if (!token) return // TODO: Redirect to login
     setIsLoading(true)
     setIsSearching(!!searchTerm)
 
-    let url = `${BACKEND_SERVER}/donation?page=${currentPage}&limit=${itemsPerPage}`
+    let url = `${BACKEND_SERVER}/donor?page=${currentPage}&limit=${itemsPerPage}`
     if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/donation-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`
+      url = `${BACKEND_SERVER}/search/donor-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`
     }
 
     try {
-      const { response, json } = await fetchJSON<PaginatedI<DonationsI>>(
+      const { response, json } = await fetchJSON<PaginatedI<DonorsI>>(
         url,
         {
           method: 'GET',
@@ -49,12 +49,12 @@ export function DashboardDonation() {
       )
 
       if (response.ok) {
-        setPaginatedDonations(json)
+        setPaginatedDonors(json)
       } else {
-        throw new Error('Failed to fetch donations')
+        throw new Error('Failed to fetch books')
       }
     } catch (error) {
-      console.error('Error fetching donations:', error)
+      console.error('Error fetching books:', error)
     } finally {
       setIsLoading(false)
     }
@@ -68,7 +68,7 @@ export function DashboardDonation() {
   const handleReset = (clearSearchBar: boolean = false) => {
     setIsSearching(false)
     setCurrentPage(1)
-    fetchDonations()
+    fetchDonors()
     if (clearSearchBar) {
       searchBarRef.current?.clearSearch()
     }
@@ -88,42 +88,42 @@ export function DashboardDonation() {
   return (
     <div className="dashboard-catalog">
       <section className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-2">DONACIONES</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">DONADORES</h1>
         <p className="text-gray-400">
-          ¡Bienvenido! Aquí podrás registrar a las Donaciones.
+          ¡Bienvenido! Aquí podrás registrar a los Donadores.
         </p>
       </section>
       <div className="outer-container bg-secondary-bg rounded-lg p-4 md:p-6"> 
         {/* <SearchBar onSearch={handleSearch} onReset={() => handleReset(true)} ref={searchBarRef} /> */}
-        <NewDonation />
+        <NewDonor />
         <div className="inner-container bg-[#0e0e0e] rounded-lg p-4 md:p-6 mt-4">
           <section className="Catalog-content-section">
             <div className="border-b border-gray-100 py-1">
-              <h2 className="text-xl font-bold text-white">Donaciones</h2>
+              <h2 className="text-xl font-bold text-white">Donadores</h2>
             </div>
             <div className="pt-3">
               {isLoading ? (
                 <p className="text-center text-gray-400">Cargando...</p>
-              ) : paginatedDonations && paginatedDonations.data.length > 0 ? (
+              ) : paginatedDonors && paginatedDonors.data.length > 0 ? (
                 <ItemTable
-                  items={paginatedDonations.data}
+                  items={paginatedDonors.data}
                   token={token || ''}
-                  mode="Donations"
-                  viewMode="Donations"
-                  currentPage={paginatedDonations.currentPage}
-                  totalPages={paginatedDonations.lastPage}
-                  itemsPerPage={paginatedDonations.limit}
+                  mode="Donors"
+                  viewMode="Donors"
+                  currentPage={paginatedDonors.currentPage}
+                  totalPages={paginatedDonors.lastPage}
+                  itemsPerPage={paginatedDonors.limit}
                   onPageChange={handlePageChange}
                   onItemsPerPageChange={handleItemsPerPageChange}
-                  prevPageUrl={paginatedDonations.prev}
-                  nextPageUrl={paginatedDonations.next}
+                  prevPageUrl={paginatedDonors.prev}
+                  nextPageUrl={paginatedDonors.next}
                 />
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-400 mb-4">No se encontraron Donaciones que coincidan con tu búsqueda.</p>
+                  <p className="text-gray-400 mb-4">No se encontraron Donadores que coincidan con tu búsqueda.</p>
                   {isSearching && (
                     <Button onClick={() => handleReset(true)} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
-                      Mostrar todas las Donaciones
+                      Mostrar todos los Donadores
                     </Button>
                   )}
                 </div>
