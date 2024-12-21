@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef } from 'react'
 import { BookTable } from './Table'
 
 interface ContentProps {
@@ -7,7 +7,6 @@ interface ContentProps {
 }
 
 export const Content: React.FC<ContentProps> = ({ isCollapsed, isSidebarOpen }) => {
-  const [containerHeight, setContainerHeight] = useState('auto')
   const tableRef = useRef<HTMLDivElement>(null)
 
   const books = [
@@ -23,23 +22,9 @@ export const Content: React.FC<ContentProps> = ({ isCollapsed, isSidebarOpen }) 
     { id: 10, titulo: "Moby-Dick", numPaginas: 585, autor: "Herman Melville", categoria: "Novela", subcategoria: "Aventura" },
   ]
 
-  useEffect(() => {
-    const updateHeight = () => {
-      if (tableRef.current) {
-        const tableHeight = tableRef.current.offsetHeight
-        setContainerHeight(`${tableHeight + 100}px`) // Adding 32px for padding
-      }
-    }
-
-    updateHeight()
-    window.addEventListener('resize', updateHeight)
-
-    return () => window.removeEventListener('resize', updateHeight)
-  }, [])
-
   return (
     <div className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-      <main className="content-area p-4 md:p-6">
+      <main className="content-area overflow-x-auto p-4 md:p-6">
         <section className="welcome-section mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">BIBLIOTECA</h1>
           <p className="text-gray-400">
@@ -48,7 +33,6 @@ export const Content: React.FC<ContentProps> = ({ isCollapsed, isSidebarOpen }) 
         </section>
         <section 
           className="content-section"
-          style={{ height: containerHeight, transition: 'height 0.3s ease-in-out' }}
         >
           <div className="p-4 md:p-6 border-b border-gray-700">
             <h2 className="text-xl md:text-2xl font-bold text-white">Catálogo de Libros</h2>

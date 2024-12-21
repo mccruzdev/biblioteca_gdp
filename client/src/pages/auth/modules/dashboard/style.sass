@@ -1,41 +1,38 @@
 @use "sass:color"
 
 $primary-bg: #0E0E0E
-$secondary-bg: #1a1a1a
+$secondary-bg: #141414
 $sidebar-border-color: #FFFFFF
 $border-color: #3e3e40
 $text-color: #C7C7CC
 $accent-color: #FFBC24
 
+.custom-bg
+  background-color: $secondary-bg
+
 .dashboard
-  display: flex
+  width: 100%
+  display: grid
+  position: absolute
+  grid-template-areas: "b a a" "b c c" "b c c"
   min-height: 100vh
   background-color: $primary-bg
 
   &.sidebar-collapsed
-    .main-content
-      margin-left: 4rem
-      transition: margin-left 0.2s ease-in-out
 
     .main-header
+      margin: 1rem
       left: 4rem
       transition: left 0.2s ease-in-out
 
   &:not(.sidebar-collapsed)
-    .main-content
-      margin-left: 16rem
-      transition: margin-left 0.2s ease-in-out
-
     .main-header
+      margin: 1rem
       left: 16rem
       transition: left 0.2s ease-in-out
 
 .sidebar
-  position: fixed
-  left: 0
-  top: 0
-  z-index: 40
-  height: 100vh
+  grid-area: b
   width: 16rem
   background-color: rgba(0, 0, 0, 0.9)
   transform: translateX(-100%)
@@ -144,17 +141,11 @@ $accent-color: #FFBC24
     color: $primary-bg
 
 .main-content
-  flex: 1
-  margin-left: 16rem
+  grid-area: c
 
 .main-header
-  position: fixed
-  top: 0
-  right: 0
-  left: 16rem
-  z-index: 30
+  grid-area: a
   display: flex
-  height: 4rem
   align-items: center
   justify-content: space-between
   background-color: $primary-bg
@@ -208,7 +199,6 @@ $accent-color: #FFBC24
 
 .content-area
   padding: 1.5rem
-  margin-top: 4rem
 
 .welcome-section
   margin-bottom: 1.5rem
@@ -222,11 +212,13 @@ $accent-color: #FFBC24
     color: $text-color
 
 .content-section
+  overflow-x: auto
   min-height: 12rem
   border-radius: 0.5rem
   background-color: $secondary-bg
   padding: 1rem
   color: $text-color
+  
 
 .overlay
   position: fixed
@@ -237,37 +229,79 @@ $accent-color: #FFBC24
 .mobile-toggle
   display: none
 
+.user-dropdown-toggle
+  display: flex
+  align-items: center
+  gap: 0.5rem
+  color: $text-color
+  background: none
+  border: none
+  cursor: pointer
+
+  &:focus
+    outline: none
+
+.user-icon
+  width: 1.5rem
+  height: 1.5rem
+
+.user-dropdown
+  position: absolute
+  right: 1rem
+  top: 100%
+  width: 12rem
+  background-color: $secondary-bg
+  border-radius: 0.375rem
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1)
+  z-index: 50
+
+.logout-button
+  display: flex
+  align-items: center
+  width: 100%
+  padding: 0.5rem 1rem
+  color: $text-color
+  background: none
+  border: none
+  cursor: pointer
+  transition: background-color 0.2s
+
+  &:hover
+    background-color: $accent-color
+    color: $primary-bg
+
+.logout-icon
+  width: 1rem
+  height: 1rem
+  margin-right: 0.5rem
+
 @media (max-width: 1024px)
   .dashboard
     &.sidebar-open
-      .main-content
-        margin-left: 16rem
-
       .main-header
         left: 16rem
 
     &:not(.sidebar-open)
-      .main-content
-        margin-left: 0
-
       .main-header
         left: 0
-
-  .main-content
-    margin-left: 0
 
   .main-header
     left: 0
 
 @media (max-width: 768px)
   .dashboard
+    grid-template-areas: "a a a" "c c c" "c c c"
     &.mobile
       .sidebar
+        position: fixed
+        bottom: 0
+        left: 0
+        z-index: 99999
         width: 100%
         max-width: 16rem
 
       &.sidebar-open
-        .main-content, .main-header
+        .main-header
           margin-left: 0
           left: 0
 
@@ -298,3 +332,4 @@ $accent-color: #FFBC24
   .content-section
     height: auto
     min-height: 12rem
+    overflow-x: auto

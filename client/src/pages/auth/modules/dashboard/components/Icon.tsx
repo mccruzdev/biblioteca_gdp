@@ -5,7 +5,7 @@ interface CombinedIconProps extends React.SVGProps<SVGSVGElement> {
   type: 'catalog' | 'loan' | 'addBook' | 'user' | 'management';
 }
 
-const Icon: React.FC<CombinedIconProps> = ({ hovered = false, type, ...props }) => {
+const Icon: React.FC<CombinedIconProps> = ({ hovered, type, ...props }) => {
   return (
     <svg
       width={16}

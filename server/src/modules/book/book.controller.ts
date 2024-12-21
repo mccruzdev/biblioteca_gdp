@@ -56,7 +56,7 @@ export class BooksController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
+  getAllBooks(@Query('page') page = 1, @Query('limit') limit = 1000) {
     return this.booksService.getAllBooks(Number(page), Number(limit));
   }
 

@@ -3,9 +3,10 @@ interface Options {
   headers?: object;
   body?: object;
   json?: boolean;
+  authorization?: string | null;
 }
 
-export async function fetchJSON<T>(
+export async function fetchJSON(
   url: string,
   options: { json: false } & Options
 ): Promise<{ response: Response }>;
@@ -20,6 +21,7 @@ export async function fetchJSON<T>(url: string, options?: Options) {
     method: options?.method,
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${options?.authorization}`,
       ...options?.headers,
     },
     body: JSON.stringify(options?.body),
