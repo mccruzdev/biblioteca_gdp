@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AllDataUserI, UserRoleE, UserRoleT } from "@/types";
-import { usePagination } from "../../../pages/catalog/hooks/use-pagination";
+import { usePagination } from "../../../hooks/use-pagination";
 import {
   DropdownMenu,
   DropdownMenuContent,
