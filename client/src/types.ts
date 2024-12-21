@@ -128,4 +128,15 @@ export interface DonorsI {
   email: string | null;
 }
 
-export type Item = BookI | Reservation | Loan | DonorsI;
+export interface DonationsI{
+  id: number;
+  date:string;
+  description: string;
+  donor: {
+    id: number;
+    name: string;
+    email: string;
+    };
+}
+
+export type Item = BookI | Reservation | Loan | DonorsI | DonationsI;

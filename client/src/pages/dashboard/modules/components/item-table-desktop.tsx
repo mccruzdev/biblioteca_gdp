@@ -1,13 +1,13 @@
 import { MoreHorizontal } from 'lucide-react'
-import { BookI, Loan, Item } from "../../../../types"
+import { BookI, Loan, Item, DonationsI, DonorsI } from "../../../../types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Button } from "../../../../components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 
 interface ItemTableDesktopProps {
     items: Item[];
-    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors";
-    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors";
+    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors" | "Donations";
+    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors" | "Donations";
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
     onReserve?: (item: BookI) => void;
@@ -18,6 +18,8 @@ interface ItemTableDesktopProps {
     onLoanStatus: (item: Item) => void;
     onEditDonor:(item: Item) => void; 
     onDeleteDonor:(item: Item) => void; 
+    // onEditDonation: (item: Item) => void;
+    onDeleteDonation: (item: Item) => void;
 }
 
 export function ItemTableDesktop({
@@ -31,11 +33,15 @@ export function ItemTableDesktop({
     onReservationStatus,
     onLoanStatus,
     onEditDonor, 
-    onDeleteDonor
+    onDeleteDonor,
+    // onEditDonation,
+    onDeleteDonation
 
 }: ItemTableDesktopProps) {
     const isBook = (item: Item): item is BookI => 'title' in item;
     const isLoan = (item: Item): item is Loan => 'loanDate' in item;
+    const isDonations = (item: Item): item is DonationsI => 'donor' in item;
+    const isDonors = (item: Item): item is DonorsI => 'name' in item;
 
     return (
         <div className="item-table__desktop">
@@ -43,7 +49,14 @@ export function ItemTableDesktop({
                 <TableHeader>
                     <TableRow>
                         <TableHead>ID</TableHead>
-                        {mode === 'Donors'?(
+                        {mode === 'Donations'?(
+                            <>
+                                <TableHead>Fecha de Donación</TableHead>
+                                <TableHead>Descripción</TableHead>
+                                <TableHead>Donador</TableHead>
+                            </>
+                        ):
+                        mode === 'Donors'?(
                             <>
                                 <TableHead>Nombre</TableHead>
                                 <TableHead>Email</TableHead>
@@ -74,7 +87,14 @@ export function ItemTableDesktop({
                     {items.map((item) => (
                         <TableRow key={item.id}>
                             <TableCell>{item.id}</TableCell>
-                            {"name" in item? (
+                            {isDonations(item) ? (
+                                <>
+                                    <TableCell>{item.date}</TableCell>
+                                    <TableCell>{item.description}</TableCell>
+                                    <TableCell>{item.donor.name}</TableCell>
+                                </>
+                            ):
+                            isDonors(item) ? (
                                 <>
                                     <TableCell>{item.name}</TableCell>
                                     <TableCell>{item.email}</TableCell>
@@ -175,6 +195,26 @@ export function ItemTableDesktop({
                                                     {onDeleteDonor && (
                                                         <DropdownMenuItem
                                                             onClick={() => onDeleteDonor(item)}
+                                                            className="item-table__dropdown-item"
+                                                        >
+                                                            Eliminar
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </>
+                                            )}
+                                            {viewMode === 'Donations' && (
+                                                <>
+                                                    {/* {onEditDonation && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEditDonation(item)}
+                                                            className="item-table__dropdown-item mb-1"
+                                                        >
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                    )} */}
+                                                    {onDeleteDonation && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onDeleteDonation(item)}
                                                             className="item-table__dropdown-item"
                                                         >
                                                             Eliminar

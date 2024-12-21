@@ -1,6 +1,6 @@
 import "../../page.sass"
 import { useState, useEffect } from "react"
-import { BookI, Reservation, Loan, Item, ReservationStatus, DonorsI } from "../../../../types"
+import { BookI, Reservation, Loan, Item, ReservationStatus, DonorsI, DonationsI } from "../../../../types"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale'
 import { useToast } from "../../../../hooks/use-toast"
@@ -19,12 +19,16 @@ import { LoanStatusModal } from "../pages/loan-history/loan-history/loan-status-
 import { EditDonorModal } from "../pages/donors/edit/donor-edit-modal"
 import { DeleteDonorModal } from "../pages/donors/delete/donor-delete-modal"
 import { donorsApi } from "../pages/donors/donors.api"
+import { DeleteDonationsModal } from "../pages/donation/delete/donation-delete-modal"
+// import { EditDonationsModal } from "../pages/donation/edit/donation-edit-modal"
+// import { DonationDTO } from "../pages/donation/edit/donation-edit-modal"
+import { donationsApi } from "../pages/donation/donations.api"
 
 interface ItemTableProps {
     items: Item[];
     token: string;
-    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors";
-    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors";
+    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors" | "Donations";
+    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors" | "Donations";
     onLoan?: (item: Item) => void;
     onReturn?: (item: Loan) => void;
     currentPage: number;
@@ -66,6 +70,8 @@ export function ItemTable({
     const { toast } = useToast()
     const [isEditModalOpenDonors, setIsEditModalOpenDonors] = useState(false)
     const [isDeleteModalOpenDonors, setIsDeleteModalOpenDonors] = useState(false)
+    // const [isEditModalOpenDonations, setIsEditModalOpenDonations] = useState(false)
+    const [isDeleteModalOpenDonations, setIsDeleteModalOpenDonations] = useState(false)
 
     useEffect(() => {
         const checkMobile = () => {
@@ -304,6 +310,61 @@ export function ItemTable({
         }
     }
 
+    // const handleEditDonations = (item: Item) => {
+    //     setSelectedItem(item)
+    //     setIsEditModalOpenDonations(true)
+    // }
+
+    const handleDeleteDonations = (item: Item) => {
+        setSelectedItem(item)
+        setIsDeleteModalOpenDonations(true)
+    }
+
+
+    // const handleEditDonationsSubmit = async (data: any) => {
+        // if (!selectedItem || !('name' in selectedItem)) return
+
+        // try {
+        //     const donorData = {
+        //         name: data.name,
+        //         email: data.email,
+        //     }
+
+        //     await donorsApi.updateDonor(selectedItem.id, donorData, token)
+        //     toast({
+        //         title: "Éxito",
+        //         description: `El Donador "${data.name}" ha sido actualizado`,
+        //     })
+        //     setIsEditModalOpenDonors(false)
+        // } catch (error) {
+        //     toast({
+        //         title: "Error",
+        //         description: error instanceof Error ? error.message : "Error al actualizar el Donador",
+        //         variant: "destructive",
+        //     })
+        // }
+    // }
+
+    const handleDeleteDonationsSubmit = async () => {
+    if (!selectedItem || !('donor' in selectedItem)) return
+
+        try {
+            await donationsApi.deleteDonation(selectedItem.id, token)
+            toast({
+                title: "Éxito",
+                description: `La donacion del donador "${selectedItem.donor.name}" ha sido eliminada`,
+            })
+            setIsDeleteModalOpenDonors(false)
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: error instanceof Error ? error.message : "Error al eliminar la donación",
+                variant: "destructive",
+            })
+        }
+    }
+
+
     return (
         <div className="item-table">
             {isMobile ? (
@@ -321,6 +382,8 @@ export function ItemTable({
                     onLoanStatus={handleLoanStatus}
                     onEditDonor={handleEditDonor}
                     onDeleteDonor={handleDeleteDonor}
+                    // onEditDonation={handleEditDonations}
+                    onDeleteDonation={handleDeleteDonations}
                 />
             ) : (
                 <ItemTableDesktop
@@ -337,6 +400,8 @@ export function ItemTable({
                     onLoanStatus={handleLoanStatus}
                     onEditDonor={handleEditDonor}
                     onDeleteDonor={handleDeleteDonor}
+                    // onEditDonation={handleEditDonations}
+                    onDeleteDonation={handleDeleteDonations}
                 />
             )}
             <ItemTablePagination
@@ -434,6 +499,23 @@ export function ItemTable({
                         isOpen={isDeleteModalOpenDonors}
                         onClose={() => setIsDeleteModalOpenDonors(false)}
                         onConfirm={handleDeleteDonorSubmit}
+                    />
+                </>
+            )}
+
+            {viewMode === "Donations" && (
+                <>
+                    {/* <EditDonationsModal
+                        isOpen={isEditModalOpenDonations}
+                        onClose={() => setIsEditModalOpenDonations(false)}
+                        onSubmit={handleEditDonationsSubmit}
+                        donation={selectedItem as Donations}
+                    /> */}
+
+                    <DeleteDonationsModal
+                        isOpen={isDeleteModalOpenDonations}
+                        onClose={() => setIsDeleteModalOpenDonations(false)}
+                        onConfirm={handleDeleteDonationsSubmit}
                     />
                 </>
             )}

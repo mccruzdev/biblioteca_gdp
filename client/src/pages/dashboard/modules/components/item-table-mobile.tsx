@@ -1,11 +1,11 @@
-import { BookI, Loan, Item } from "../../../../types"
+import { BookI, DonationsI, DonorsI, Loan, Item } from "../../../../types"
 import { Button } from "../../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
 
 interface ItemTableMobileProps {
     items: Item[];
-    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors";
-    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors";
+    mode: "books" | "reservations" | "loans" | "loans-history" | "Donors" | "Donations";
+    viewMode: "books" | "catalog" | "loan" | "loan-history" | "Donors" | "Donations";
     onEdit?: (item: BookI) => void;
     onDelete?: (item: BookI) => void;
     onReserve?: (item: BookI) => void;
@@ -16,6 +16,8 @@ interface ItemTableMobileProps {
     onLoanStatus: (item: Item) => void;
     onEditDonor: (item: Item) => void;
     onDeleteDonor: (item: Item) => void;
+    // onEditDonation: (item: Item) => void;
+    onDeleteDonation: (item: Item) => void;
 }
 
 export function ItemTableMobile({
@@ -29,11 +31,15 @@ export function ItemTableMobile({
     onReservationStatus,
     onLoanStatus,
     onEditDonor,
-    onDeleteDonor
+    onDeleteDonor,
+    // onEditDonation,
+    onDeleteDonation
 
 }: ItemTableMobileProps) {
     const isBook = (item: Item): item is BookI => 'title' in item;
     const isLoan = (item: Item): item is Loan => 'loanDate' in item;
+    const isDonations = (item: Item): item is DonationsI => 'donor' in item;
+    const isDonors = (item: Item): item is DonorsI => 'name' in item;
 
     return (
         <div className="item-table__mobile">
@@ -45,7 +51,14 @@ export function ItemTableMobile({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {"name" in item? (
+                        {isDonations(item) ? (
+                            <>
+                                <p><strong>Fecha de Donación:</strong>{item.date}</p>
+                                <p><strong>Descripción:</strong>{item.description}</p>
+                                <p><strong>Donador:</strong>{item.donor.name}</p>
+                            </>
+                        ):
+                        isDonors(item) ? (
                             <>
                                 <p><strong>ID:</strong> {item.id}</p>
                                 <p><strong>Nombre:</strong> {item.name}</p>
@@ -128,6 +141,27 @@ export function ItemTableMobile({
                                     {onDeleteDonor && (
                                         <Button
                                             onClick={() => onDeleteDonor(item)}
+                                            className="item-table__button"
+                                        >
+                                            Eliminar
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+
+                                {viewMode === 'Donations' && (
+                                    <>
+                                    {/* {onEditDonation && (
+                                        <Button
+                                            onClick={() => onEditDonation(item)}
+                                            className="item-table__button"
+                                        >
+                                            Editar
+                                        </Button>
+                                    )} */}
+                                    {onDeleteDonation && (
+                                        <Button
+                                            onClick={() => onDeleteDonation(item)}
                                             className="item-table__button"
                                         >
                                             Eliminar
