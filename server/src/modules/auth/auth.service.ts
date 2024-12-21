@@ -216,6 +216,7 @@ export class AuthService {
       '..',
       '..',
       '..',
+      '..',
       'resources',
       'logo-muni.png',
     );
@@ -257,6 +258,7 @@ Si no te registraste en nuestro sitio, por favor ignora este correo.`,
     const passwordChangeLink = `${backendServer}/auth/confirm-change-password?token=${token}`;
     const filePath = join(
       __dirname,
+      '..',
       '..',
       '..',
       '..',
