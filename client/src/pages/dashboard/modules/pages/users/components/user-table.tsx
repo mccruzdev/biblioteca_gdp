@@ -6,16 +6,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../../components/ui/table";
-import { AllDataUserI, UserRoleE, UserRoleT } from "../../../../types";
-import { usePagination } from "../pages/catalog/hooks/use-pagination";
+} from "@/components/ui/table";
+import { AllDataUserI, UserRoleE, UserRoleT } from "@/types";
+import { usePagination } from "../../../pages/catalog/hooks/use-pagination";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../../components/ui/dropdown-menu";
-import { Button } from "../../../../components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import {
   Select,
@@ -23,7 +23,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../../components/ui/select";
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -31,13 +31,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../../components/ui/dialog";
-import { Label } from "../../../../components/ui/label";
-import { useUserDataUDC } from "../../../../context/data/data.hook";
-import { fetchJSON } from "../../../../services/fetch";
-import { BACKEND_SERVER } from "../../../../config/api";
-import { useTokenUC } from "../../../../context/user/user.hook";
-import { useToast } from "../../../../hooks/use-toast";
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useUserDataUDC } from "@/context/data/data.hook";
+import { fetchJSON } from "@/services/fetch";
+import { BACKEND_SERVER } from "@/config/api";
+import { useTokenUC } from "@/context/user/user.hook";
+import { useToast } from "@/hooks/use-toast";
 
 type UserAvailabilityT = "UNAVAILABLE" | "AVAILABLE";
 enum UserAvailabilityE {
