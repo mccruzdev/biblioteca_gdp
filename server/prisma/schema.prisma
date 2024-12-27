@@ -144,7 +144,7 @@ model User {
   dni               String        @unique @db.VarChar(9)
   names             String
   lastName          String
-  phoneNumber       String        @unique @db.VarChar(9)
+  phoneNumber       String?       @unique @db.VarChar(9)
   password          String
   role              Role
   email             String        @unique @db.VarChar(255)

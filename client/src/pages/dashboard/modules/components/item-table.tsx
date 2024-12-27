@@ -1,6 +1,6 @@
 import "../../page.sass"
 import { useState, useEffect } from "react"
-import { BookI, Reservation, Loan, Item, ReservationStatus, DonorsI, DonationsI } from "../../../../types"
+import { BookI, Reservation, Loan, Item, ReservationStatus, DonorsI } from "../../../../types"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale'
 import { useToast } from "../../../../hooks/use-toast"
@@ -61,7 +61,7 @@ export function ItemTable({
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [isReservationModalOpen, setIsReservationModalOpen] = useState(false)
-    const [isLoanModalOpen, setIsLoanModalOpen] = useState(false)
+    const [, setIsLoanModalOpen] = useState(false)
     const [isLoanConfirmationModalOpen, setIsLoanConfirmationModalOpen] = useState(false)
     const [isReservationStatusModalOpen, setIsReservationStatusModalOpen] = useState(false)
     const [isLoanStatusModalOpen, setIsLoanStatusModalOpen] = useState(false)
@@ -102,7 +102,7 @@ export function ItemTable({
             setCopies(data)
             setSelectedItem(item)
             setIsReservationModalOpen(true)
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
@@ -120,7 +120,7 @@ export function ItemTable({
                 setCopies(data)
                 setSelectedItem(item)
                 setIsLoanModalOpen(true)
-            } catch (error) {
+            } catch {
                 toast({
                     title: "Error",
                     description: "No se pudieron obtener las copias del libro. Por favor, inténtalo de nuevo.",
@@ -136,6 +136,7 @@ export function ItemTable({
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleEditSubmit = async (data: any) => {
         if (!selectedItem || !('title' in selectedItem)) return
 
@@ -267,6 +268,7 @@ export function ItemTable({
     }
 
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleEditDonorSubmit = async (data: any) => {
         if (!selectedItem || !('name' in selectedItem)) return
 

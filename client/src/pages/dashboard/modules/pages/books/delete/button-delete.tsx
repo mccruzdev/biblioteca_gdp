@@ -29,7 +29,7 @@ export function ButtonDelete({ book, onDeleted }: ButtonDeleteProps) {
         if (!token) return;
 
         try {
-            await booksApi.deleteBook(book.id.toString(), token);
+            await booksApi.deleteBook(book.id, token);
             
             toast({
                 title: "Éxito",

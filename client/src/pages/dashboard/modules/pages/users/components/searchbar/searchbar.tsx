@@ -55,7 +55,7 @@ export function SearchBar() {
           </div>
         ) : selectedFilter.value === "role" ? (
           <Select
-            value={searchTerm}
+            value={searchTerm as string}
             onValueChange={(value: UserRoleT) => {
               setSearchTerm(value);
             }}
@@ -88,7 +88,7 @@ export function SearchBar() {
           <Input
             type="text"
             placeholder="Buscar usuarios..."
-            value={searchTerm}
+            value={searchTerm as string}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-[#141414] border-[#3e3e40] text-[#C7C7CC] placeholder-[#6e6e6e] pr-8"
           />
