@@ -6,6 +6,11 @@ interface Options {
   authorization?: string | null;
 }
 
+export interface ErrorI {
+  statusCode?: number;
+  message?: string;
+}
+
 export async function fetchJSON(
   url: string,
   options: { json: false } & Options

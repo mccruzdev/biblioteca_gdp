@@ -104,8 +104,9 @@ export class AuthController {
     status: 200,
     description: 'Inicio de sesión exitoso. Token JWT devuelto.',
   })
-  @ApiResponse({ status: 404, description: 'El usuario no existe.' })
   @ApiResponse({ status: 401, description: 'Credenciales incorrectas.' })
+  @ApiResponse({ status: 403, description: 'No se ha confirmado el usuario' })
+  @ApiResponse({ status: 404, description: 'El usuario no existe.' })
   loginUser(@Body() user: LoginUserDTO) {
     return this.auth.loginUser(user);
   }

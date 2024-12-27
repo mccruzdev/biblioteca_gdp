@@ -185,16 +185,25 @@ export class AuthService {
     });
 
     if (!userRes)
-      throw new HttpException('User not exists.', HttpStatus.NOT_FOUND);
+      throw new HttpException('El usuario no existe', HttpStatus.NOT_FOUND);
 
     if (userRes.isDisabled)
-      throw new HttpException('User is disabled.', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        'El usuario está desabilitado',
+        HttpStatus.FORBIDDEN,
+      );
 
     if (needEmailVerification && !userRes.emailVerified)
-      throw new HttpException('Email not confirmed', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        'El correo no está confirmado',
+        HttpStatus.FORBIDDEN,
+      );
 
     if (!(await this._comparePassword(userRes.password, password)))
-      throw new HttpException('Invalid credentials.', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Credenciales invalidas',
+        HttpStatus.UNAUTHORIZED,
+      );
 
     return userRes;
   }

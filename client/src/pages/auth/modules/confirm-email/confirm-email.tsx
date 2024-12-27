@@ -1,14 +1,15 @@
 import "../login/style.sass";
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast } from "sonner";
 import Button from "../login/components/Button";
 import { BACKEND_SERVER } from "../../../../config/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ConfirmedEmail() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
+  const { toast } = useToast();
 
   const confirmEmail = () => {
     fetch(`${BACKEND_SERVER}/auth/confirm-email?token=${token}`, {
@@ -20,13 +21,20 @@ export default function ConfirmedEmail() {
       .then((response) => {
         if (response.ok) {
           navigate("/");
-          toast.success("¡Correo confirmado exitosamente!");
+          toast({
+            title: "Correo confirmado",
+            description: "¡Correo confirmado exitosamente!",
+          });
         } else {
-          toast.error("Error al confirmar correo");
+          toast({ title: "Error", description: "Error al confirmar correo" });
         }
       })
       .catch(() => {
-        toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
+        toast({
+          title: "Error",
+          description:
+            "Ocurrió un error en la red. Por favor, intenta de nuevo.",
+        });
       });
   };
 
