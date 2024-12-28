@@ -15,7 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../../components/ui/dropdown-menu";
-import { useAuthUC } from "@/context/user/user.hook";
 
 interface ItemTableDesktopProps {
   items: Item[];
@@ -62,8 +61,6 @@ export function ItemTableDesktop({
   // onEditDonation,
   onDeleteDonation,
 }: ItemTableDesktopProps) {
-  const { user } = useAuthUC();
-
   const isBook = (item: Item): item is BookI => "title" in item;
   const isLoan = (item: Item): item is Loan => "loanDate" in item;
   const isDonations = (item: Item): item is DonationsI => "donor" in item;
@@ -108,7 +105,7 @@ export function ItemTableDesktop({
                 <TableHead>Copia</TableHead>
               </>
             )}
-            {mode !== "loans-history" && user?.role !== "READER" && (
+            {mode !== "loans-history" && (
               <TableHead className="text-right">Acciones</TableHead>
             )}
           </TableRow>
@@ -168,7 +165,7 @@ export function ItemTableDesktop({
                   <TableCell>{item.copies[0]?.code || "N/A"}</TableCell>
                 </>
               )}
-              {mode !== "loans-history" && user?.role !== "READER" && (
+              {mode !== "loans-history" && (
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../../components/ui/card";
-import { useAuthUC } from "@/context/user/user.hook";
 
 interface ItemTableMobileProps {
   items: Item[];
@@ -53,7 +52,6 @@ export function ItemTableMobile({
   // onEditDonation,
   onDeleteDonation,
 }: ItemTableMobileProps) {
-  const { user } = useAuthUC();
   const isBook = (item: Item): item is BookI => "title" in item;
   const isLoan = (item: Item): item is Loan => "loanDate" in item;
   const isDonations = (item: Item): item is DonationsI => "donor" in item;
@@ -161,7 +159,7 @@ export function ItemTableMobile({
                 </p>
               </>
             )}
-            {mode !== "loans-history" && user?.role !== "READER" && (
+            {mode !== "loans-history" && (
               <div className="mt-4 space-x-2">
                 {viewMode === "books" && isBook(item) && (
                   <>

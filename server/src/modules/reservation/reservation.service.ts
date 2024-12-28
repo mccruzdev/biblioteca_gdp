@@ -81,7 +81,7 @@ export class ReservationService {
         select: this.selectReservation,
         where: { userId: data.id },
       },
-      { page, limit, path: 'reservation' },
+      { page, limit, path: 'reservation/me' },
       transformReservations,
     );
   }
@@ -104,13 +104,7 @@ export class ReservationService {
     });
   }
 
-  async updateReservation(
-    authorization: string | undefined,
-    id: number,
-    data: UpdateReservationDTO,
-  ) {
-    const dataHeader = this.tokenManager.getDataFromHeader(authorization);
-
+  async updateReservation(id: number, data: UpdateReservationDTO) {
     try {
       await this.prisma.reservation.update({
         data: {
@@ -120,7 +114,7 @@ export class ReservationService {
             set: data.copies.map((copyId) => ({ id: copyId })),
           },
         },
-        where: { id, userId: dataHeader.id },
+        where: { id },
       });
     } catch {
       throw new HttpException(

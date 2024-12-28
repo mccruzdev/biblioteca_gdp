@@ -181,15 +181,10 @@ export class ReservationController {
     description: 'Reserva o ID del ejemplar no encontrado',
   })
   updateReservation(
-    @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateReservationDTO,
   ) {
-    return this.reservationService.updateReservation(
-      req.headers.authorization,
-      id,
-      data,
-    );
+    return this.reservationService.updateReservation(id, data);
   }
 
   @Delete(':id')
