@@ -7,16 +7,13 @@ import {
   Item,
   ReservationStatus,
   DonorsI,
+  Copy,
 } from "../../../../types";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useToast } from "../../../../hooks/use-toast";
 import { ToastAction } from "../../../../components/ui/toast";
-import {
-  catalogApi,
-  Copy,
-  CreateReservationDTO,
-} from "../pages/catalog/catalog.api";
+import { catalogApi, CreateReservationDTO } from "../pages/catalog/catalog.api";
 import { booksApi } from "../pages/books/books.api";
 import { ItemTableDesktop } from "./item-table-desktop";
 import { ItemTableMobile } from "./item-table-mobile";
@@ -31,8 +28,7 @@ import { EditDonorModal } from "../pages/donors/edit/donor-edit-modal";
 import { DeleteDonorModal } from "../pages/donors/delete/donor-delete-modal";
 import { donorsApi } from "../pages/donors/donors.api";
 import { DeleteDonationsModal } from "../pages/donation/delete/donation-delete-modal";
-// import { EditDonationsModal } from "../pages/donation/edit/donation-edit-modal"
-// import { DonationDTO } from "../pages/donation/edit/donation-edit-modal"
+
 import { donationsApi } from "../pages/donation/donations.api";
 
 interface ItemTableProps {
@@ -62,6 +58,7 @@ interface ItemTableProps {
   prevPageUrl: string | null;
   nextPageUrl: string | null;
   onReservationConverted?: () => void;
+  showActions: boolean;
 }
 
 export function ItemTable({
@@ -79,6 +76,7 @@ export function ItemTable({
   prevPageUrl,
   nextPageUrl,
   onReservationConverted,
+  showActions,
 }: ItemTableProps) {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -443,6 +441,7 @@ export function ItemTable({
           onDeleteDonor={handleDeleteDonor}
           // onEditDonation={handleEditDonations}
           onDeleteDonation={handleDeleteDonations}
+          showActions={showActions}
         />
       ) : (
         <ItemTableDesktop
@@ -461,6 +460,7 @@ export function ItemTable({
           onDeleteDonor={handleDeleteDonor}
           // onEditDonation={handleEditDonations}
           onDeleteDonation={handleDeleteDonations}
+          showActions={showActions}
         />
       )}
       <ItemTablePagination

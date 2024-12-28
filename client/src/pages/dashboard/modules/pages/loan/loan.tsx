@@ -97,6 +97,7 @@ export function DashboardLoan() {
                     onItemsPerPageChange={handleItemsPerPageChange}
                     prevPageUrl={paginatedReservations.prev}
                     nextPageUrl={paginatedReservations.next}
+                    showActions={user?.role !== "READER"}
                   />
                 </>
               ) : (

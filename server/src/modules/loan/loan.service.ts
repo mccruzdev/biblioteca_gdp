@@ -75,8 +75,6 @@ export class LoanService {
   ) {
     const data = this.tokenManager.getDataFromHeader(authorization);
 
-    console.log(data);
-
     return paginateMe(
       this.prisma.loan,
       {

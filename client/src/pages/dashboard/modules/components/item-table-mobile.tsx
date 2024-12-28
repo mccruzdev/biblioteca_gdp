@@ -35,6 +35,7 @@ interface ItemTableMobileProps {
   onDeleteDonor: (item: Item) => void;
   // onEditDonation: (item: Item) => void;
   onDeleteDonation: (item: Item) => void;
+  showActions: boolean;
 }
 
 export function ItemTableMobile({
@@ -51,6 +52,7 @@ export function ItemTableMobile({
   onDeleteDonor,
   // onEditDonation,
   onDeleteDonation,
+  showActions,
 }: ItemTableMobileProps) {
   const isBook = (item: Item): item is BookI => "title" in item;
   const isLoan = (item: Item): item is Loan => "loanDate" in item;
@@ -159,7 +161,7 @@ export function ItemTableMobile({
                 </p>
               </>
             )}
-            {mode !== "loans-history" && (
+            {mode !== "loans-history" && showActions && (
               <div className="mt-4 space-x-2">
                 {viewMode === "books" && isBook(item) && (
                   <>

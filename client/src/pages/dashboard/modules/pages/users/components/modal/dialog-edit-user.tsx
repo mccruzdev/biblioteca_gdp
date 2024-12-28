@@ -21,7 +21,7 @@ import { useTokenUC } from "@/context/user/user.hook";
 import { useToast } from "@/hooks/use-toast";
 import { fetchJSON } from "@/services/fetch";
 import { AllDataUserI, UserRoleE, UserRoleT } from "@/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type UserAvailabilityT = "UNAVAILABLE" | "AVAILABLE";
 enum UserAvailabilityE {

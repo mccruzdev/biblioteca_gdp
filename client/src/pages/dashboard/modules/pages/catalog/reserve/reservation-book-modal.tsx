@@ -2,7 +2,7 @@ import { useState } from "react";
 import { format, isBefore, startOfDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon, Check } from "lucide-react";
-import { BookConditionT, BookI } from "../../../../../../types";
+import { BookI, Copy } from "../../../../../../types";
 import { Calendar } from "../../../../../../components/ui/calendar";
 import { cn } from "../../../../../../lib/utils";
 import { Button } from "../../../../../../components/ui/button";
@@ -27,12 +27,6 @@ import {
   PopoverTrigger,
 } from "../../../../../../components/ui/popover";
 import { Label } from "../../../../../../components/ui/label";
-
-type Copy = {
-  id: number;
-  code: string | null;
-  condition: BookConditionT;
-};
 
 interface ReservationModalProps {
   isOpen: boolean;

@@ -44,6 +44,7 @@ interface ItemTableDesktopProps {
   onDeleteDonor: (item: Item) => void;
   // onEditDonation: (item: Item) => void;
   onDeleteDonation: (item: Item) => void;
+  showActions: boolean;
 }
 
 export function ItemTableDesktop({
@@ -60,6 +61,7 @@ export function ItemTableDesktop({
   onDeleteDonor,
   // onEditDonation,
   onDeleteDonation,
+  showActions,
 }: ItemTableDesktopProps) {
   const isBook = (item: Item): item is BookI => "title" in item;
   const isLoan = (item: Item): item is Loan => "loanDate" in item;
@@ -105,7 +107,7 @@ export function ItemTableDesktop({
                 <TableHead>Copia</TableHead>
               </>
             )}
-            {mode !== "loans-history" && (
+            {mode !== "loans-history" && showActions && (
               <TableHead className="text-right">Acciones</TableHead>
             )}
           </TableRow>
@@ -165,7 +167,7 @@ export function ItemTableDesktop({
                   <TableCell>{item.copies[0]?.code || "N/A"}</TableCell>
                 </>
               )}
-              {mode !== "loans-history" && (
+              {mode !== "loans-history" && showActions && (
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

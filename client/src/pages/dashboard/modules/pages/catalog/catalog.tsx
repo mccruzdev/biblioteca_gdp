@@ -10,76 +10,74 @@ import { Button } from "../../../../../components/ui/button";
 import { ItemTable } from "../../components/item-table";
 
 export function DashboardCatalog() {
-  const { data: token } = useTokenUC()
-  const [paginatedBooks, setPaginatedBooks] = useState<PaginatedI<BookI> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSearching, setIsSearching] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const searchBarRef = useRef<{ clearSearch: () => void }>(null)
+  const { data: token } = useTokenUC();
+  const [paginatedBooks, setPaginatedBooks] =
+    useState<PaginatedI<BookI> | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const searchBarRef = useRef<{ clearSearch: () => void }>(null);
 
   useEffect(() => {
     if (token) {
-      fetchBooks()
+      fetchBooks();
     }
-  }, [token, currentPage, itemsPerPage])
+  }, [token, currentPage, itemsPerPage]);
 
   const fetchBooks = async (searchTerm?: string, searchType?: string) => {
-    if (!token) return // TODO: Redirect to login
-    setIsLoading(true)
-    setIsSearching(!!searchTerm)
+    if (!token) return; // TODO: Redirect to login
+    setIsLoading(true);
+    setIsSearching(!!searchTerm);
 
-    let url = `${BACKEND_SERVER}/book?page=${currentPage}&limit=${itemsPerPage}`
+    let url = `${BACKEND_SERVER}/book?page=${currentPage}&limit=${itemsPerPage}`;
     if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`
+      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`;
     }
 
     try {
-      const { response, json } = await fetchJSON<PaginatedI<BookI>>(
-        url,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      const { response, json } = await fetchJSON<PaginatedI<BookI>>(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
-        setPaginatedBooks(json)
+        setPaginatedBooks(json);
       } else {
-        throw new Error('Failed to fetch books')
+        throw new Error("Failed to fetch books");
       }
     } catch (error) {
-      console.error('Error fetching books:', error)
+      console.error("Error fetching books:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSearch = (searchTerm: string, searchType: string) => {
-    setCurrentPage(1) 
-    fetchBooks(searchTerm, searchType)
-  }
+    setCurrentPage(1);
+    fetchBooks(searchTerm, searchType);
+  };
 
   const handleReset = (clearSearchBar: boolean = false) => {
-    setIsSearching(false)
-    setCurrentPage(1)
-    fetchBooks()
+    setIsSearching(false);
+    setCurrentPage(1);
+    fetchBooks();
     if (clearSearchBar) {
-      searchBarRef.current?.clearSearch()
+      searchBarRef.current?.clearSearch();
     }
-  }
+  };
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-  }
+    setCurrentPage(newPage);
+  };
 
   const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    setItemsPerPage(newItemsPerPage)
-    setCurrentPage(1)
-  }
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="dashboard-catalog">
@@ -90,11 +88,17 @@ export function DashboardCatalog() {
         </p>
       </section>
       <div className="outer-container bg-secondary-bg rounded-lg p-4 md:p-6">
-        <SearchBar onSearch={handleSearch} onReset={() => handleReset(true)} ref={searchBarRef} />
+        <SearchBar
+          onSearch={handleSearch}
+          onReset={() => handleReset(true)}
+          ref={searchBarRef}
+        />
         <div className="inner-container bg-[#0e0e0e] rounded-lg p-4 md:p-6 mt-4">
           <section className="Catalog-content-section">
             <div className="border-b border-gray-100 py-1">
-              <h2 className="text-xl font-bold text-white">Catálogo de Libros</h2>
+              <h2 className="text-xl font-bold text-white">
+                Catálogo de Libros
+              </h2>
             </div>
             <div className="pt-3">
               {isLoading ? (
@@ -102,7 +106,7 @@ export function DashboardCatalog() {
               ) : paginatedBooks && paginatedBooks.data.length > 0 ? (
                 <ItemTable
                   items={paginatedBooks.data}
-                  token={token || ''}
+                  token={token || ""}
                   mode="books"
                   viewMode="catalog"
                   currentPage={paginatedBooks.currentPage}
@@ -112,12 +116,18 @@ export function DashboardCatalog() {
                   onItemsPerPageChange={handleItemsPerPageChange}
                   prevPageUrl={paginatedBooks.prev}
                   nextPageUrl={paginatedBooks.next}
+                  showActions={true}
                 />
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-400 mb-4">No se encontraron libros que coincidan con tu búsqueda.</p>
+                  <p className="text-gray-400 mb-4">
+                    No se encontraron libros que coincidan con tu búsqueda.
+                  </p>
                   {isSearching && (
-                    <Button onClick={() => handleReset(true)} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                    <Button
+                      onClick={() => handleReset(true)}
+                      className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80"
+                    >
                       Mostrar todos los libros
                     </Button>
                   )}
@@ -129,5 +139,5 @@ export function DashboardCatalog() {
       </div>
       <Toaster />
     </div>
-  )
+  );
 }
