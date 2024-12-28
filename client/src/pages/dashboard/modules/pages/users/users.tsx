@@ -5,7 +5,7 @@ import { SearchBar } from "./components/searchbar/searchbar";
 import { useAuthUC } from "@/context/user/user.hook";
 import { NotAuthorized } from "@/components/not-authorized/not-authorized";
 
-export function DashboardUsers() {
+export default function DashboardUsers() {
   const { user } = useAuthUC();
   const { allPaginatedUsers } = useUserDataUDC();
 

@@ -9,7 +9,7 @@ import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 import { ItemTable } from "../../components/item-table";
 
-export function DashboardCatalog() {
+export default function DashboardCatalog() {
   const { data: token } = useTokenUC();
   const [paginatedBooks, setPaginatedBooks] =
     useState<PaginatedI<BookI> | null>(null);

@@ -11,7 +11,7 @@ import { ItemTable } from "../../components/item-table";
 import { NewDonation } from "./new/button-new-donation";
 import { NotAuthorized } from "@/components/not-authorized/not-authorized";
 
-export function DashboardDonation() {
+export default function DashboardDonation() {
   const { user } = useAuthUC();
   const { data: token } = useTokenUC();
   const [paginatedDonations, setPaginatedDonations] =

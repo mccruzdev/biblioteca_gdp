@@ -8,7 +8,7 @@ import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 
-export function DashboardLoan() {
+export default function DashboardLoan() {
   const { data: token } = useTokenUC();
   const { user } = useAuthUC();
   const [paginatedReservations, setPaginatedReservations] =

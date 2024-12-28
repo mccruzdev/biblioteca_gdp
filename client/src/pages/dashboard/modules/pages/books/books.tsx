@@ -12,7 +12,7 @@ import { Button } from "../../../../../components/ui/button";
 import { NotAuthorized } from "../../../../../components/not-authorized/not-authorized";
 import { ItemTable } from "../../components/item-table";
 
-export function DashboardBooks() {
+export default function DashboardBooks() {
   const { user } = useAuthUC();
   const { data: token } = useTokenUC();
   const [paginatedBooks, setPaginatedBooks] =

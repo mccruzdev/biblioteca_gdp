@@ -9,7 +9,7 @@ import { useAuthUC } from "../../context/user/user.hook";
 import { NotAuthorized } from "../../components/not-authorized/not-authorized";
 import { DataProvider } from "../../context/data/data";
 
-export function DashboardPage() {
+export default function DashboardPage() {
   const { isAuth } = useAuthUC();
   const [isCollapsed, setIsCollapsed] = useState(true);
 

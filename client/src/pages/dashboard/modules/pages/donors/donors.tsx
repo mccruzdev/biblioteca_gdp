@@ -12,7 +12,7 @@ import { ItemTable } from "../../components/item-table";
 import { NewDonor } from "./new/button-new-donor";
 import { NotAuthorized } from "@/components/not-authorized/not-authorized";
 
-export function DashboardDonors() {
+export default function DashboardDonors() {
   const { user } = useAuthUC();
   const { data: token } = useTokenUC();
   const [paginatedDonors, setPaginatedDonors] =

@@ -1,5 +1,5 @@
 import "./loan-history.sass";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ItemTable } from "../../components/item-table";
 import { PaginatedI, Loan } from "@/types";
 import { fetchJSON } from "../../../../../services/fetch";
@@ -8,7 +8,7 @@ import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 
-export function DashboardLoanHistory() {
+export default function DashboardLoanHistory() {
   const { user } = useAuthUC();
   const { data: token } = useTokenUC();
   const [paginatedLoans, setPaginatedLoans] = useState<PaginatedI<Loan> | null>(
@@ -18,13 +18,7 @@ export function DashboardLoanHistory() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  useEffect(() => {
-    if (token && user) {
-      fetchLoans();
-    }
-  }, [token, user, currentPage, itemsPerPage]);
-
-  const fetchLoans = async () => {
+  const fetchLoans = useCallback(async () => {
     if (!token || !user) return; // TODO: Redirect to login
     setIsLoading(true);
 
@@ -51,7 +45,7 @@ export function DashboardLoanHistory() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token, user, currentPage, itemsPerPage]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -61,6 +55,12 @@ export function DashboardLoanHistory() {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (token && user) {
+      fetchLoans();
+    }
+  }, [token, user, fetchLoans]);
 
   return (
     <div className="dashboard-catalog">
