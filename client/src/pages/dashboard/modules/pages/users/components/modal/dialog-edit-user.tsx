@@ -78,12 +78,6 @@ export function ModalEditUser({ isOpen, onClose, user }: Props) {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      document.body.style.pointerEvents = "auto";
-    };
-  }, []);
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] bg-[#0e0e0e] text-[#C7C7CC]">
