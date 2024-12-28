@@ -20,14 +20,7 @@ export const navItems: NavItem[] = [
     label: "Libros",
     href: "/dashboard/books",
     icon: (props) => <Icon type="addBook" {...props} />,
-    children: [{ label: "Libros", href: "/dashboard/books" }],
     roles: ["LIBRARIAN", "ADMIN"],
-  },
-  {
-    label: "Usuarios",
-    href: "/dashboard/users",
-    icon: (props) => <Icon type="user" {...props} />,
-    roles: ["ADMIN"],
   },
   {
     label: "Donaciones",
@@ -38,5 +31,11 @@ export const navItems: NavItem[] = [
       { label: "Donadores", href: "/dashboard/donors" },
     ],
     roles: ["LIBRARIAN", "ADMIN"],
+  },
+  {
+    label: "Usuarios",
+    href: "/dashboard/users",
+    icon: (props) => <Icon type="user" {...props} />,
+    roles: ["ADMIN"],
   },
 ];

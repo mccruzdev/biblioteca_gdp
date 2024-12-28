@@ -49,7 +49,7 @@ export function LoanConfirmationModal({
   const generateTimeOptions = () => {
     const now = new Date();
     const options = [];
-    const endTime = setHours(setMinutes(now, 0), 22); // TODO
+    const endTime = setHours(setMinutes(now, 0), 17);
 
     let currentTime = now;
     currentTime = setMinutes(

@@ -8,7 +8,6 @@ import { DashboardCatalog } from "./pages/dashboard/modules/pages/catalog/catalo
 import { DashboardLoan } from "./pages/dashboard/modules/pages/loan/loan";
 import { DashboardBooks } from "./pages/dashboard/modules/pages/books/books";
 import { DashboardUsers } from "./pages/dashboard/modules/pages/users/users";
-import { DashboardManagement } from "./pages/dashboard/modules/pages/management/management";
 import { DashboardDonation } from "./pages/dashboard/modules/pages/donation/donation";
 import { DashboardLoanHistory } from "./pages/dashboard/modules/pages/loan-history/loan-history";
 import { DashboardDonors } from "./pages/dashboard/modules/pages/donors/donors";
@@ -30,7 +29,6 @@ export default function App() {
             <Route path="loan-history" element={<DashboardLoanHistory />} />
             <Route path="books" element={<DashboardBooks />} />
             <Route path="users" element={<DashboardUsers />} />
-            <Route path="management" element={<DashboardManagement />} />
             <Route path="donations" element={<DashboardDonation />} />
             <Route path="donors" element={<DashboardDonors />} />
           </Route>

@@ -1,6 +1,6 @@
 import "./books.sass";
 //import React from "react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { BookI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
@@ -23,41 +23,39 @@ export function DashboardBooks() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const searchBarRef = useRef<{ clearSearch: () => void }>(null);
 
-  useEffect(() => {
-    if (!user || user.role === "READER") return;
-    if (token) fetchBooks();
-  }, [user, token]);
+  const fetchBooks = useCallback(
+    async (searchTerm?: string, searchType?: string) => {
+      if (!token) return; // TODO: Redirect to login
+      setIsLoading(true);
+      setIsSearching(!!searchTerm);
 
-  const fetchBooks = async (searchTerm?: string, searchType?: string) => {
-    if (!token) return; // TODO: Redirect to login
-    setIsLoading(true);
-    setIsSearching(!!searchTerm);
-
-    let url = `${BACKEND_SERVER}/book?page=${currentPage}&limit=${itemsPerPage}`;
-    if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`;
-    }
-
-    try {
-      const { response, json } = await fetchJSON<PaginatedI<BookI>>(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        setPaginatedBooks(json);
-      } else {
-        throw new Error("Failed to fetch books");
+      let url = `${BACKEND_SERVER}/book?page=${currentPage}&limit=${itemsPerPage}`;
+      if (searchTerm && searchType) {
+        url = `${BACKEND_SERVER}/search/books-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`;
       }
-    } catch (error) {
-      console.error("Error fetching books:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+      try {
+        const { response, json } = await fetchJSON<PaginatedI<BookI>>(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          setPaginatedBooks(json);
+        } else {
+          throw new Error("Failed to fetch books");
+        }
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentPage, itemsPerPage, token]
+  );
 
   const handleSearch = (searchTerm: string, searchType: string) => {
     setCurrentPage(1);
@@ -81,6 +79,11 @@ export function DashboardBooks() {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (!user || user.role === "READER") return;
+    if (token) fetchBooks();
+  }, [user, token, fetchBooks]);
 
   if (!user) return <p>Loading...</p>;
   if (user.role === "READER") return <NotAuthorized path="/dashboard" />;

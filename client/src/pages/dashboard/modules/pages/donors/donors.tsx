@@ -1,17 +1,19 @@
 import "./donors.sass";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { DonorsI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
-import { useTokenUC } from "../../../../../context/user/user.hook";
+import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 // import { SearchBar } from "../../components/search-bar";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 import { ItemTable } from "../../components/item-table";
 import { NewDonor } from "./new/button-new-donor";
+import { NotAuthorized } from "@/components/not-authorized/not-authorized";
 
 export function DashboardDonors() {
+  const { user } = useAuthUC();
   const { data: token } = useTokenUC();
   const [paginatedDonors, setPaginatedDonors] =
     useState<PaginatedI<DonorsI> | null>(null);
@@ -21,47 +23,39 @@ export function DashboardDonors() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const searchBarRef = useRef<{ clearSearch: () => void }>(null);
 
-  useEffect(() => {
-    if (token) {
-      fetchDonors();
-    }
-  }, [token, currentPage, itemsPerPage]);
+  const fetchDonors = useCallback(
+    async (searchTerm?: string, searchType?: string) => {
+      if (!token) return; // TODO: Redirect to login
+      setIsLoading(true);
+      setIsSearching(!!searchTerm);
 
-  const fetchDonors = async (searchTerm?: string, searchType?: string) => {
-    if (!token) return; // TODO: Redirect to login
-    setIsLoading(true);
-    setIsSearching(!!searchTerm);
-
-    let url = `${BACKEND_SERVER}/donor?page=${currentPage}&limit=${itemsPerPage}`;
-    if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/donor-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`;
-    }
-
-    try {
-      const { response, json } = await fetchJSON<PaginatedI<DonorsI>>(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        setPaginatedDonors(json);
-      } else {
-        throw new Error("Failed to fetch books");
+      let url = `${BACKEND_SERVER}/donor?page=${currentPage}&limit=${itemsPerPage}`;
+      if (searchTerm && searchType) {
+        url = `${BACKEND_SERVER}/search/donor-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`;
       }
-    } catch (error) {
-      console.error("Error fetching books:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  // const handleSearch = (searchTerm: string, searchType: string) => {
-  //   setCurrentPage(1)
-  //   fetchDonors(searchTerm, searchType)
-  // }
+      try {
+        const { response, json } = await fetchJSON<PaginatedI<DonorsI>>(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          setPaginatedDonors(json);
+        } else {
+          throw new Error("Failed to fetch books");
+        }
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [token, currentPage, itemsPerPage]
+  );
 
   const handleReset = (clearSearchBar: boolean = false) => {
     setIsSearching(false);
@@ -80,6 +74,15 @@ export function DashboardDonors() {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (token && user && user.role !== "READER") {
+      fetchDonors();
+    }
+  }, [token, user, fetchDonors]);
+
+  if (!user) return <p>Loading...</p>;
+  if (user.role === "READER") return <NotAuthorized path="/dashboard" />;
 
   return (
     <div className="dashboard-catalog">

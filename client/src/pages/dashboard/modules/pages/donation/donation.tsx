@@ -1,17 +1,18 @@
 import "./donation.sass";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { DonationsI, PaginatedI } from "../../../../../types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
-import { useTokenUC } from "../../../../../context/user/user.hook";
-// import { SearchBar } from "../../components/search-bar";
+import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 import { ItemTable } from "../../components/item-table";
 import { NewDonation } from "./new/button-new-donation";
+import { NotAuthorized } from "@/components/not-authorized/not-authorized";
 
 export function DashboardDonation() {
+  const { user } = useAuthUC();
   const { data: token } = useTokenUC();
   const [paginatedDonations, setPaginatedDonations] =
     useState<PaginatedI<DonationsI> | null>(null);
@@ -21,47 +22,42 @@ export function DashboardDonation() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const searchBarRef = useRef<{ clearSearch: () => void }>(null);
 
-  useEffect(() => {
-    if (token) {
-      fetchDonations();
-    }
-  }, [token, currentPage, itemsPerPage]);
+  const fetchDonations = useCallback(
+    async (searchTerm?: string, searchType?: string) => {
+      if (!token) return; // TODO: Redirect to login
+      setIsLoading(true);
+      setIsSearching(!!searchTerm);
 
-  const fetchDonations = async (searchTerm?: string, searchType?: string) => {
-    if (!token) return; // TODO: Redirect to login
-    setIsLoading(true);
-    setIsSearching(!!searchTerm);
-
-    let url = `${BACKEND_SERVER}/donation?page=${currentPage}&limit=${itemsPerPage}`;
-    if (searchTerm && searchType) {
-      url = `${BACKEND_SERVER}/search/donation-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`;
-    }
-
-    try {
-      const { response, json } = await fetchJSON<PaginatedI<DonationsI>>(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        setPaginatedDonations(json);
-      } else {
-        throw new Error("Failed to fetch donations");
+      let url = `${BACKEND_SERVER}/donation?page=${currentPage}&limit=${itemsPerPage}`;
+      if (searchTerm && searchType) {
+        url = `${BACKEND_SERVER}/search/donation-by-${searchType}/${searchTerm}?page=${currentPage}&limit=${itemsPerPage}`;
       }
-    } catch (error) {
-      console.error("Error fetching donations:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  // const handleSearch = (searchTerm: string, searchType: string) => {
-  //   setCurrentPage(1)
-  //   fetchDonors(searchTerm, searchType)
-  // }
+      try {
+        const { response, json } = await fetchJSON<PaginatedI<DonationsI>>(
+          url,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          setPaginatedDonations(json);
+        } else {
+          throw new Error("Failed to fetch donations");
+        }
+      } catch (error) {
+        console.error("Error fetching donations:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [token, currentPage, itemsPerPage]
+  );
 
   const handleReset = (clearSearchBar: boolean = false) => {
     setIsSearching(false);
@@ -80,6 +76,15 @@ export function DashboardDonation() {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (token) {
+      fetchDonations();
+    }
+  }, [token, fetchDonations]);
+
+  if (!user) return <p>Loading...</p>;
+  if (user.role === "READER") return <NotAuthorized path="/dashboard" />;
 
   return (
     <div className="dashboard-catalog">
