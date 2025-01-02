@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { BookDTO } from './dto/book.dto';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
-import { Author, ParseBook } from 'src/types';
+import { Author } from 'src/types';
 import { transformBook, transformBooks } from 'src/transformers/book';
 
 const paginate: PaginateFunction = paginator({
@@ -43,34 +43,6 @@ export class BooksService {
 
   async getCatalogBooks(page: number, limit: number) {
     const currentDate = new Date();
-    this.prisma.book.findMany({
-      select: this.customSelect,
-      where: {
-        copies: {
-          some: {
-            OR: [
-              {
-                loans: {
-                  none: {
-                    AND: [
-                      { loanDate: { lte: currentDate } },
-                      { dueDate: { gte: currentDate } },
-                      { status: { not: 'RETURNED' } },
-                    ],
-                  },
-                },
-              },
-              {
-                loans: {
-                  none: {},
-                },
-              },
-            ],
-          },
-        },
-      },
-    });
-
     return paginateCatalog(
       this.prisma.book,
       {
