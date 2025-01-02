@@ -643,6 +643,7 @@ const handleRemoveCopyFromDonationForm = (copy: NewCopyI) => {
           <template #header-description>
             Agrega una copia a la donación
           </template>
+
           <div class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col">
             <FormBaseInput
               v-model="copyFormData.bookId"

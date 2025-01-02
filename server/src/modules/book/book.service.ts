@@ -3,7 +3,11 @@ import { PrismaService } from 'src/providers/prisma/prisma.service';
 import { BookDTO } from './dto/book.dto';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { Author } from 'src/types';
-import { transformBook, transformBooks } from 'src/transformers/book';
+import {
+  transformBook,
+  transformBooks,
+  transformBooksWithCopies,
+} from 'src/transformers/book';
 
 const paginate: PaginateFunction = paginator({
   path: 'book',
@@ -80,9 +84,59 @@ export class BooksService {
   async getAllBooks(page: number, limit: number) {
     return await paginate(
       this.prisma.book,
-      { select: this.customSelect },
+      {
+        select: {
+          id: true,
+          title: true,
+          pages: true,
+          authors: true,
+          Subcategory: {
+            select: {
+              name: true,
+              Category: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          copies: {
+            select: {
+              id: true,
+              code: true,
+              condition: true,
+              Location: true,
+              Publisher: true,
+              Book: {
+                select: {
+                  id: true,
+                  title: true,
+                  pages: true,
+                  authors: {
+                    select: {
+                      id: true,
+                      name: true,
+                      email: true,
+                    },
+                  },
+                  Subcategory: {
+                    select: {
+                      name: true,
+                      Category: {
+                        select: {
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       { page, path: 'book', limit },
-      transformBooks,
+      transformBooksWithCopies,
     );
   }
 

@@ -62,6 +62,20 @@ export interface ParseBook {
   };
 }
 
+export interface ParseBookWithCopies {
+  id: number;
+  title: string;
+  pages?: number;
+  authors?: Author[];
+  Subcategory?: {
+    name: string;
+    Category?: {
+      name: string;
+    };
+  };
+  copies: ParseCopy[];
+}
+
 export interface ParseDonation {
   id: number;
   date: string;

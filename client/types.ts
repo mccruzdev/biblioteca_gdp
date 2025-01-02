@@ -49,6 +49,42 @@ export interface BookI {
   authors: AuthorI[];
   subcategory: string | null;
   category: string | null;
+  copies: CopyI[];
+}
+
+export interface LocationI {
+  shelf: string;
+  shelfColor: string;
+  shelfLevel: string;
+}
+
+export interface PublisherI {
+  name: string;
+  email: string;
+  country: string;
+  address: string;
+  phoneNumber: string;
+  website: string;
+}
+
+export interface CopyI {
+  id: number;
+  code: string;
+  condition: BookConditionT;
+  location: LocationI;
+  publisher: PublisherI;
+  book: {
+    id: number;
+    title: string;
+    pages: number;
+    authors: {
+      id: number;
+      name: string;
+      email: string | null;
+    }[];
+    subcategory: string | null;
+    category: string | null;
+  };
 }
 
 export type Copy = {

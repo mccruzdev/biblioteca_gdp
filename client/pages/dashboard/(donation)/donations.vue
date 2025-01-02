@@ -34,7 +34,6 @@ const columns = [
   { key: "description", label: "Descripción" },
   { key: "donorName", label: "Nombre del donador" },
   { key: "donorEmail", label: "Correo del donador" },
-  { key: "actions", label: "Acciones" },
 ];
 
 const expand = ref({

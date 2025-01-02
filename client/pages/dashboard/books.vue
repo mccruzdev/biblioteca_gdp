@@ -4,7 +4,17 @@ import { BACKEND_SERVER } from "~/config/api";
 import ActionsContainer from "~/features/dashboard/components/actions-container.vue";
 import SearchContainer from "~/features/dashboard/components/search-container.vue";
 import DashboardContainer from "~/features/dashboard/dashboard-container.vue";
-import { type PaginatedI, type BookI } from "~/types";
+import { transformCondition } from "~/transforms/copy-condition";
+import {
+  type PaginatedI,
+  type BookI,
+  type BookConditionT,
+  BookConditionE,
+  type CopyI,
+  type Copy,
+  type LocationI,
+  type PublisherI,
+} from "~/types";
 
 const { data } = useAuthStore();
 const toast = useToast();
@@ -45,7 +55,19 @@ const items = (row: BookI) => [
       click: () => handleEditSelectedRow(row),
     },
   ],
+  [
+    {
+      label: "Agregar copia",
+      icon: "i-mdi-book-cog",
+      click: () => handleAddCopySelectedRow(row),
+    },
+  ],
 ];
+
+const expand = ref({
+  openedRows: [],
+  row: {},
+});
 
 // Pagination
 
@@ -316,6 +338,210 @@ const handleAcceptEditBook = async () => {
   selectedEditBook.value = undefined;
   loadingAcceptEditButton.value = false;
 };
+
+// Add Copies
+
+interface NewCopyI {
+  code: string;
+  condition: BookConditionT;
+  location: LocationI;
+  publisher: PublisherI;
+}
+
+const showAddCopiesModal = ref(false);
+const loadingAddCopiesButton = ref(false);
+const selectedBookToAddCopies = ref<BookI>();
+
+const copyFormData = ref<NewCopyI>({
+  code: "",
+  condition: BookConditionE.NEW,
+  location: { shelf: "", shelfColor: "", shelfLevel: "" },
+  publisher: {
+    name: "",
+    email: "",
+    country: "",
+    address: "",
+    phoneNumber: "",
+    website: "",
+  },
+});
+
+const handleAddCopySelectedRow = (row: BookI) => {
+  showAddCopiesModal.value = true;
+  selectedBookToAddCopies.value = row;
+
+  copyFormData.value = {
+    code: "",
+    condition: BookConditionE.NEW,
+    location: { shelf: "", shelfColor: "", shelfLevel: "" },
+    publisher: {
+      name: "",
+      email: "",
+      country: "",
+      address: "",
+      phoneNumber: "",
+      website: "",
+    },
+  };
+};
+
+const handleAcceptAddCopies = async () => {
+  loadingAddCopiesButton.value = true;
+
+  try {
+    const copy = copyFormData.value;
+
+    const response = await axios.post(
+      `${BACKEND_SERVER}/copy`,
+      {
+        code: copy.code,
+        condition: copy.condition,
+        location: {
+          shelf: copy.location.shelf,
+          shelfColor: copy.location.shelfColor
+            ? copy.location.shelfColor
+            : null,
+          shelfLevel: copy.location.shelfLevel
+            ? copy.location.shelfLevel
+            : null,
+        },
+        publisher: {
+          name: copy.publisher.name,
+          email: copy.publisher.email ? copy.publisher.email : null,
+          country: copy.publisher.country ? copy.publisher.country : null,
+          address: copy.publisher.address ? copy.publisher.address : null,
+          phoneNumber: copy.publisher.phoneNumber
+            ? copy.publisher.phoneNumber
+            : null,
+          website: copy.publisher.website ? copy.publisher.website : null,
+        },
+        bookId: selectedBookToAddCopies.value?.id,
+      },
+      { headers: { Authorization: `Bearer ${data}` } }
+    );
+
+    if (response.status === 201) {
+      toast.add({
+        title: "Copia registrada con éxito",
+      });
+      if (currentPage.value === paginatedBooks.value?.lastPage)
+        await fetchBooks(currentPage.value, Number(limitPerPage.value));
+    } else
+      toast.add({
+        title: "Error",
+        description: "Error creando la copia",
+      });
+  } catch {
+    toast.add({
+      title: "Error",
+      description: "Error creando la copia",
+    });
+    return;
+  }
+
+  loadingAddCopiesButton.value = false;
+  selectedBookToAddCopies.value = undefined;
+  showAddCopiesModal.value = false;
+};
+
+// Edit Copy
+
+interface EditCopyI {
+  id: number;
+  code: string;
+  condition: BookConditionT;
+  location: LocationI;
+  publisher: PublisherI;
+}
+
+const showEditCopyModal = ref(false);
+const loadingEditCopyAcceptButton = ref(false);
+const selectedEditCopy = ref<CopyI>();
+
+const editCopyFormData = ref<EditCopyI>();
+
+const handleEditCopy = (row: CopyI) => {
+  selectedEditCopy.value = row;
+  showEditCopyModal.value = true;
+
+  editCopyFormData.value = {
+    id: row.id,
+    code: row.code,
+    condition: row.condition || "NEW",
+    location: {
+      shelf: row.location?.shelf || "",
+      shelfColor: row.location?.shelfColor || "",
+      shelfLevel: row.location?.shelfLevel || "",
+    },
+    publisher: {
+      name: row.publisher?.name || "",
+      email: row.publisher?.email || "",
+      country: row.publisher?.country || "",
+      address: row.publisher?.address || "",
+      phoneNumber: row.publisher?.phoneNumber || "",
+      website: row.publisher?.website || "",
+    },
+  };
+};
+
+const handleAcceptEditCopy = async () => {
+  loadingEditCopyAcceptButton.value = true;
+
+  try {
+    const copy = editCopyFormData.value;
+    if (!copy) return;
+
+    const response = await axios.put(
+      `${BACKEND_SERVER}/copy/${editCopyFormData.value?.id}`,
+      {
+        code: copy.code,
+        condition: copy.condition,
+        location: {
+          shelf: copy.location.shelf,
+          shelfColor: copy.location.shelfColor
+            ? copy.location.shelfColor
+            : null,
+          shelfLevel: copy.location.shelfLevel
+            ? copy.location.shelfLevel
+            : null,
+        },
+        publisher: {
+          name: copy.publisher.name,
+          email: copy.publisher.email ? copy.publisher.email : null,
+          country: copy.publisher.country ? copy.publisher.country : null,
+          address: copy.publisher.address ? copy.publisher.address : null,
+          phoneNumber: copy.publisher.phoneNumber
+            ? copy.publisher.phoneNumber
+            : null,
+          website: copy.publisher.website ? copy.publisher.website : null,
+        },
+        bookId: selectedEditCopy.value?.book.id,
+      },
+      { headers: { Authorization: `Bearer ${data}` } }
+    );
+
+    if (response.status === 200) {
+      toast.add({
+        title: "Copia editada con éxito",
+      });
+      if (currentPage.value === paginatedBooks.value?.lastPage)
+        await fetchBooks(currentPage.value, Number(limitPerPage.value));
+    } else
+      toast.add({
+        title: "Error",
+        description: "Error editando la copia",
+      });
+  } catch {
+    toast.add({
+      title: "Error",
+      description: "Error editando la copia",
+    });
+  }
+
+  showEditCopyModal.value = false;
+  loadingEditCopyAcceptButton.value = false;
+  selectedEditCopy.value = undefined;
+};
 </script>
 
 <template>
@@ -379,6 +605,8 @@ const handleAcceptEditBook = async () => {
       :loading="paginatedBooks === undefined || !paginatedBooks.data"
       :columns="columns"
       :rows="paginatedBooks?.data"
+      v-model:expand="expand"
+      :multiple-expand="false"
     >
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
@@ -453,6 +681,99 @@ const handleAcceptEditBook = async () => {
             />
           </template>
         </UDropdown>
+      </template>
+
+      <template #expand="{ row }">
+        <div class="p-4 flex flex-col gap-2">
+          <div
+            class="flex flex-col space-y-4 w-full"
+            v-for="copy in row.copies"
+            :key="copy.id"
+          >
+            <!-- Información del ejemplar -->
+            <div
+              class="p-4 border rounded-lg shadow"
+              style="border-color: #ffffff"
+            >
+              <div class="flex w-40">
+                <Button
+                  icon="i-mdi-edit"
+                  @click="() => handleEditCopy(copy)"
+                  class="mb-4"
+                >
+                  Editar
+                </Button>
+              </div>
+              <h3 class="text-lg font-semibold text-white">
+                Código: {{ copy.code }}
+              </h3>
+              <p class="text-sm text-gray-300">
+                Condición: {{ transformCondition(copy.condition) }}
+              </p>
+
+              <!-- Ubicación -->
+              <div class="mt-2" v-if="copy.location">
+                <h4 class="text-md font-medium text-gray-200">Ubicación</h4>
+                <p class="text-sm text-gray-300">
+                  Estante: {{ copy.location.shelf || "N/A" }}
+                </p>
+                <p class="text-sm text-gray-300">
+                  Color del estante: {{ copy.location.shelfColor || "N/A" }}
+                </p>
+                <p class="text-sm text-gray-300">
+                  Nivel del estante: {{ copy.location.shelfLevel || "N/A" }}
+                </p>
+              </div>
+
+              <!-- Editorial -->
+              <div class="mt-2" v-if="copy.publisher">
+                <h4 class="text-md font-medium text-gray-200">Editorial</h4>
+                <p class="text-sm text-gray-300">
+                  Nombre: {{ copy.publisher.name }}
+                </p>
+                <p class="text-sm text-gray-300">
+                  País: {{ copy.publisher.country || "N/A" }}
+                </p>
+                <p class="text-sm text-gray-300">
+                  Dirección: {{ copy.publisher.address || "N/A" }}
+                </p>
+                <p class="text-sm text-gray-300">
+                  Teléfono: {{ copy.publisher.phoneNumber || "N/A" }}
+                </p>
+                <p class="text-sm text-gray-300">
+                  Sitio Web: {{ copy.publisher.website || "N/A" }}
+                </p>
+              </div>
+
+              <!-- Información del libro -->
+              <div class="mt-2">
+                <h4 class="text-md font-medium text-gray-200">Libro</h4>
+                <p class="text-sm text-gray-300">
+                  Título: {{ copy.book.title }}
+                </p>
+                <p class="text-sm text-gray-300">
+                  Páginas: {{ copy.book.pages }}
+                </p>
+                <p class="text-sm text-gray-300" v-if="copy.book.category">
+                  Categoría: {{ copy.book.category }}
+                </p>
+                <p class="text-sm text-gray-300" v-if="copy.book.subcategory">
+                  Subcategoría: {{ copy.book.subcategory }}
+                </p>
+
+                <!-- Autores -->
+                <div class="mt-2" v-if="copy.book.authors.length">
+                  <h5 class="text-sm font-medium text-gray-200">Autores</h5>
+                  <ul class="list-disc list-inside text-sm text-gray-300">
+                    <li v-for="author in copy.book.authors" :key="author.id">
+                      {{ author.name }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
     </UTable>
 
@@ -653,6 +974,196 @@ const handleAcceptEditBook = async () => {
             type="email"
           />
         </Modal>
+      </Modal>
+      <!-- Add copy -->
+      <Modal
+        v-model="showAddCopiesModal"
+        :loading="loadingAddCopiesButton"
+        @handle-accept="handleAcceptAddCopies"
+      >
+        <template #header-title>Agrega una copia</template>
+        <template #header-description>
+          Agrega una copia del libro &quot;
+          {{ selectedBookToAddCopies?.title }}
+          &quot;
+        </template>
+
+        <div class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col">
+          <FormBaseInput
+            v-model="copyFormData.code"
+            name="copy-code"
+            label="Código del libro"
+            placeholder="Ingrese el código del libro"
+            required
+          />
+          <USelect
+            v-model="copyFormData.condition"
+            :options="[
+              { value: BookConditionE.NEW, label: 'Nuevo' },
+              { value: BookConditionE.GOOD, label: 'Bueno' },
+              { value: BookConditionE.FAIR, label: 'Regular' },
+              { value: BookConditionE.DAMAGED, label: 'Dañado' },
+              { value: BookConditionE.BAD, label: 'Malo' },
+            ]"
+          />
+
+          <p class="w-full text-center text-white font-bold">Ubicación</p>
+
+          <FormBaseInput
+            v-model="copyFormData.location.shelf"
+            name="copy-location-shelf"
+            label="Estante"
+            placeholder="Estante donde se encuentra"
+            required
+          />
+          <FormBaseInput
+            v-model="copyFormData.location.shelfColor"
+            name="copy-location-shelfcolor"
+            label="Color del estante"
+            placeholder="Color del estante donde se encuentra"
+          />
+          <FormBaseInput
+            v-model="copyFormData.location.shelfLevel"
+            name="copy-location-shelflevel"
+            label="Nivel del estante"
+            placeholder="Nivel del estante donde se encuentra"
+          />
+
+          <p class="w-full text-center text-white font-bold">Editorial</p>
+
+          <FormBaseInput
+            v-model="copyFormData.publisher.name"
+            name="copy-publisher-name"
+            label="Nombre de la editorial"
+            placeholder="Nombre de la editorial"
+            required
+          />
+          <FormBaseInput
+            v-model="copyFormData.publisher.email"
+            name="copy-publisher-email"
+            label="Correo de la editorial"
+            placeholder="Correo de la editorial"
+            type="email"
+          />
+          <FormBaseInput
+            v-model="copyFormData.publisher.country"
+            name="copy-publisher-country"
+            label="País de la editorial"
+            placeholder="País de la editorial"
+          />
+          <FormBaseInput
+            v-model="copyFormData.publisher.address"
+            name="copy-publisher-address"
+            label="Dirección de la editorial"
+            placeholder="Dirección de la editorial"
+          />
+          <FormBaseInput
+            v-model="copyFormData.publisher.phoneNumber"
+            name="copy-publisher-phonenumber"
+            label="Teléfono de la editorial"
+            placeholder="Número de teléfono de la editorial"
+            type="tel"
+          />
+          <FormBaseInput
+            v-model="copyFormData.publisher.website"
+            name="copy-publisher-website"
+            label="Sitio web de la editorial"
+            placeholder="Sitio Web de la editorial"
+          />
+        </div>
+      </Modal>
+      <!-- Edit Copy -->
+      <Modal
+        v-model="showEditCopyModal"
+        :loading="loadingEditCopyAcceptButton"
+        @handle-accept="handleAcceptEditCopy"
+      >
+        <template #header-title>Edita una copia</template>
+        <template #header-description>
+          Edita una copia del libro &quot;
+          {{ editCopyFormData?.code }}
+          &quot;
+        </template>
+
+        <div
+          class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col"
+          v-if="editCopyFormData"
+        >
+          <USelect
+            v-model="editCopyFormData.condition"
+            :options="[
+              { value: BookConditionE.NEW, label: 'Nuevo' },
+              { value: BookConditionE.GOOD, label: 'Bueno' },
+              { value: BookConditionE.FAIR, label: 'Regular' },
+              { value: BookConditionE.DAMAGED, label: 'Dañado' },
+              { value: BookConditionE.BAD, label: 'Malo' },
+            ]"
+          />
+
+          <p class="w-full text-center text-white font-bold">Ubicación</p>
+
+          <FormBaseInput
+            v-model="editCopyFormData.location.shelf"
+            name="copy-location-shelf"
+            label="Estante"
+            placeholder="Estante donde se encuentra"
+            required
+          />
+          <FormBaseInput
+            v-model="editCopyFormData.location.shelfColor"
+            name="copy-location-shelfcolor"
+            label="Color del estante"
+            placeholder="Color del estante donde se encuentra"
+          />
+          <FormBaseInput
+            v-model="editCopyFormData.location.shelfLevel"
+            name="copy-location-shelflevel"
+            label="Nivel del estante"
+            placeholder="Nivel del estante donde se encuentra"
+          />
+
+          <p class="w-full text-center text-white font-bold">Editorial</p>
+
+          <FormBaseInput
+            v-model="editCopyFormData.publisher.name"
+            name="copy-publisher-name"
+            label="Nombre de la editorial"
+            placeholder="Nombre de la editorial"
+            required
+          />
+          <FormBaseInput
+            v-model="editCopyFormData.publisher.email"
+            name="copy-publisher-email"
+            label="Correo de la editorial"
+            placeholder="Correo de la editorial"
+            type="email"
+          />
+          <FormBaseInput
+            v-model="editCopyFormData.publisher.country"
+            name="copy-publisher-country"
+            label="País de la editorial"
+            placeholder="País de la editorial"
+          />
+          <FormBaseInput
+            v-model="editCopyFormData.publisher.address"
+            name="copy-publisher-address"
+            label="Dirección de la editorial"
+            placeholder="Dirección de la editorial"
+          />
+          <FormBaseInput
+            v-model="editCopyFormData.publisher.phoneNumber"
+            name="copy-publisher-phonenumber"
+            label="Teléfono de la editorial"
+            placeholder="Número de teléfono de la editorial"
+            type="tel"
+          />
+          <FormBaseInput
+            v-model="editCopyFormData.publisher.website"
+            name="copy-publisher-website"
+            label="Sitio web de la editorial"
+            placeholder="Sitio Web de la editorial"
+          />
+        </div>
       </Modal>
     </template>
   </DashboardContainer>
