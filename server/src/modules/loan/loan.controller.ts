@@ -32,7 +32,7 @@ export class LoanController {
   constructor(private loanService: LoanService) {}
 
   @Get()
-  @Roles('ADMIN')
+  @Roles('LIBRARIAN')
   @ApiOperation({
     summary: 'Obtener una lista paginada de todos los prestamos',
   })
@@ -108,7 +108,7 @@ export class LoanController {
   }
 
   @Post()
-  @Roles('READER')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Registrar prestamos' })
   @ApiBody({
     type: CreateLoanDTO,
@@ -140,7 +140,7 @@ export class LoanController {
   }
 
   @Put(':id')
-  @Roles('READER')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Actualizar prestamos' })
   @ApiParam({
     name: 'id',

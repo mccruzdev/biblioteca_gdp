@@ -1,5 +1,5 @@
 import { ParseCopies, ParseDonation } from 'src/types';
-import { transformCopies } from './copy';
+import { transformCopies, transformCopyArray } from './copy';
 
 export const transformDonation = (donation: ParseDonation) => {
   return {
@@ -7,6 +7,7 @@ export const transformDonation = (donation: ParseDonation) => {
     date: donation.date,
     description: donation.description,
     donor: donation.Donor,
+    copies: transformCopyArray(donation.copies),
   };
 };
 

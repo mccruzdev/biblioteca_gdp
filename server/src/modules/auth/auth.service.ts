@@ -190,7 +190,7 @@ export class AuthService {
     if (userRes.isDisabled)
       throw new HttpException(
         'El usuario está desabilitado',
-        HttpStatus.FORBIDDEN,
+        HttpStatus.CONFLICT,
       );
 
     if (needEmailVerification && !userRes.emailVerified)

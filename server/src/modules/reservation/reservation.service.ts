@@ -6,6 +6,7 @@ import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { CreateReservationDTO } from './dto/create-reservation.dto';
 import { UpdateReservationDTO } from './dto/update-reservation.dto';
 import { transformReservations } from 'src/transformers/reservation';
+import { ReservationToLoanDTO } from './dto/reservation-to-loan.dto';
 
 const paginateAll: PaginateFunction = paginator({
   path: 'reservation',
@@ -100,6 +101,28 @@ export class ReservationService {
         copies: {
           connect: data.copies.map((copyId) => ({ id: copyId })),
         },
+      },
+    });
+  }
+
+  async reservationToLoan(data: ReservationToLoanDTO) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: data.reservationId },
+    });
+
+    await this.prisma.reservation.update({
+      data: { status: 'PICKED_UP' },
+      where: { id: data.reservationId },
+    });
+
+    await this.prisma.loan.create({
+      data: {
+        dueDate: data.dueDate,
+        status: 'ACTIVE',
+        copies: {
+          connect: data.copies.map((copyId) => ({ id: copyId })),
+        },
+        userId: reservation.userId,
       },
     });
   }
