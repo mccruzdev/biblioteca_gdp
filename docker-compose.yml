@@ -1,0 +1,41 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./scripts/script.sql:/docker-entrypoint-initdb.d/script.sql
+    ports:
+      - "3306:3306"
+
+  client:
+    build:
+      context: .
+      dockerfile: dockerfile.client
+    container_name: nuxt-client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: .
+      dockerfile: dockerfile.server
+    container_name: nest-server
+    env_file:
+      - ./server/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    volumes:
+      - ./server:/app
+
+volumes:
+  db_data:
