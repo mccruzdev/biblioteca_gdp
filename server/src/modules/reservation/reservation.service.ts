@@ -6,6 +6,7 @@ import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { CreateReservationDTO } from './dto/create-reservation.dto';
 import { UpdateReservationDTO } from './dto/update-reservation.dto';
 import { transformReservations } from 'src/transformers/reservation';
+import { ReservationToLoanDTO } from './dto/reservation-to-loan.dto';
 
 const paginateAll: PaginateFunction = paginator({
   path: 'reservation',
@@ -81,7 +82,7 @@ export class ReservationService {
         select: this.selectReservation,
         where: { userId: data.id },
       },
-      { page, limit, path: 'reservation' },
+      { page, limit, path: 'reservation/me' },
       transformReservations,
     );
   }
@@ -104,13 +105,29 @@ export class ReservationService {
     });
   }
 
-  async updateReservation(
-    authorization: string | undefined,
-    id: number,
-    data: UpdateReservationDTO,
-  ) {
-    const dataHeader = this.tokenManager.getDataFromHeader(authorization);
+  async reservationToLoan(data: ReservationToLoanDTO) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: data.reservationId },
+    });
 
+    await this.prisma.reservation.update({
+      data: { status: 'PICKED_UP' },
+      where: { id: data.reservationId },
+    });
+
+    await this.prisma.loan.create({
+      data: {
+        dueDate: data.dueDate,
+        status: 'ACTIVE',
+        copies: {
+          connect: data.copies.map((copyId) => ({ id: copyId })),
+        },
+        userId: reservation.userId,
+      },
+    });
+  }
+
+  async updateReservation(id: number, data: UpdateReservationDTO) {
     try {
       await this.prisma.reservation.update({
         data: {
@@ -120,7 +137,7 @@ export class ReservationService {
             set: data.copies.map((copyId) => ({ id: copyId })),
           },
         },
-        where: { id, userId: dataHeader.id },
+        where: { id },
       });
     } catch {
       throw new HttpException(

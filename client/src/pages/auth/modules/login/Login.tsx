@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 import BaseInput from "../../../components/Input";
 import Button from "./components/Button";
 import { BACKEND_SERVER } from "../../../../config/api";
-import { fetchJSON } from "../../../../services/fetch";
+import { ErrorI, fetchJSON } from "../../../../services/fetch";
 import FloatingTab from "./components/FloatingTab";
-import { toast } from "sonner";
 import { useTokenUC } from "../../../../context/user/user.hook";
+import { useToast } from "@/hooks/use-toast";
+
+interface TokenI extends ErrorI {
+  token: string;
+}
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,6 +28,7 @@ export default function AuthPage() {
   const [dniForChange, setDniForChange] = useState(""); // Estado para el DNI en el FloatingTab
   const navigate = useNavigate();
   const { setItem } = useTokenUC();
+  const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,30 +36,27 @@ export default function AuthPage() {
   };
 
   const handleLogin = async () => {
-    try {
-      const { response, json } = await fetchJSON<{ token: string }>(
-        `${BACKEND_SERVER}/auth/login`,
-        {
-          method: "POST",
-          body: {
-            dni: formData.dni,
-            password: formData.password,
-          },
-        }
-      );
-
-      if (response.ok) {
-        localStorage.setItem("gdp-bm", json.token);
-        setItem(json.token);
-        navigate("/dashboard");
-      } else {
-        toast.error(
-          "Error al iniciar sesión. Por favor, verifica tus credenciales."
-        );
-      }
-    } catch (error) {
-      toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
-    }
+    await fetchJSON<TokenI>(`${BACKEND_SERVER}/auth/login`, {
+      method: "POST",
+      body: {
+        dni: formData.dni,
+        password: formData.password,
+      },
+    })
+      .then(({ response, json }) => {
+        if (response.ok && json.token) {
+          localStorage.setItem("gdp-bm", json.token);
+          setItem(json.token);
+          navigate("/dashboard");
+        } else
+          toast({
+            title: "Error",
+            description: json.message,
+          });
+      })
+      .catch((reason) => {
+        console.log("error", reason);
+      });
   };
 
   const handleRegister = async () => {
@@ -76,45 +78,54 @@ export default function AuthPage() {
       );
 
       if (response.status === 204) {
-        toast.success(
-          "Registro exitoso. Por favor, confirma tu correo electrónico."
-        );
+        toast({
+          description:
+            "Registro exitoso. Por favor, confirma tu correo electrónico.",
+        });
       } else if (response.ok || response.status === 201) {
-        toast.success(
-          "Registro exitoso. Por favor, confirma tu correo electrónico."
-        );
+        toast({
+          description:
+            "Registro exitoso. Por favor, confirma tu correo electrónico.",
+        });
       } else {
         if (response.status === 409) {
-          toast.error(
-            "El usuario ya existe. Por favor, intenta con otro DNI o correo electrónico."
-          );
+          toast({
+            title: "Error",
+            description:
+              "El usuario ya existe. Por favor, intenta con otro DNI o correo electrónico.",
+          });
         } else {
-          toast.error("Error en el registro. Por favor, intenta de nuevo.");
+          toast({
+            title: "Error",
+            description: "Error en el registro. Por favor, intenta de nuevo.",
+          });
         }
       }
     } catch (error) {
       console.error("Error en el registro:", error);
-      toast.error("Ocurrió un error en la red. Por favor, intenta de nuevo.");
+      toast({
+        title: "Error",
+        description: "Ocurrió un error en la red. Por favor, intenta de nuevo.",
+      });
     }
   };
 
-  const handleRequestPasswordChange = () => {
+  const handleRequestPasswordChange = async () => {
     try {
-      toast.promise(
-        fetch(`${BACKEND_SERVER}/auth/change-password`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ dni: dniForChange }), // Enviar el DNI al backend
-        }),
-        {
-          loading: "Enviando...",
-          success:
+      const response = await fetch(`${BACKEND_SERVER}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ dni: dniForChange }), // Enviar el DNI al backend
+      });
+
+      if (response.ok)
+        toast({
+          description:
             "Solicitud de cambio de contraseña enviada. Revisa tu correo.",
-          error: "Solicitud fallida.",
-        }
-      );
+        });
+      else toast({ description: "Solicitud fallida." });
     } catch (error) {
       console.error("Error de red:", error);
     }

@@ -142,4 +142,14 @@ export class SearchDonationController {
   ) {
     return this.searchService.getDonationByCopyCode(page, limit, code);
   }
+
+  @Get('donation-by-book/:book')
+  @Roles('LIBRARIAN')
+  getDonationByBook(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Param('book') book: string,
+  ) {
+    return this.searchService.getDonationByBook(page, limit, book);
+  }
 }

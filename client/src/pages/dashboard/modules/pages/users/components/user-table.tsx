@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AllDataUserI, UserRoleE, UserRoleT } from "@/types";
+import { AllDataUserI } from "@/types";
 import { usePagination } from "../../../hooks/use-pagination";
 import {
   DropdownMenu,
@@ -24,43 +24,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { useUserDataUDC } from "@/context/data/data.hook";
-import { fetchJSON } from "@/services/fetch";
-import { BACKEND_SERVER } from "@/config/api";
-import { useTokenUC } from "@/context/user/user.hook";
-import { useToast } from "@/hooks/use-toast";
-
-type UserAvailabilityT = "UNAVAILABLE" | "AVAILABLE";
-enum UserAvailabilityE {
-  UNAVAILABLE = "UNAVAILABLE",
-  AVAILABLE = "AVAILABLE",
-}
+import { ModalEditUser } from "./modal/dialog-edit-user";
 
 interface Props {
   users: AllDataUserI[];
 }
 
 export function UserTable({ users }: Props) {
-  const { data } = useTokenUC();
-  const { getUsers } = useUserDataUDC();
   const [usersPerPage, setUsersPerPage] = useState(10);
   const [selectedUser, setSelectedUser] = useState<AllDataUserI | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { toast } = useToast();
-
-  const [formData, setFormData] = useState<{
-    role: UserRoleT;
-    availability: UserAvailabilityT;
-  } | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(true);
 
   const {
     currentPage,
@@ -73,44 +46,7 @@ export function UserTable({ users }: Props) {
 
   const handleEdit = (user: AllDataUserI) => {
     setSelectedUser(user);
-    setFormData({
-      role: user.role,
-      availability: user.isDisabled ? "UNAVAILABLE" : "AVAILABLE",
-    });
     setIsEditModalOpen(true);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmitEdit = async (e: any) => {
-    e.preventDefault();
-
-    const { response } = await fetchJSON(
-      `${BACKEND_SERVER}/user/${selectedUser?.id}`,
-      {
-        method: "PUT",
-        authorization: data,
-        body: {
-          role: formData?.role,
-          isDisabled: formData?.availability === "UNAVAILABLE" ? true : false,
-        },
-        json: false,
-      }
-    );
-
-    if (response.ok) {
-      toast({
-        title: "Éxito",
-        description: "El usuario ha sido editado correctamente",
-      });
-      await getUsers();
-    } else {
-      toast({
-        title: "Error",
-        description: "Ha ocurrido un error al editar el usuario",
-      });
-    }
-
-    setIsEditModalOpen(false);
   };
 
   const renderPaginationButtons = () => {
@@ -326,99 +262,13 @@ export function UserTable({ users }: Props) {
         </Select>
       </div>
 
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-[#0e0e0e] text-[#C7C7CC]">
-          <DialogHeader>
-            <DialogTitle>Editar Usuario</DialogTitle>
-            <DialogDescription>
-              Modifica el rol e inabilita usuarios.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleSubmitEdit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Rol</Label>
-                <Select
-                  value={formData?.role}
-                  onValueChange={(value: UserRoleT) => {
-                    if (!formData) return;
-                    setFormData({ ...formData, role: value });
-                  }}
-                >
-                  <SelectTrigger className="w-[180px] border-[#3e3e40] bg-[#0e0e0e] text-[#C7C7CC]">
-                    <SelectValue placeholder="Seleccionar rol" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0e0e0e] border-[#3e3e40]">
-                    <SelectItem
-                      value={UserRoleE.READER}
-                      className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]"
-                    >
-                      Lector
-                    </SelectItem>
-                    <SelectItem
-                      value={UserRoleE.LIBRARIAN}
-                      className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]"
-                    >
-                      Bibliotecario
-                    </SelectItem>
-                    <SelectItem
-                      value={UserRoleE.ADMIN}
-                      className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]"
-                    >
-                      Administrador
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Habilitado</Label>
-                <Select
-                  value={formData?.availability}
-                  onValueChange={(value: UserAvailabilityT) => {
-                    if (!formData) return;
-                    setFormData({ ...formData, availability: value });
-                  }}
-                >
-                  <SelectTrigger className="w-[180px] border-[#3e3e40] bg-[#0e0e0e] text-[#C7C7CC]">
-                    <SelectValue placeholder="Seleccionar disponibilidad" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0e0e0e] border-[#3e3e40]">
-                    <SelectItem
-                      value={UserAvailabilityE.AVAILABLE}
-                      className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]"
-                    >
-                      Habilitado
-                    </SelectItem>
-                    <SelectItem
-                      value={UserAvailabilityE.UNAVAILABLE}
-                      className="text-[#C7C7CC] focus:bg-[#141414] focus:text-[#FFBC24]"
-                    >
-                      No Habilitado
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setIsEditModalOpen(false)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-[#FFBC24] rounded-md hover:bg-[#FFBC24] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-[#FFBC24]"
-              >
-                Guardar
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {selectedUser && isEditModalOpen ? (
+        <ModalEditUser
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          user={selectedUser}
+        />
+      ) : null}
     </>
   );
 }

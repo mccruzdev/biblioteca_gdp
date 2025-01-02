@@ -1,5 +1,5 @@
 import "./loan-history.sass";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ItemTable } from "../../components/item-table";
 import { PaginatedI, Loan } from "@/types";
 import { fetchJSON } from "../../../../../services/fetch";
@@ -8,59 +8,59 @@ import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 
-export function DashboardLoanHistory() {
+export default function DashboardLoanHistory() {
   const { user } = useAuthUC();
   const { data: token } = useTokenUC();
-  const [paginatedLoans, setPaginatedLoans] = useState<PaginatedI<Loan> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [paginatedLoans, setPaginatedLoans] = useState<PaginatedI<Loan> | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const fetchLoans = useCallback(async () => {
+    if (!token || !user) return; // TODO: Redirect to login
+    setIsLoading(true);
+
+    try {
+      const url =
+        user.role === "READER"
+          ? `${BACKEND_SERVER}/loan/me?page=${currentPage}&limit=${itemsPerPage}`
+          : `${BACKEND_SERVER}/loan?page=${currentPage}&limit=${itemsPerPage}`;
+      const { response, json } = await fetchJSON<PaginatedI<Loan>>(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setPaginatedLoans(json);
+      } else {
+        throw new Error("Failed to fetch loans");
+      }
+    } catch (error) {
+      console.error("Error fetching loans:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [token, user, currentPage, itemsPerPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
   useEffect(() => {
     if (token && user) {
-      fetchLoans()
+      fetchLoans();
     }
-  }, [token, user, currentPage, itemsPerPage])
-
-  const fetchLoans = async () => {
-    if (!token || !user) return // TODO: Redirect to login
-    setIsLoading(true)
-
-    try {
-      const url = user.role === "READER"
-        ? `${BACKEND_SERVER}/loan/me?page=${currentPage}&limit=${itemsPerPage}`
-        : `${BACKEND_SERVER}/loan?page=${currentPage}&limit=${itemsPerPage}`;
-      const { response, json } = await fetchJSON<PaginatedI<Loan>>(
-        url,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.ok) {
-        setPaginatedLoans(json)
-      } else {
-        throw new Error('Failed to fetch loans')
-      }
-    } catch (error) {
-      console.error('Error fetching loans:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-  }
-
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    setItemsPerPage(newItemsPerPage)
-    setCurrentPage(1)
-  }
+  }, [token, user, fetchLoans]);
 
   return (
     <div className="dashboard-catalog">
@@ -74,7 +74,9 @@ export function DashboardLoanHistory() {
         <div className="inner-container bg-[#0e0e0e] rounded-lg p-4 md:p-6 mt-4">
           <section className="Catalog-content-section">
             <div className="border-b border-gray-100 py-1">
-              <h2 className="text-xl font-bold text-white">Historial de Préstamos</h2>
+              <h2 className="text-xl font-bold text-white">
+                Historial de Préstamos
+              </h2>
             </div>
             <div className="pt-3">
               {isLoading ? (
@@ -82,12 +84,12 @@ export function DashboardLoanHistory() {
               ) : paginatedLoans && paginatedLoans.data.length > 0 ? (
                 <>
                   <ItemTable
-                    items={paginatedLoans.data.map(loan => ({
+                    items={paginatedLoans.data.map((loan) => ({
                       ...loan,
                       bookId: loan.copies[0]?.book.id,
-                      bookTitle: loan.copies[0]?.book.title
+                      bookTitle: loan.copies[0]?.book.title,
                     }))}
-                    token={token || ''}
+                    token={token || ""}
                     mode={user?.role === "READER" ? "loans-history" : "loans"}
                     viewMode="loan-history"
                     currentPage={paginatedLoans.currentPage}
@@ -97,12 +99,18 @@ export function DashboardLoanHistory() {
                     onItemsPerPageChange={handleItemsPerPageChange}
                     prevPageUrl={paginatedLoans.prev}
                     nextPageUrl={paginatedLoans.next}
+                    showActions={true}
                   />
                 </>
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-400 mb-4">No se encontraron préstamos.</p>
-                  <Button onClick={fetchLoans} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                  <p className="text-gray-400 mb-4">
+                    No se encontraron préstamos.
+                  </p>
+                  <Button
+                    onClick={fetchLoans}
+                    className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80"
+                  >
                     Recargar reservas
                   </Button>
                 </div>
@@ -113,6 +121,5 @@ export function DashboardLoanHistory() {
       </div>
       <Toaster />
     </div>
-  )
+  );
 }
-

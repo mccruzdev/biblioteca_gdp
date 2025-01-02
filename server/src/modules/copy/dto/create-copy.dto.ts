@@ -38,5 +38,5 @@ export class CopyDto {
 
   @IsOptional()
   @IsNumber({}, { message: 'The bookId field must be a number.' })
-  bookId?: number;
+  bookId: number;
 }

@@ -30,6 +30,39 @@ export class DonationService {
           date: true,
           description: true,
           Donor: true,
+          copies: {
+            select: {
+              id: true,
+              code: true,
+              condition: true,
+              Location: true,
+              Publisher: true,
+              Book: {
+                select: {
+                  id: true,
+                  title: true,
+                  pages: true,
+                  authors: {
+                    select: {
+                      id: true,
+                      name: true,
+                      email: true,
+                    },
+                  },
+                  Subcategory: {
+                    select: {
+                      name: true,
+                      Category: {
+                        select: {
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
       { page, limit, path: 'donation' },

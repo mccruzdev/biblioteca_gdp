@@ -2,9 +2,9 @@ import "../login/style.sass";
 import React, { useState } from "react";
 import BaseInput from "../../../components/Input";
 import Button from "../login/components/Button";
-import { toast } from "sonner";
 import { BACKEND_SERVER } from "../../../../config/api";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ConfirmChangePassword() {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ export default function ConfirmChangePassword() {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,13 +34,21 @@ export default function ConfirmChangePassword() {
       );
 
       if (response.ok) {
-        toast.success("Contraseña restablecida exitosamente.");
+        toast({
+          description: "Contraseña restablecida exitosamente.",
+        });
         navigate("/"); // Redirect to login after success
       } else {
-        toast.error("Error al restablecer la contraseña.");
+        toast({
+          title: "Error",
+          description: "Error al restablecer la contraseña.",
+        });
       }
     } else {
-      toast.error("Las contraseñas no coinciden.");
+      toast({
+        title: "Error",
+        description: "Las contraseñas no coinciden.",
+      });
     }
   };
 

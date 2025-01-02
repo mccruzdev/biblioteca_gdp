@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { AllDataUserI, PaginatedI } from "../../types";
-import { useTokenUC } from "../user/user.hook";
+import { useAuthUC, useTokenUC } from "../user/user.hook";
 import { fetchJSON } from "../../services/fetch";
 import { BACKEND_SERVER } from "../../config/api";
 
@@ -19,6 +19,7 @@ export interface useUserDataEx {
 
 export function useUserData() {
   const { data } = useTokenUC();
+  const { user } = useAuthUC();
 
   const [allPaginatedUsers, setAllPaginatedUsers] =
     useState<PaginatedI<AllDataUserI> | null>(null);
@@ -27,7 +28,7 @@ export function useUserData() {
     useState<PaginatedI<AllDataUserI> | null>(null);
 
   const getUsers = useCallback(async () => {
-    if (!data) return;
+    if (!data || user?.role !== "ADMIN") return;
 
     const { response, json } = await fetchJSON<PaginatedI<AllDataUserI>>(
       `${BACKEND_SERVER}/user/all`,
@@ -37,7 +38,7 @@ export function useUserData() {
       setAllPaginatedUsers(json);
       setFilteredUsers(json);
     }
-  }, [data]);
+  }, [data, user]);
 
   useEffect(() => {
     getUsers();

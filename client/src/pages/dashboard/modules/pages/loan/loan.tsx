@@ -1,63 +1,65 @@
 import "./loan.sass";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ItemTable } from "../../components/item-table";
 import { Reservation, PaginatedI } from "@/types";
 import { fetchJSON } from "../../../../../services/fetch";
 import { BACKEND_SERVER } from "../../../../../config/api";
-import { useTokenUC } from "../../../../../context/user/user.hook";
+import { useAuthUC, useTokenUC } from "../../../../../context/user/user.hook";
 import { Toaster } from "../../../../../components/ui/toaster";
 import { Button } from "../../../../../components/ui/button";
 
-export function DashboardLoan() {
-  const { data: token } = useTokenUC()
-  const [paginatedReservations, setPaginatedReservations] = useState<PaginatedI<Reservation> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+export default function DashboardLoan() {
+  const { data: token } = useTokenUC();
+  const { user } = useAuthUC();
+  const [paginatedReservations, setPaginatedReservations] =
+    useState<PaginatedI<Reservation> | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const fetchReservations = useCallback(async () => {
+    if (!token) return; // TODO: Redirect to login
+    setIsLoading(true);
+
+    try {
+      const url =
+        user?.role !== "ADMIN"
+          ? `${BACKEND_SERVER}/reservation/me?page=${currentPage}&limit=${itemsPerPage}`
+          : `${BACKEND_SERVER}/reservation?page=${currentPage}&limit=${itemsPerPage}`;
+      const { response, json } = await fetchJSON<PaginatedI<Reservation>>(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setPaginatedReservations(json);
+      } else {
+        throw new Error("Failed to fetch reservations");
+      }
+    } catch (error) {
+      console.error("Error fetching reservations:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, itemsPerPage, token, user]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   useEffect(() => {
     if (token) {
-      fetchReservations()
+      fetchReservations();
     }
-  }, [token, currentPage, itemsPerPage])
-
-  const fetchReservations = async () => {
-    if (!token) return // TODO: Redirect to login
-    setIsLoading(true)
-
-    try {
-      const url = `${BACKEND_SERVER}/reservation?page=${currentPage}&limit=${itemsPerPage}`
-      const { response, json } = await fetchJSON<PaginatedI<Reservation>>(
-        url,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.ok) {
-        setPaginatedReservations(json)
-      } else {
-        throw new Error('Failed to fetch reservations')
-      }
-    } catch (error) {
-      console.error('Error fetching reservations:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-  }
-
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    setItemsPerPage(newItemsPerPage)
-    setCurrentPage(1) // Reset to first page when changing items per page
-  }
+  }, [token, fetchReservations]);
 
   return (
     <div className="dashboard-catalog">
@@ -76,15 +78,16 @@ export function DashboardLoan() {
             <div className="pt-3">
               {isLoading ? (
                 <p className="text-center text-gray-400">Cargando...</p>
-              ) : paginatedReservations && paginatedReservations.data.length > 0 ? (
+              ) : paginatedReservations &&
+                paginatedReservations.data.length > 0 ? (
                 <>
                   <ItemTable
-                    items={paginatedReservations.data.map(reservation => ({
+                    items={paginatedReservations.data.map((reservation) => ({
                       ...reservation,
                       bookId: reservation.copies[0]?.book.id,
-                      bookTitle: reservation.copies[0]?.book.title
+                      bookTitle: reservation.copies[0]?.book.title,
                     }))}
-                    token={token || ''}
+                    token={token || ""}
                     mode="reservations"
                     viewMode="loan"
                     currentPage={paginatedReservations.currentPage}
@@ -94,12 +97,18 @@ export function DashboardLoan() {
                     onItemsPerPageChange={handleItemsPerPageChange}
                     prevPageUrl={paginatedReservations.prev}
                     nextPageUrl={paginatedReservations.next}
+                    showActions={user?.role !== "READER"}
                   />
                 </>
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-400 mb-4">No se encontraron reservas.</p>
-                  <Button onClick={fetchReservations} className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80">
+                  <p className="text-gray-400 mb-4">
+                    No se encontraron reservas.
+                  </p>
+                  <Button
+                    onClick={fetchReservations}
+                    className="bg-[#FFBC24] text-[#010101] hover:bg-[#FFBC24]/80"
+                  >
                     Recargar reservas
                   </Button>
                 </div>
@@ -110,7 +119,5 @@ export function DashboardLoan() {
       </div>
       <Toaster />
     </div>
-  )
+  );
 }
-
-

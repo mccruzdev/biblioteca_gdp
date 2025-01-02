@@ -24,6 +24,7 @@ import {
 import { Roles } from 'src/decorators/roles/roles.decorator';
 import { CreateReservationDTO } from './dto/create-reservation.dto';
 import { UpdateReservationDTO } from './dto/update-reservation.dto';
+import { ReservationToLoanDTO } from './dto/reservation-to-loan.dto';
 
 @ApiTags('Reservation')
 @ApiBearerAuth()
@@ -32,7 +33,7 @@ export class ReservationController {
   constructor(private reservationService: ReservationService) {}
 
   @Get()
-  @Roles('ADMIN')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Obtener una lista paginada de todas las reservas' })
   @ApiQuery({
     name: 'page',
@@ -143,6 +144,11 @@ export class ReservationController {
     );
   }
 
+  @Put('to-loan')
+  reservationToLoan(@Body() data: ReservationToLoanDTO) {
+    return this.reservationService.reservationToLoan(data);
+  }
+
   @Put(':id')
   @Roles('READER')
   @ApiOperation({ summary: 'Actualizar reservaciones' })
@@ -181,15 +187,10 @@ export class ReservationController {
     description: 'Reserva o ID del ejemplar no encontrado',
   })
   updateReservation(
-    @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateReservationDTO,
   ) {
-    return this.reservationService.updateReservation(
-      req.headers.authorization,
-      id,
-      data,
-    );
+    return this.reservationService.updateReservation(id, data);
   }
 
   @Delete(':id')

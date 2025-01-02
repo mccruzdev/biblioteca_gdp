@@ -7,6 +7,17 @@ export enum UserRoleE {
   LIBRARIAN = "LIBRARIAN",
   READER = "READER",
 }
+
+export type BookConditionT = "NEW" | "GOOD" | "FAIR" | "DAMAGED" | "BAD";
+
+export enum BookCOnditionE {
+  NEW = "NEW",
+  GOOD = "GOOD",
+  FAIR = "FAIR",
+  DAMAGED = "DAMAGED",
+  BAD = "BAD",
+}
+
 export interface UserI {
   dni: string;
   names: string;
@@ -15,17 +26,6 @@ export interface UserI {
   role: UserRoleT;
   email: string;
 }
-
-/*export interface PaginatedI<T> {
-  total: number;
-  lastPage: number;
-  currentPage: number;
-  limit: number;
-  prev: string | null;
-  next: string | null;
-  data: T[];
-}*/
-
 export interface PaginatedI<T> {
   total: number;
   lastPage: number;
@@ -57,11 +57,17 @@ export type Copy = {
   condition: string;
 };
 
+export type ReservationStatusT =
+  | "PENDING"
+  | "PICKED_UP"
+  | "CANCELED"
+  | "EXPIRED";
+
 export enum ReservationStatus {
-  PENDING = 'PENDING',
-  PICKED_UP = 'PICKED_UP',
-  CANCELED = 'CANCELED',
-  EXPIRED = 'EXPIRED'
+  PENDING = "PENDING",
+  PICKED_UP = "PICKED_UP",
+  CANCELED = "CANCELED",
+  EXPIRED = "EXPIRED",
 }
 
 export interface Reservation {
@@ -93,10 +99,10 @@ export interface Reservation {
 }
 
 export enum LoanStatus {
-  ACTIVE = 'ACTIVE',
-  RETURNED = 'RETURNED',
-  OVERDUE = 'OVERDUE',
-  CANCELLED = 'CANCELLED'
+  ACTIVE = "ACTIVE",
+  RETURNED = "RETURNED",
+  OVERDUE = "OVERDUE",
+  CANCELLED = "CANCELLED",
 }
 
 export interface Loan {
@@ -133,15 +139,15 @@ export interface DonorsI {
   email: string | null;
 }
 
-export interface DonationsI{
+export interface DonationsI {
   id: number;
-  date:string;
+  date: string;
   description: string;
   donor: {
     id: number;
     name: string;
     email: string;
-    };
+  };
 }
 
 export interface AllDataUserI extends UserI {
@@ -151,7 +157,3 @@ export interface AllDataUserI extends UserI {
 }
 
 export type Item = BookI | Reservation | Loan | DonorsI | DonationsI;
-
-
-
-

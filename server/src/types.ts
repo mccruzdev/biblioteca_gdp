@@ -71,6 +71,7 @@ export interface ParseDonation {
     name: string;
     email: string;
   };
+  copies: ParseCopy[];
 }
 
 export interface ParseCopy {
