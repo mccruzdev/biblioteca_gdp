@@ -177,11 +177,10 @@ export class LoanController {
     description: 'Prestamo o ID del ejemplar no encontrado',
   })
   updateLoan(
-    @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateLoanDTO,
   ) {
-    return this.loanService.updateLoan(req.headers.authorization, id, data);
+    return this.loanService.updateLoan(id, data);
   }
 
   @Delete(':id')
@@ -205,7 +204,7 @@ export class LoanController {
     status: 404,
     description: 'Préstamo no encontrado',
   })
-  deleteLoan(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
-    return this.loanService.deleteLoan(req.headers.authorization, id);
+  deleteLoan(@Param('id', ParseIntPipe) id: number) {
+    return this.loanService.deleteLoan(id);
   }
 }

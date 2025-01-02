@@ -14,7 +14,7 @@ const shoppingCard = useShoppingCardStore();
 const toast = useToast();
 const paginatedBooks = ref<PaginatedI<BookI>>();
 const isNotAuthorized = ref(false);
-const url = ref(`${BACKEND_SERVER}/book`);
+const url = ref(`${BACKEND_SERVER}/book/catalog`);
 
 const fetchBooks = async (page: number, limit: number) => {
   try {
@@ -76,15 +76,15 @@ const searchInput = ref("");
 
 const handleFilter = async () => {
   if (selectedFilter.value === "Todo") {
-    url.value = `${BACKEND_SERVER}/book`;
+    url.value = `${BACKEND_SERVER}/book/catalog`;
   } else if (selectedFilter.value === "Titulo") {
-    url.value = `${BACKEND_SERVER}/search/books-by-title/${searchInput.value}`;
+    url.value = `${BACKEND_SERVER}/search/books-catalog-by-title/${searchInput.value}`;
   } else if (selectedFilter.value === "Autor") {
-    url.value = `${BACKEND_SERVER}/search/books-by-author/${searchInput.value}`;
+    url.value = `${BACKEND_SERVER}/search/books-catalog-by-author/${searchInput.value}`;
   } else if (selectedFilter.value === "Categoría") {
-    url.value = `${BACKEND_SERVER}/search/books-by-category/${searchInput.value}`;
+    url.value = `${BACKEND_SERVER}/search/books-catalog-by-category/${searchInput.value}`;
   } else if (selectedFilter.value === "Subcategoría") {
-    url.value = `${BACKEND_SERVER}/search/books-by-subcategory/${searchInput.value}`;
+    url.value = `${BACKEND_SERVER}/search/books-catalog-by-subcategory/${searchInput.value}`;
   }
 
   if (currentPage.value !== 1) currentPage.value = 1;

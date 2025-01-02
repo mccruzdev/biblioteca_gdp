@@ -101,13 +101,7 @@ export class LoanService {
     });
   }
 
-  async updateLoan(
-    authorization: string | undefined,
-    id: number,
-    data: UpdateLoanDTO,
-  ) {
-    const dataHeader = this.tokenManager.getDataFromHeader(authorization);
-
+  async updateLoan(id: number, data: UpdateLoanDTO) {
     try {
       await this.prisma.loan.update({
         data: {
@@ -117,7 +111,7 @@ export class LoanService {
             set: data.copies.map((copyId) => ({ id: copyId })),
           },
         },
-        where: { id, userId: dataHeader.id },
+        where: { id },
       });
     } catch {
       throw new HttpException(
@@ -127,12 +121,10 @@ export class LoanService {
     }
   }
 
-  async deleteLoan(authorization: string | undefined, id: number) {
-    const dataHeader = this.tokenManager.getDataFromHeader(authorization);
-
+  async deleteLoan(id: number) {
     try {
       await this.prisma.loan.delete({
-        where: { id, userId: dataHeader.id },
+        where: { id },
       });
     } catch {
       throw new HttpException('Loan not found', HttpStatus.NOT_FOUND);

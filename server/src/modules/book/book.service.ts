@@ -10,6 +10,11 @@ const paginate: PaginateFunction = paginator({
   limit: 10,
 });
 
+const paginateCatalog: PaginateFunction = paginator({
+  path: 'book/catalog',
+  limit: 10,
+});
+
 @Injectable()
 export class BooksService {
   constructor(private prisma: PrismaService) {}
@@ -35,6 +40,70 @@ export class BooksService {
       },
     },
   };
+
+  async getCatalogBooks(page: number, limit: number) {
+    const currentDate = new Date();
+    this.prisma.book.findMany({
+      select: this.customSelect,
+      where: {
+        copies: {
+          some: {
+            OR: [
+              {
+                loans: {
+                  none: {
+                    AND: [
+                      { loanDate: { lte: currentDate } },
+                      { dueDate: { gte: currentDate } },
+                      { status: { not: 'RETURNED' } },
+                    ],
+                  },
+                },
+              },
+              {
+                loans: {
+                  none: {},
+                },
+              },
+            ],
+          },
+        },
+      },
+    });
+
+    return paginateCatalog(
+      this.prisma.book,
+      {
+        select: this.customSelect,
+        where: {
+          copies: {
+            some: {
+              OR: [
+                {
+                  loans: {
+                    none: {
+                      AND: [
+                        { loanDate: { lte: currentDate } },
+                        { dueDate: { gte: currentDate } },
+                        { status: { not: 'RETURNED' } },
+                      ],
+                    },
+                  },
+                },
+                {
+                  loans: {
+                    none: {},
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      { page, limit, path: 'book/catalog' },
+      transformBooks,
+    );
+  }
 
   async getAllBooks(page: number, limit: number) {
     return await paginate(

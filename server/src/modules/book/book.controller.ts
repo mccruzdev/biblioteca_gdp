@@ -28,8 +28,26 @@ import { BookDTO } from './dto/book.dto';
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
-  @Get()
+  @Get('catalog')
   @Roles('READER')
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Número de la página',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Resultados por página',
+    required: false,
+  })
+  getCatalogBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.booksService.getCatalogBooks(page, limit);
+  }
+
+  @Get()
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Obtener una lista paginada de todos los libros' })
   @ApiQuery({
     name: 'page',
@@ -56,7 +74,7 @@ export class BooksController {
     description:
       'Forbidden: You do not have permission to access this resource',
   })
-  getAllBooks(@Query('page') page = 1, @Query('limit') limit = 1000) {
+  getAllBooks(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.booksService.getAllBooks(Number(page), Number(limit));
   }
 
@@ -88,8 +106,6 @@ export class BooksController {
   getBookById(@Param('id', ParseIntPipe) id: number) {
     return this.booksService.getBookById(id);
   }
-
-  // getBooksByAuthor(@Param('author') author: string) {}
 
   @Post()
   @Roles('LIBRARIAN')

@@ -16,8 +16,100 @@ import { Roles } from 'src/decorators/roles/roles.decorator';
 export class SearchBooksController {
   constructor(private readonly searchService: SearchBooksService) {}
 
-  @Get('books-by-author/:author')
+  @Get('books-catalog-by-author/:author')
   @Roles('READER')
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Número de la página',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Resultados por página',
+    required: false,
+  })
+  getCatalogBooksByAuthor(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Param('author') author: string,
+  ) {
+    return this.searchService.getCatalogBooksByAuthor(page, limit, author);
+  }
+
+  @Get('books-catalog-by-category/:category')
+  @Roles('READER')
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Número de la página',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Resultados por página',
+    required: false,
+  })
+  getCatalogBooksByCategory(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Param('category') category: string,
+  ) {
+    return this.searchService.getCatalogBooksByCategory(page, limit, category);
+  }
+
+  @Get('books-catalog-by-subcategory/:subcategory')
+  @Roles('READER')
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Número de la página',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Resultados por página',
+    required: false,
+  })
+  getCatalogBooksBySubcategory(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Param('subcategory') subcategory: string,
+  ) {
+    return this.searchService.getCatalogBooksBySubcategory(
+      page,
+      limit,
+      subcategory,
+    );
+  }
+
+  @Get('books-catalog-by-title/:title')
+  @Roles('READER')
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Número de la página',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Resultados por página',
+    required: false,
+  })
+  getCatalogBooksByTitle(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Param('title') title: string,
+  ) {
+    return this.searchService.getCatalogBooksByTitle(page, limit, title);
+  }
+
+  @Get('books-by-author/:author')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Obtener libros paginados por autor' })
   @ApiQuery({
     name: 'page',
@@ -58,7 +150,7 @@ export class SearchBooksController {
   }
 
   @Get('books-by-category/:category')
-  @Roles('READER')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Obtener libros paginados por categoria' })
   @ApiQuery({
     name: 'page',
@@ -99,7 +191,7 @@ export class SearchBooksController {
   }
 
   @Get('books-by-subcategory/:subcategory')
-  @Roles('READER')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Obtener libros paginados por subcategoria' })
   @ApiQuery({
     name: 'page',
@@ -140,7 +232,7 @@ export class SearchBooksController {
   }
 
   @Get('books-by-title/:title')
-  @Roles('READER')
+  @Roles('LIBRARIAN')
   @ApiOperation({ summary: 'Obtener libros paginados por titulo' })
   @ApiQuery({
     name: 'page',
