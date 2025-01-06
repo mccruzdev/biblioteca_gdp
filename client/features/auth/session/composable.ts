@@ -61,28 +61,37 @@ export function useIndexPage() {
   const handleRegister = async () => {
     buttonRegisterLoading.value = true;
 
-    const response = await axios.post(`${BACKEND_SERVER}/auth/create-user`, {
-      dni: formData.value.dni,
-      names: formData.value.names,
-      lastName: formData.value.lastName,
-      email: formData.value.email,
-      phoneNumber: formData.value.phoneNumber
-        ? formData.value.phoneNumber
-        : null,
-      password: formData.value.password,
-    });
-
-    if (response.status === 201)
-      toast.add({
-        title: "Usuario creado con éxito",
-        description:
-          "Por favor, verifica tu correo electrónico para completar el proceso de registro.",
+    try {
+      const response = await axios.post(`${BACKEND_SERVER}/auth/create-user`, {
+        dni: formData.value.dni,
+        names: formData.value.names,
+        lastName: formData.value.lastName,
+        email: formData.value.email,
+        phoneNumber: formData.value.phoneNumber
+          ? formData.value.phoneNumber
+          : null,
+        password: formData.value.password,
       });
-    else
+  
+      if (response.status === 201)
+        toast.add({
+          title: "Usuario creado con éxito",
+          description:
+            "Por favor, verifica tu correo electrónico para completar el proceso de registro.",
+        });
+      else
+        toast.add({
+          title: "Error",
+          description: response.data.message,
+        });
+    } catch (reason) {
+      const error = reason as AxiosError;
+
       toast.add({
         title: "Error",
-        description: response.data.message,
+        description: error.response?.data?.message[0] as string,
       });
+    }
 
     buttonRegisterLoading.value = false;
     showConfirmModal.value = false;
