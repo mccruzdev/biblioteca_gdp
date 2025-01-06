@@ -115,8 +115,8 @@ export interface ReservationI {
     id: number;
     code: string;
     condition: string;
-    location: string | null;
-    publisher: string | null;
+    location: LocationI;
+    publisher: PublisherI;
     book: {
       id: number;
       title: string;
@@ -148,8 +148,8 @@ export interface LoanI {
     id: number;
     code: string;
     condition: string;
-    location: string | null;
-    publisher: string | null;
+    location: LocationI;
+    publisher: PublisherI;
     book: {
       id: number;
       title: string;
@@ -180,6 +180,25 @@ export interface DonationsI {
     name: string;
     email: string;
   };
+  copies: {
+    id: number;
+    code: string;
+    condition: string;
+    location: LocationI;
+    publisher: PublisherI;
+    book: {
+      id: number;
+      title: string;
+      pages: number;
+      authors: {
+        id: number;
+        name: string;
+        email: string | null;
+      }[];
+      subcategory: string | null;
+      category: string | null;
+    };
+  }[];
 }
 
 export interface AllDataUserI extends UserI {

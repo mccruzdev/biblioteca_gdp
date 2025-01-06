@@ -2,7 +2,9 @@
 import axios from "axios";
 import { BACKEND_SERVER } from "~/config/api";
 import ActionsContainer from "~/features/dashboard/components/actions-container.vue";
+import ActionsDropdown from "~/features/dashboard/components/actions-dropdown.vue";
 import SearchContainer from "~/features/dashboard/components/search-container.vue";
+import { MIN_WIDTH_SCREEN_FOR_TABLE } from "~/features/dashboard/constants";
 import DashboardContainer from "~/features/dashboard/dashboard-container.vue";
 import {
   type PaginatedI,
@@ -413,29 +415,12 @@ const handleRemoveCopyFromDonationForm = (copy: NewCopyI) => {
     <template #title-table>Donantes</template>
 
     <template #search>
-      <SearchContainer>
-        <template #search-filter>
-          <USelectMenu v-model="selectedFilter" :options="filters" />
-        </template>
-        <template #search-input>
-          <UInput v-model="searchInput" name="filter" placeholder="Buscar" :disabled="selectedFilter === 'Todo'" />
-        </template>
-        <template #search-reset-filter>
-          <Button v-show="selectedFilter !== 'Todo' || searchInput !== ''" @click="
-            selectedFilter = 'Todo';
-          searchInput = '';
-          handleFilter();
-          " icon="i-tabler-circle-x-filled">
-            Limpiar filtro
-          </Button>
-        </template>
-        <template #search-button>
-          <Button @click="handleFilter" icon="i-heroicons-magnifying-glass"
-            :disabled="!searchInput && selectedFilter !== 'Todo'">
-            Filtrar
-          </Button>
-        </template>
-      </SearchContainer>
+      <Searchbar
+        v-model:input="searchInput"
+        v-model:filter="selectedFilter"
+        :filters="filters"
+        @handle-filter="handleFilter"
+      />
     </template>
 
     <template #actions>
@@ -448,8 +433,38 @@ const handleRemoveCopyFromDonationForm = (copy: NewCopyI) => {
       </ActionsContainer>
     </template>
 
-    <UTable :loading="paginatedDonors === undefined || !paginatedDonors.data" :columns="columns"
-      :rows="paginatedDonors?.data">
+    <template v-if="width < MIN_WIDTH_SCREEN_FOR_TABLE">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          v-for="row in paginatedDonors?.data"
+          :key="row.id"
+          class="bg-gray-800 rounded-lg p-4 shadow"
+        >
+          <div class="text-white text-lg font-bold">
+            {{ row.name }}
+          </div>
+          <div class="text-white text-sm">
+            <p><strong>ID:</strong> {{ row.id }}</p>
+            <p><strong>Email:</strong> {{ row.email }}</p>
+          </div>
+          <div class="mt-4">
+            <ActionsDropdown :items="items" :row="row" />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="!paginatedDonors || !paginatedDonors.data" class="text-center py-6">
+        <UIcon name="i-heroicons-circle-stack-20-solid" class="w-8 h-8 mx-auto" />
+        <span class="text-white">No hay resultados</span>
+      </div>
+    </template>
+
+    <UTable
+      :loading="paginatedDonors === undefined || !paginatedDonors.data"
+      :columns="columns"
+      :rows="paginatedDonors?.data"
+      v-else
+    >
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
       </template>
@@ -487,15 +502,7 @@ const handleRemoveCopyFromDonationForm = (copy: NewCopyI) => {
         <span class="text-white text-left">{{ row.email }}</span>
       </template>
       <template #actions-data="{ row }">
-        <UDropdown :items="items(row)">
-          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
-
-          <template #item="{ item }">
-            <span class="truncate text-black">{{ item.label }}</span>
-
-            <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto" />
-          </template>
-        </UDropdown>
+        <ActionsDropdown :items="items" :row="row" />
       </template>
     </UTable>
 
@@ -503,108 +510,212 @@ const handleRemoveCopyFromDonationForm = (copy: NewCopyI) => {
     <template #total-pages>{{ paginatedDonors?.lastPage }}</template>
 
     <template #pagination v-if="paginatedDonors">
-      <UPagination v-model="currentPage" :page-count="Number(limitPerPage)" :total="paginatedDonors.total"
-        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'" />
+      <UPagination
+        v-model="currentPage"
+        :page-count="Number(limitPerPage)"
+        :total="paginatedDonors.total"
+        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'"
+      />
     </template>
     <template #select-limit-per-page>
-      <USelect v-model="limitPerPage" :options="[
-        { value: 10, label: 'Mostrar 10' },
-        { value: 20, label: 'Mostrar 20' },
-        { value: 30, label: 'Mostrar 30' },
-        { value: 40, label: 'Mostrar 40' },
-        { value: 50, label: 'Mostrar 50' },
-      ]" />
+      <USelect
+        v-model="limitPerPage"
+        :options="[
+          { value: 10, label: 'Mostrar 10' },
+          { value: 20, label: 'Mostrar 20' },
+          { value: 30, label: 'Mostrar 30' },
+          { value: 40, label: 'Mostrar 40' },
+          { value: 50, label: 'Mostrar 50' },
+        ]"
+      />
     </template>
 
     <template #modals>
       <!-- Add Donor -->
-      <Modal v-model="showAddDonorModal" :disabled-accept-button="disabledAcceptDonorButton"
-        :loading="loadingAcceptButton" @handle-accept="handleAcceptAddDonorButton">
+      <Modal
+        v-model="showAddDonorModal"
+        :disabled-accept-button="disabledAcceptDonorButton"
+        :loading="loadingAcceptButton"
+        @handle-accept="handleAcceptAddDonorButton"
+      >
         <template #header-title>Agregar Donador</template>
         <template #header-description> Agrega un nuevo donante </template>
 
-        <FormBaseInput v-model="donorFormData.name" name="donor-name" label="Nombre"
-          placeholder="Ingrese el nombre del donante" required />
-        <FormBaseInput v-model="donorFormData.email" name="donor-email" label="Correo"
-          placeholder="Ingrese el correo del donante" type="email" required />
+        <FormBaseInput
+          v-model="donorFormData.name"
+          name="donor-name"
+          label="Nombre"
+          placeholder="Ingrese el nombre del donante"
+          required
+        />
+        <FormBaseInput
+          v-model="donorFormData.email"
+          name="donor-email"
+          label="Correo"
+          placeholder="Ingrese el correo del donante"
+          type="email"
+          required
+        />
       </Modal>
       <!-- Edit Modal -->
-      <Modal v-model="showEditModal" :disabled-accept-button="disabledAcceptDonorButton" :loading="loadingAcceptButton"
-        @handle-accept="handleAcceptEdit">
+      <Modal
+        v-model="showEditModal"
+        :disabled-accept-button="disabledAcceptDonorButton"
+        :loading="loadingAcceptButton"
+        @handle-accept="handleAcceptEdit"
+      >
         <template #header-title>Editar Donador</template>
         <template #header-description> Edita los datos de un donante </template>
 
-        <FormBaseInput v-model="donorFormData.name" name="donor-name" label="Nombre"
-          placeholder="Ingrese el nombre del donante" required />
-        <FormBaseInput v-model="donorFormData.email" name="donor-email" label="Correo"
-          placeholder="Ingrese el correo del donante" type="email" required />
+        <FormBaseInput
+          v-model="donorFormData.name"
+          name="donor-name"
+          label="Nombre"
+          placeholder="Ingrese el nombre del donante"
+          required
+        />
+        <FormBaseInput
+          v-model="donorFormData.email"
+          name="donor-email"
+          label="Correo"
+          placeholder="Ingrese el correo del donante"
+          type="email"
+          required
+        />
       </Modal>
       <!-- Donation Modal -->
-      <Modal v-model="showRegisterDonationModal" :disabled-accept-button="disabledAcceptButtonDonationButton"
-        :loading="loadingAcceptDonationButton" @handle-accept="handleRegisterDonation">
+      <Modal
+        v-model="showRegisterDonationModal"
+        :disabled-accept-button="disabledAcceptButtonDonationButton"
+        :loading="loadingAcceptDonationButton"
+        @handle-accept="handleRegisterDonation"
+      >
         <template #header-title>Registrar donación</template>
         <template #header-description> Registra una nueva donación </template>
 
-        <FormBaseInput v-model="donationFormData.description" name="donation-description" label="Descripción"
-          placeholder="Descripción de la donación" />
+        <FormBaseInput
+          v-model="donationFormData.description"
+          name="donation-description"
+          label="Descripción"
+          placeholder="Descripción de la donación"
+        />
 
-        <Button icon="i-mdi-plus" @click="handleAddNewCopyToForm">
-          Agregar Copia
-        </Button>
+        <Button icon="i-mdi-plus" @click="handleAddNewCopyToForm"> Agregar Copia </Button>
 
         <div class="flex flex-col gap-4">
-          <div class="flex outline outline-1 outline-white p-2 rounded-md" v-for="copy in donationFormData.copies">
+          <div
+            class="flex outline outline-1 outline-white p-2 rounded-md"
+            v-for="copy in donationFormData.copies"
+          >
             <p class="text-white flex-1">
               Libro: {{ copy.bookId }} - Código: {{ copy.code }}
             </p>
-            <UButton class="cursor-pointer text-red-600" variant="ghost" icon="i-mdi-delete-forever"
-              @click="handleRemoveCopyFromDonationForm(copy)" />
+            <UButton
+              class="cursor-pointer text-red-600"
+              variant="ghost"
+              icon="i-mdi-delete-forever"
+              @click="handleRemoveCopyFromDonationForm(copy)"
+            />
           </div>
         </div>
 
-        <Modal v-model="showAddCopyModal" :disabled-accept-button="disabledAcceptButtonCopyForm"
-          @handle-accept="handleAcceptAddNewCopyToForm">
+        <Modal
+          v-model="showAddCopyModal"
+          :disabled-accept-button="disabledAcceptButtonCopyForm"
+          @handle-accept="handleAcceptAddNewCopyToForm"
+        >
           <template #header-title>Agrega una copia</template>
-          <template #header-description>
-            Agrega una copia a la donación
-          </template>
+          <template #header-description> Agrega una copia a la donación </template>
 
           <div class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col">
-            <FormBaseInput v-model="copyFormData.bookId" name="copy-bookId" label="Id del libro"
-              placeholder="Ingrese el ID del libro" required />
-            <FormBaseInput v-model="copyFormData.code" name="copy-code" label="Código del libro"
-              placeholder="Ingrese el código del libro" required />
-            <USelect v-model="copyFormData.condition" :options="[
-              { value: BookConditionE.NEW, label: 'Nuevo' },
-              { value: BookConditionE.GOOD, label: 'Bueno' },
-              { value: BookConditionE.FAIR, label: 'Regular' },
-              { value: BookConditionE.DAMAGED, label: 'Dañado' },
-              { value: BookConditionE.BAD, label: 'Malo' },
-            ]" />
+            <FormBaseInput
+              v-model="copyFormData.bookId"
+              name="copy-bookId"
+              label="Id del libro"
+              placeholder="Ingrese el ID del libro"
+              required
+            />
+            <FormBaseInput
+              v-model="copyFormData.code"
+              name="copy-code"
+              label="Código del libro"
+              placeholder="Ingrese el código del libro"
+              required
+            />
+            <USelect
+              v-model="copyFormData.condition"
+              :options="[
+                { value: BookConditionE.NEW, label: 'Nuevo' },
+                { value: BookConditionE.GOOD, label: 'Bueno' },
+                { value: BookConditionE.FAIR, label: 'Regular' },
+                { value: BookConditionE.DAMAGED, label: 'Dañado' },
+                { value: BookConditionE.BAD, label: 'Malo' },
+              ]"
+            />
 
             <p class="w-full text-center text-white font-bold">Ubicación</p>
 
-            <FormBaseInput v-model="copyFormData.location.shelf" name="copy-location-shelf" label="Estante"
-              placeholder="Estante donde se encuentra" required />
-            <FormBaseInput v-model="copyFormData.location.shelfColor" name="copy-location-shelfcolor"
-              label="Color del estante" placeholder="Color del estante donde se encuentra" />
-            <FormBaseInput v-model="copyFormData.location.shelfLevel" name="copy-location-shelflevel"
-              label="Nivel del estante" placeholder="Nivel del estante donde se encuentra" />
+            <FormBaseInput
+              v-model="copyFormData.location.shelf"
+              name="copy-location-shelf"
+              label="Estante"
+              placeholder="Estante donde se encuentra"
+              required
+            />
+            <FormBaseInput
+              v-model="copyFormData.location.shelfColor"
+              name="copy-location-shelfcolor"
+              label="Color del estante"
+              placeholder="Color del estante donde se encuentra"
+            />
+            <FormBaseInput
+              v-model="copyFormData.location.shelfLevel"
+              name="copy-location-shelflevel"
+              label="Nivel del estante"
+              placeholder="Nivel del estante donde se encuentra"
+            />
 
             <p class="w-full text-center text-white font-bold">Editorial</p>
 
-            <FormBaseInput v-model="copyFormData.publisher.name" name="copy-publisher-name"
-              label="Nombre de la editorial" placeholder="Nombre de la editorial" required />
-            <FormBaseInput v-model="copyFormData.publisher.email" name="copy-publisher-email"
-              label="Correo de la editorial" placeholder="Correo de la editorial" type="email" />
-            <FormBaseInput v-model="copyFormData.publisher.country" name="copy-publisher-country"
-              label="País de la editorial" placeholder="País de la editorial" />
-            <FormBaseInput v-model="copyFormData.publisher.address" name="copy-publisher-address"
-              label="Dirección de la editorial" placeholder="Dirección de la editorial" />
-            <FormBaseInput v-model="copyFormData.publisher.phoneNumber" name="copy-publisher-phonenumber"
-              label="Teléfono de la editorial" placeholder="Número de teléfono de la editorial" type="tel" />
-            <FormBaseInput v-model="copyFormData.publisher.website" name="copy-publisher-website"
-              label="Sitio web de la editorial" placeholder="Sitio Web de la editorial" />
+            <FormBaseInput
+              v-model="copyFormData.publisher.name"
+              name="copy-publisher-name"
+              label="Nombre de la editorial"
+              placeholder="Nombre de la editorial"
+              required
+            />
+            <FormBaseInput
+              v-model="copyFormData.publisher.email"
+              name="copy-publisher-email"
+              label="Correo de la editorial"
+              placeholder="Correo de la editorial"
+              type="email"
+            />
+            <FormBaseInput
+              v-model="copyFormData.publisher.country"
+              name="copy-publisher-country"
+              label="País de la editorial"
+              placeholder="País de la editorial"
+            />
+            <FormBaseInput
+              v-model="copyFormData.publisher.address"
+              name="copy-publisher-address"
+              label="Dirección de la editorial"
+              placeholder="Dirección de la editorial"
+            />
+            <FormBaseInput
+              v-model="copyFormData.publisher.phoneNumber"
+              name="copy-publisher-phonenumber"
+              label="Teléfono de la editorial"
+              placeholder="Número de teléfono de la editorial"
+              type="tel"
+            />
+            <FormBaseInput
+              v-model="copyFormData.publisher.website"
+              name="copy-publisher-website"
+              label="Sitio web de la editorial"
+              placeholder="Sitio Web de la editorial"
+            />
           </div>
         </Modal>
       </Modal>

@@ -47,11 +47,11 @@ table tbody tr td {
 }
 
 table tbody tr td span {
-  display: inline-block;
-  max-width: 100%; /* Asegura que el span no exceda el ancho de la celda */
-  word-wrap: break-word; /* Permite que las palabras largas se dividan */
-  overflow-wrap: break-word; /* Alternativa para soporte más amplio */
-  white-space: normal; /* Permite el salto de línea */
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  color: white;
 }
 
 @layer base {

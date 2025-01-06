@@ -1,0 +1,1 @@
+export const MIN_WIDTH_SCREEN_FOR_TABLE = 770;
