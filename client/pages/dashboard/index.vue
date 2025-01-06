@@ -10,6 +10,7 @@ import DashboardContainer from "~/features/dashboard/dashboard-container.vue";
 import { type PaginatedI, type BookI, type Copy } from "~/types";
 
 const { data } = useAuthStore();
+const { width } = useWindowSize()
 const shoppingCard = useShoppingCardStore();
 const toast = useToast();
 const paginatedBooks = ref<PaginatedI<BookI>>();
@@ -107,17 +108,16 @@ const disabledAcceptButtonAddToCardModal = computed(
 const parseCopy = (copy: Copy) => {
   return {
     value: String(copy.id),
-    label: `Código: ${copy.code} - Condición: ${
-      copy.condition === "NEW"
-        ? "Nuevo"
-        : copy.condition === "GOOD"
+    label: `Código: ${copy.code} - Condición: ${copy.condition === "NEW"
+      ? "Nuevo"
+      : copy.condition === "GOOD"
         ? "Bueno"
         : copy.condition === "FAIR"
-        ? "Regular"
-        : copy.condition === "DAMAGED"
-        ? "Dañado"
-        : "Malo"
-    }`,
+          ? "Regular"
+          : copy.condition === "DAMAGED"
+            ? "Dañado"
+            : "Malo"
+      }`,
   };
 };
 
@@ -225,32 +225,20 @@ const handleReservation = async () => {
           <USelectMenu v-model="selectedFilter" :options="filters" />
         </template>
         <template #search-input>
-          <UInput
-            v-model="searchInput"
-            name="filter"
-            placeholder="Buscar"
-            :disabled="selectedFilter === 'Todo'"
-          />
+          <UInput v-model="searchInput" name="filter" placeholder="Buscar" :disabled="selectedFilter === 'Todo'" />
         </template>
         <template #search-reset-filter>
-          <Button
-            v-show="selectedFilter !== 'Todo' || searchInput !== ''"
-            @click="
-              selectedFilter = 'Todo';
-              searchInput = '';
-              handleFilter();
-            "
-            icon="i-tabler-circle-x-filled"
-          >
+          <Button v-show="selectedFilter !== 'Todo' || searchInput !== ''" @click="
+            selectedFilter = 'Todo';
+          searchInput = '';
+          handleFilter();
+          " icon="i-tabler-circle-x-filled">
             Limpiar filtro
           </Button>
         </template>
         <template #search-button>
-          <Button
-            @click="handleFilter"
-            icon="i-heroicons-magnifying-glass"
-            :disabled="!searchInput && selectedFilter !== 'Todo'"
-          >
+          <Button @click="handleFilter" icon="i-heroicons-magnifying-glass"
+            :disabled="!searchInput && selectedFilter !== 'Todo'">
             Filtrar
           </Button>
         </template>
@@ -260,30 +248,16 @@ const handleReservation = async () => {
     <template #actions>
       <ActionsContainer>
         <template #right>
-          <UChip
-            :text="shoppingCard.copies.length"
-            size="2xl"
-            :show="shoppingCard.copies.length > 0"
-          >
-            <UButton
-              icon="i-mdi-plus"
-              size="lg"
-              color="primary"
-              :ui="{ rounded: 'rounded-full' }"
-              variant="solid"
-              @click="handleClickOnShoppingCardButton"
-              :disabled="disabledShoppingCardButton"
-            />
+          <UChip :text="shoppingCard.copies.length" size="2xl" :show="shoppingCard.copies.length > 0">
+            <UButton icon="i-mdi-plus" size="lg" color="primary" :ui="{ rounded: 'rounded-full' }" variant="solid"
+              @click="handleClickOnShoppingCardButton" :disabled="disabledShoppingCardButton" />
           </UChip>
         </template>
       </ActionsContainer>
     </template>
 
-    <UTable
-      :loading="paginatedBooks === undefined || !paginatedBooks.data"
-      :columns="columns"
-      :rows="paginatedBooks?.data"
-    >
+    <UTable :loading="paginatedBooks === undefined || !paginatedBooks.data" :columns="columns"
+      :rows="paginatedBooks?.data">
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
       </template>
@@ -342,19 +316,12 @@ const handleReservation = async () => {
       </template>
       <template #actions-data="{ row }">
         <UDropdown :items="items(row)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
+          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
 
           <template #item="{ item }">
             <span class="truncate text-black">{{ item.label }}</span>
 
-            <UIcon
-              :name="item.icon"
-              class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto"
-            />
+            <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto" />
           </template>
         </UDropdown>
       </template>
@@ -364,87 +331,56 @@ const handleReservation = async () => {
     <template #total-pages>{{ paginatedBooks?.lastPage }}</template>
 
     <template #pagination v-if="paginatedBooks">
-      <UPagination
-        v-model="currentPage"
-        :page-count="Number(limitPerPage)"
-        :total="paginatedBooks.total"
-      >
+      <UPagination v-model="currentPage" :page-count="Number(limitPerPage)" :total="paginatedBooks.total"
+        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'">
       </UPagination>
     </template>
     <template #select-limit-per-page>
-      <USelect
-        v-model="limitPerPage"
-        :options="[
-          { value: 10, label: 'Mostrar 10' },
-          { value: 20, label: 'Mostrar 20' },
-          { value: 30, label: 'Mostrar 30' },
-          { value: 40, label: 'Mostrar 40' },
-          { value: 50, label: 'Mostrar 50' },
-        ]"
-      ></USelect>
+      <USelect v-model="limitPerPage" :options="[
+        { value: 10, label: 'Mostrar 10' },
+        { value: 20, label: 'Mostrar 20' },
+        { value: 30, label: 'Mostrar 30' },
+        { value: 40, label: 'Mostrar 40' },
+        { value: 50, label: 'Mostrar 50' },
+      ]"></USelect>
     </template>
 
     <template #modals>
-      <Modal
-        v-model="showAddToCardModal"
-        :disabledAcceptButton="disabledAcceptButtonAddToCardModal"
-        @handle-accept="handleAcceptToAddNewBook"
-      >
+      <Modal v-model="showAddToCardModal" :disabledAcceptButton="disabledAcceptButtonAddToCardModal"
+        @handle-accept="handleAcceptToAddNewBook">
         <template #header-title>Agregar copia de libro</template>
         <template #header-description>
           Agrega una copia del libro &quot;{{ bookToAddToCard?.title }}&quot;
         </template>
 
-        <USelect
-          v-model="selectedBookId"
-          :options="copiesOfSelectedBookOptions"
-          placeholder="Selecciona una copia"
-        />
+        <USelect v-model="selectedBookId" :options="copiesOfSelectedBookOptions" placeholder="Selecciona una copia" />
       </Modal>
-      <Modal
-        v-model="showReservationModal"
-        :disabledAcceptButton="disabledShoppingCardButton"
-        @handle-accept="handleReservation"
-      >
+      <Modal v-model="showReservationModal" :disabledAcceptButton="disabledShoppingCardButton"
+        @handle-accept="handleReservation">
         <template #header-title>Confirmar reserva</template>
         <template #header-description>
           Seleccione el día y hora de recojo, y confirme la reserva.
         </template>
 
         <div
-          class="max-h-52 overflow-y-auto p-4 rounded-lg shadow-md outline outline-white outline-2 flex gap-4 flex-col"
-        >
-          <div
-            v-for="copy in shoppingCard.copies"
-            :key="copy.id"
-            class="flex items-center justify-between p-3 rounded-lg shadow-sm outline outline-yellow-600 outline-1"
-          >
+          class="max-h-52 overflow-y-auto p-4 rounded-lg shadow-md outline outline-white outline-2 flex gap-4 flex-col">
+          <div v-for="copy in shoppingCard.copies" :key="copy.id"
+            class="flex items-center justify-between p-3 rounded-lg shadow-sm outline outline-yellow-600 outline-1">
             <p class="text-white font-medium">
               {{ parseCopy(copy).label }}
             </p>
-            <UButton
-              class="cursor-pointer text-red-600"
-              variant="ghost"
-              icon="i-mdi-delete-forever"
-              @click="handleRemoveCopy(copy)"
-            />
+            <UButton class="cursor-pointer text-red-600" variant="ghost" icon="i-mdi-delete-forever"
+              @click="handleRemoveCopy(copy)" />
           </div>
         </div>
 
         <div class="flex">
           <UPopover :popper="{ placement: 'bottom-start' }">
-            <UButton
-              icon="i-heroicons-calendar-days-20-solid"
-              :label="format(reservationDate, 'd MMM, yyy', { locale: es })"
-            />
+            <UButton icon="i-heroicons-calendar-days-20-solid"
+              :label="format(reservationDate, 'd MMM, yyy', { locale: es })" />
 
             <template #panel="{ close }">
-              <DatePicker
-                v-model="reservationDate"
-                :min-date="new Date()"
-                is-required
-                @close="close"
-              />
+              <DatePicker v-model="reservationDate" :min-date="new Date()" is-required @close="close" />
             </template>
           </UPopover>
         </div>

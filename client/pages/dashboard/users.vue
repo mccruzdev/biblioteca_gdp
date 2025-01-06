@@ -11,6 +11,7 @@ import {
 } from "~/types";
 
 const { data } = useAuthStore();
+const { width } = useWindowSize()
 const toast = useToast();
 const paginatedUsers = ref<PaginatedI<AllDataUserI>>();
 const isNotAuthorized = ref(false);
@@ -186,43 +187,28 @@ const handleAcceptEdit = async () => {
           <USelectMenu v-model="selectedFilter" :options="filters" />
         </template>
         <template #search-input>
-          <UInput
-            v-model="searchInput"
-            name="filter"
-            placeholder="Buscar"
-            :disabled="selectedFilter === 'Todo'"
-          />
+          <UInput v-model="searchInput" name="filter" placeholder="Buscar" :disabled="selectedFilter === 'Todo'" />
         </template>
         <template #search-reset-filter>
-          <Button
-            v-show="selectedFilter !== 'Todo' || searchInput !== ''"
-            @click="
-              selectedFilter = 'Todo';
-              searchInput = '';
-              handleFilter();
-            "
-            icon="i-tabler-circle-x-filled"
-          >
+          <Button v-show="selectedFilter !== 'Todo' || searchInput !== ''" @click="
+            selectedFilter = 'Todo';
+          searchInput = '';
+          handleFilter();
+          " icon="i-tabler-circle-x-filled">
             Limpiar filtro
           </Button>
         </template>
         <template #search-button>
-          <Button
-            @click="handleFilter"
-            icon="i-heroicons-magnifying-glass"
-            :disabled="!searchInput && selectedFilter !== 'Todo'"
-          >
+          <Button @click="handleFilter" icon="i-heroicons-magnifying-glass"
+            :disabled="!searchInput && selectedFilter !== 'Todo'">
             Filtrar
           </Button>
         </template>
       </SearchContainer>
     </template>
 
-    <UTable
-      :loading="paginatedUsers === undefined || !paginatedUsers.data"
-      :columns="columns"
-      :rows="paginatedUsers?.data"
-    >
+    <UTable :loading="paginatedUsers === undefined || !paginatedUsers.data" :columns="columns"
+      :rows="paginatedUsers?.data">
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
       </template>
@@ -288,8 +274,8 @@ const handleAcceptEdit = async () => {
           row.role === "ADMIN"
             ? "ADMINISTRADOR"
             : row.role === "LIBRARIAN"
-            ? "BIBLIOTECARIO"
-            : "LECTOR"
+              ? "BIBLIOTECARIO"
+              : "LECTOR"
         }}</span>
       </template>
       <template #email-data="{ row }">
@@ -307,19 +293,12 @@ const handleAcceptEdit = async () => {
       </template>
       <template #actions-data="{ row }">
         <UDropdown :items="items(row)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
+          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
 
           <template #item="{ item }">
             <span class="truncate text-black">{{ item.label }}</span>
 
-            <UIcon
-              :name="item.icon"
-              class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto"
-            />
+            <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto" />
           </template>
         </UDropdown>
       </template>
@@ -329,24 +308,18 @@ const handleAcceptEdit = async () => {
     <template #total-pages>{{ paginatedUsers?.lastPage }}</template>
 
     <template #pagination v-if="paginatedUsers">
-      <UPagination
-        v-model="currentPage"
-        :page-count="Number(limitPerPage)"
-        :total="paginatedUsers.total"
-      >
+      <UPagination v-model="currentPage" :page-count="Number(limitPerPage)" :total="paginatedUsers.total"
+        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'">
       </UPagination>
     </template>
     <template #select-limit-per-page>
-      <USelect
-        v-model="limitPerPage"
-        :options="[
-          { value: 10, label: 'Mostrar 10' },
-          { value: 20, label: 'Mostrar 20' },
-          { value: 30, label: 'Mostrar 30' },
-          { value: 40, label: 'Mostrar 40' },
-          { value: 50, label: 'Mostrar 50' },
-        ]"
-      ></USelect>
+      <USelect v-model="limitPerPage" :options="[
+        { value: 10, label: 'Mostrar 10' },
+        { value: 20, label: 'Mostrar 20' },
+        { value: 30, label: 'Mostrar 30' },
+        { value: 40, label: 'Mostrar 40' },
+        { value: 50, label: 'Mostrar 50' },
+      ]"></USelect>
     </template>
 
     <template #modals>
@@ -356,21 +329,15 @@ const handleAcceptEdit = async () => {
           Modifica el rol e inabilita usuarios.
         </template>
 
-        <USelect
-          v-model="editFormData.role"
-          :options="[
-            { value: UserRoleE.READER, label: 'Lector' },
-            { value: UserRoleE.LIBRARIAN, label: 'Bibliotecario' },
-            { value: UserRoleE.ADMIN, label: 'Administrador' },
-          ]"
-        />
-        <USelect
-          v-model="editFormData.isDisabled"
-          :options="[
-            { value: 'false', label: 'Habilitado' },
-            { value: 'true', label: 'Inhabilitado' },
-          ]"
-        />
+        <USelect v-model="editFormData.role" :options="[
+          { value: UserRoleE.READER, label: 'Lector' },
+          { value: UserRoleE.LIBRARIAN, label: 'Bibliotecario' },
+          { value: UserRoleE.ADMIN, label: 'Administrador' },
+        ]" />
+        <USelect v-model="editFormData.isDisabled" :options="[
+          { value: 'false', label: 'Habilitado' },
+          { value: 'true', label: 'Inhabilitado' },
+        ]" />
       </Modal>
     </template>
   </DashboardContainer>

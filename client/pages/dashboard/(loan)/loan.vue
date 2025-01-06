@@ -10,6 +10,7 @@ import { transformCondition } from "~/transforms/copy-condition";
 import { type PaginatedI, type LoanI, LoanStatus } from "~/types";
 
 const { data } = useAuthStore();
+const { width } = useWindowSize();
 const paginatedLoans = ref<PaginatedI<LoanI>>();
 const isNotAuthorized = ref(false);
 const url = ref(`${BACKEND_SERVER}/loan/me`);
@@ -95,14 +96,10 @@ const handleFilter = async () => {
           <USelectMenu v-model="selectedFilter" :options="filters" />
         </template>
         <template #search-reset-filter>
-          <Button
-            v-show="selectedFilter !== 'Todo'"
-            @click="
-              selectedFilter = 'Todo';
-              handleFilter();
-            "
-            icon="i-tabler-circle-x-filled"
-          >
+          <Button v-show="selectedFilter !== 'Todo'" @click="
+            selectedFilter = 'Todo';
+          handleFilter();
+          " icon="i-tabler-circle-x-filled">
             Limpiar filtro
           </Button>
         </template>
@@ -114,13 +111,8 @@ const handleFilter = async () => {
       </SearchContainer>
     </template>
 
-    <UTable
-      :loading="paginatedLoans === undefined || !paginatedLoans.data"
-      :columns="columns"
-      :rows="paginatedLoans?.data"
-      v-model:expand="expand"
-      :multiple-expand="false"
-    >
+    <UTable :loading="paginatedLoans === undefined || !paginatedLoans.data" :columns="columns"
+      :rows="paginatedLoans?.data" v-model:expand="expand" :multiple-expand="false">
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
       </template>
@@ -169,16 +161,9 @@ const handleFilter = async () => {
 
       <template #expand="{ row }">
         <div class="p-4 flex flex-col gap-2">
-          <div
-            class="flex flex-col space-y-4 w-full"
-            v-for="copy in row.copies"
-            :key="copy.id"
-          >
+          <div class="flex flex-col space-y-4 w-full" v-for="copy in row.copies" :key="copy.id">
             <!-- Información del ejemplar -->
-            <div
-              class="p-4 border rounded-lg shadow"
-              style="border-color: #ffffff"
-            >
+            <div class="p-4 border rounded-lg shadow" style="border-color: #ffffff">
               <h3 class="text-lg font-semibold text-white">
                 Código: {{ copy.code }}
               </h3>
@@ -256,24 +241,18 @@ const handleFilter = async () => {
     <template #total-pages>{{ paginatedLoans?.lastPage }}</template>
 
     <template #pagination v-if="paginatedLoans">
-      <UPagination
-        v-model="currentPage"
-        :page-count="Number(limitPerPage)"
-        :total="paginatedLoans.total"
-      >
+      <UPagination v-model="currentPage" :page-count="Number(limitPerPage)" :total="paginatedLoans.total"
+        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'">
       </UPagination>
     </template>
     <template #select-limit-per-page>
-      <USelect
-        v-model="limitPerPage"
-        :options="[
-          { value: 10, label: 'Mostrar 10' },
-          { value: 20, label: 'Mostrar 20' },
-          { value: 30, label: 'Mostrar 30' },
-          { value: 40, label: 'Mostrar 40' },
-          { value: 50, label: 'Mostrar 50' },
-        ]"
-      ></USelect>
+      <USelect v-model="limitPerPage" :options="[
+        { value: 10, label: 'Mostrar 10' },
+        { value: 20, label: 'Mostrar 20' },
+        { value: 30, label: 'Mostrar 30' },
+        { value: 40, label: 'Mostrar 40' },
+        { value: 50, label: 'Mostrar 50' },
+      ]"></USelect>
     </template>
   </DashboardContainer>
 </template>

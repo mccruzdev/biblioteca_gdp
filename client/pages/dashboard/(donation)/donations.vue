@@ -9,6 +9,7 @@ import { transformCondition } from "~/transforms/copy-condition";
 import { type PaginatedI, type DonationsI } from "~/types";
 
 const { data } = useAuthStore();
+const { width } = useWindowSize()
 const paginatedDonations = ref<PaginatedI<DonationsI>>();
 const isNotAuthorized = ref(false);
 const url = ref(`${BACKEND_SERVER}/donation`);
@@ -103,45 +104,28 @@ const handleFilter = async () => {
           <USelectMenu v-model="selectedFilter" :options="filters" />
         </template>
         <template #search-input>
-          <UInput
-            v-model="searchInput"
-            name="filter"
-            placeholder="Buscar"
-            :disabled="selectedFilter === 'Todo'"
-          />
+          <UInput v-model="searchInput" name="filter" placeholder="Buscar" :disabled="selectedFilter === 'Todo'" />
         </template>
         <template #search-reset-filter>
-          <Button
-            v-show="selectedFilter !== 'Todo' || searchInput !== ''"
-            @click="
-              selectedFilter = 'Todo';
-              searchInput = '';
-              handleFilter();
-            "
-            icon="i-tabler-circle-x-filled"
-          >
+          <Button v-show="selectedFilter !== 'Todo' || searchInput !== ''" @click="
+            selectedFilter = 'Todo';
+          searchInput = '';
+          handleFilter();
+          " icon="i-tabler-circle-x-filled">
             Limpiar filtro
           </Button>
         </template>
         <template #search-button>
-          <Button
-            @click="handleFilter"
-            icon="i-heroicons-magnifying-glass"
-            :disabled="!searchInput && selectedFilter !== 'Todo'"
-          >
+          <Button @click="handleFilter" icon="i-heroicons-magnifying-glass"
+            :disabled="!searchInput && selectedFilter !== 'Todo'">
             Filtrar
           </Button>
         </template>
       </SearchContainer>
     </template>
 
-    <UTable
-      :loading="paginatedDonations === undefined || !paginatedDonations.data"
-      :columns="columns"
-      :rows="paginatedDonations?.data"
-      v-model:expand="expand"
-      :multiple-expand="false"
-    >
+    <UTable :loading="paginatedDonations === undefined || !paginatedDonations.data" :columns="columns"
+      :rows="paginatedDonations?.data" v-model:expand="expand" :multiple-expand="false">
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
       </template>
@@ -192,16 +176,9 @@ const handleFilter = async () => {
 
       <template #expand="{ row }">
         <div class="p-4 flex flex-col gap-2">
-          <div
-            class="flex flex-col space-y-4 w-full"
-            v-for="copy in row.copies"
-            :key="copy.id"
-          >
+          <div class="flex flex-col space-y-4 w-full" v-for="copy in row.copies" :key="copy.id">
             <!-- Información del ejemplar -->
-            <div
-              class="p-4 border rounded-lg shadow"
-              style="border-color: #ffffff"
-            >
+            <div class="p-4 border rounded-lg shadow" style="border-color: #ffffff">
               <h3 class="text-lg font-semibold text-white">
                 Código: {{ copy.code }}
               </h3>
@@ -279,24 +256,18 @@ const handleFilter = async () => {
     <template #total-pages>{{ paginatedDonations?.lastPage }}</template>
 
     <template #pagination v-if="paginatedDonations">
-      <UPagination
-        v-model="currentPage"
-        :page-count="Number(limitPerPage)"
-        :total="paginatedDonations.total"
-      >
+      <UPagination v-model="currentPage" :page-count="Number(limitPerPage)" :total="paginatedDonations.total"
+        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'">
       </UPagination>
     </template>
     <template #select-limit-per-page>
-      <USelect
-        v-model="limitPerPage"
-        :options="[
-          { value: 10, label: 'Mostrar 10' },
-          { value: 20, label: 'Mostrar 20' },
-          { value: 30, label: 'Mostrar 30' },
-          { value: 40, label: 'Mostrar 40' },
-          { value: 50, label: 'Mostrar 50' },
-        ]"
-      ></USelect>
+      <USelect v-model="limitPerPage" :options="[
+        { value: 10, label: 'Mostrar 10' },
+        { value: 20, label: 'Mostrar 20' },
+        { value: 30, label: 'Mostrar 30' },
+        { value: 40, label: 'Mostrar 40' },
+        { value: 50, label: 'Mostrar 50' },
+      ]"></USelect>
     </template>
   </DashboardContainer>
 </template>

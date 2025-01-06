@@ -17,7 +17,7 @@
         </h1>
       </div>
       <div class="z-10 bg-white p-4 rounded-2xl shadow-lg w-full mb-8">
-        <h2 class="text-2xl font-extrabold text-center mb-3">
+        <h2 class="text-2xl font-extrabold text-center mb-3 text-black">
           <slot name="header-title" />
         </h2>
         <p class="text-sm text-center text-gray-600 mb-4">

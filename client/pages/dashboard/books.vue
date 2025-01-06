@@ -11,12 +11,12 @@ import {
   type BookConditionT,
   BookConditionE,
   type CopyI,
-  type Copy,
   type LocationI,
   type PublisherI,
 } from "~/types";
 
 const { data } = useAuthStore();
+const { width } = useWindowSize()
 const toast = useToast();
 const paginatedBooks = ref<PaginatedI<BookI>>();
 const isNotAuthorized = ref(false);
@@ -559,32 +559,20 @@ const handleAcceptEditCopy = async () => {
           <USelectMenu v-model="selectedFilter" :options="filters" />
         </template>
         <template #search-input>
-          <UInput
-            v-model="searchInput"
-            name="filter"
-            placeholder="Buscar"
-            :disabled="selectedFilter === 'Todo'"
-          />
+          <UInput v-model="searchInput" name="filter" placeholder="Buscar" :disabled="selectedFilter === 'Todo'" />
         </template>
         <template #search-reset-filter>
-          <Button
-            v-show="selectedFilter !== 'Todo' || searchInput !== ''"
-            @click="
-              selectedFilter = 'Todo';
-              searchInput = '';
-              handleFilter();
-            "
-            icon="i-tabler-circle-x-filled"
-          >
+          <Button v-show="selectedFilter !== 'Todo' || searchInput !== ''" @click="
+            selectedFilter = 'Todo';
+          searchInput = '';
+          handleFilter();
+          " icon="i-tabler-circle-x-filled">
             Limpiar filtro
           </Button>
         </template>
         <template #search-button>
-          <Button
-            @click="handleFilter"
-            icon="i-heroicons-magnifying-glass"
-            :disabled="!searchInput && selectedFilter !== 'Todo'"
-          >
+          <Button @click="handleFilter" icon="i-heroicons-magnifying-glass"
+            :disabled="!searchInput && selectedFilter !== 'Todo'">
             Filtrar
           </Button>
         </template>
@@ -601,13 +589,8 @@ const handleAcceptEditCopy = async () => {
       </ActionsContainer>
     </template>
 
-    <UTable
-      :loading="paginatedBooks === undefined || !paginatedBooks.data"
-      :columns="columns"
-      :rows="paginatedBooks?.data"
-      v-model:expand="expand"
-      :multiple-expand="false"
-    >
+    <UTable :loading="paginatedBooks === undefined || !paginatedBooks.data" :columns="columns"
+      :rows="paginatedBooks?.data" v-model:expand="expand" :multiple-expand="false">
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
       </template>
@@ -666,41 +649,23 @@ const handleAcceptEditCopy = async () => {
       </template>
       <template #actions-data="{ row }">
         <UDropdown :items="items(row)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
+          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
 
           <template #item="{ item }">
             <span class="truncate text-black">{{ item.label }}</span>
 
-            <UIcon
-              :name="item.icon"
-              class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto"
-            />
+            <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto" />
           </template>
         </UDropdown>
       </template>
 
       <template #expand="{ row }">
         <div class="p-4 flex flex-col gap-2">
-          <div
-            class="flex flex-col space-y-4 w-full"
-            v-for="copy in row.copies"
-            :key="copy.id"
-          >
+          <div class="flex flex-col space-y-4 w-full" v-for="copy in row.copies" :key="copy.id">
             <!-- Información del ejemplar -->
-            <div
-              class="p-4 border rounded-lg shadow"
-              style="border-color: #ffffff"
-            >
+            <div class="p-4 border rounded-lg shadow" style="border-color: #ffffff">
               <div class="flex w-40">
-                <Button
-                  icon="i-mdi-edit"
-                  @click="() => handleEditCopy(copy)"
-                  class="mb-4"
-                >
+                <Button icon="i-mdi-edit" @click="() => handleEditCopy(copy)" class="mb-4">
                   Editar
                 </Button>
               </div>
@@ -781,206 +746,115 @@ const handleAcceptEditCopy = async () => {
     <template #total-pages>{{ paginatedBooks?.lastPage }}</template>
 
     <template #pagination v-if="paginatedBooks">
-      <UPagination
-        v-model="currentPage"
-        :page-count="Number(limitPerPage)"
-        :total="paginatedBooks.total"
-      >
+      <UPagination v-model="currentPage" :page-count="Number(limitPerPage)" :total="paginatedBooks.total"
+        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'">
       </UPagination>
     </template>
     <template #select-limit-per-page>
-      <USelect
-        v-model="limitPerPage"
-        :options="[
-          { value: 10, label: 'Mostrar 10' },
-          { value: 20, label: 'Mostrar 20' },
-          { value: 30, label: 'Mostrar 30' },
-          { value: 40, label: 'Mostrar 40' },
-          { value: 50, label: 'Mostrar 50' },
-        ]"
-      ></USelect>
+      <USelect v-model="limitPerPage" :options="[
+        { value: 10, label: 'Mostrar 10' },
+        { value: 20, label: 'Mostrar 20' },
+        { value: 30, label: 'Mostrar 30' },
+        { value: 40, label: 'Mostrar 40' },
+        { value: 50, label: 'Mostrar 50' },
+      ]"></USelect>
     </template>
 
     <template #modals>
       <!-- Add Book -->
-      <Modal
-        v-model="showAddBookModal"
-        :disabled-accept-button="disabledAcceptButtonAddBook"
-        @handle-accept="handleAcceptAddBook"
-      >
+      <Modal v-model="showAddBookModal" :disabled-accept-button="disabledAcceptButtonAddBook"
+        @handle-accept="handleAcceptAddBook">
         <template #header-title>Agrega un Libro</template>
         <template #header-description>
           Agrega un nuevo libro al catálogo
         </template>
 
         <div class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col">
-          <FormBaseInput
-            v-model="addBookFormData.title"
-            name="title"
-            label="Título"
-            placeholder="Ingrese el título del libro"
-            required
-          />
-          <FormBaseInput
-            v-model="addBookFormData.pages"
-            name="pages"
-            label="Páginas"
-            placeholder="Ingrese el número de páginas del libro"
-          />
-          <FormBaseInput
-            v-model="addBookFormData.category"
-            name="category"
-            label="Categoría"
-            placeholder="Ingrese la categoría del libro"
-          />
-          <FormBaseInput
-            v-model="addBookFormData.subcategory"
-            name="subcategory"
-            label="Subcategoría"
-            placeholder="Ingrese la subcategoría del libro"
-          />
+          <FormBaseInput v-model="addBookFormData.title" name="title" label="Título"
+            placeholder="Ingrese el título del libro" required />
+          <FormBaseInput v-model="addBookFormData.pages" name="pages" label="Páginas"
+            placeholder="Ingrese el número de páginas del libro" />
+          <FormBaseInput v-model="addBookFormData.category" name="category" label="Categoría"
+            placeholder="Ingrese la categoría del libro" />
+          <FormBaseInput v-model="addBookFormData.subcategory" name="subcategory" label="Subcategoría"
+            placeholder="Ingrese la subcategoría del libro" />
 
           <Button icon="i-mdi-plus" @click="handleAddNewAuthor">
             Agregar Autor
           </Button>
 
           <div class="flex flex-col gap-4">
-            <div
-              class="flex outline outline-1 outline-white p-2 rounded-md"
-              v-for="author in addBookFormData.authors"
-            >
+            <div class="flex outline outline-1 outline-white p-2 rounded-md" v-for="author in addBookFormData.authors">
               <p class="text-white flex-1">
                 {{ author.name }}{{ author.email ? ` - ${author.email}` : "" }}
               </p>
-              <UButton
-                class="cursor-pointer text-red-600"
-                variant="ghost"
-                icon="i-mdi-delete-forever"
-                @click="handleRemoveAuthor(author)"
-              />
+              <UButton class="cursor-pointer text-red-600" variant="ghost" icon="i-mdi-delete-forever"
+                @click="handleRemoveAuthor(author)" />
             </div>
           </div>
         </div>
 
-        <Modal
-          v-model="showAddAuthorModal"
-          :disabled-accept-button="disabledAcceptButtonAddAuthor"
-          @handle-accept="handleAcceptAddAuthor"
-        >
+        <Modal v-model="showAddAuthorModal" :disabled-accept-button="disabledAcceptButtonAddAuthor"
+          @handle-accept="handleAcceptAddAuthor">
           <template #header-title>Agrega un Autor</template>
           <template #header-description>
             Agrega un autor para el libro
           </template>
 
-          <FormBaseInput
-            v-model="authorFormData.name"
-            name="author-name"
-            label="Nombre"
-            placeholder="Ingrese el nombre del autor"
-            required
-          />
-          <FormBaseInput
-            v-model="authorFormData.email"
-            name="author-email"
-            label="Correo"
-            placeholder="Ingrese el correo del autor"
-            type="email"
-          />
+          <FormBaseInput v-model="authorFormData.name" name="author-name" label="Nombre"
+            placeholder="Ingrese el nombre del autor" required />
+          <FormBaseInput v-model="authorFormData.email" name="author-email" label="Correo"
+            placeholder="Ingrese el correo del autor" type="email" />
         </Modal>
       </Modal>
       <!-- Edit Book -->
-      <Modal
-        v-model="showEditBookModal"
-        :disable-accept-button="disabledAcceptButtonEditBook"
-        :loading="loadingAcceptEditButton"
-        @handle-accept="handleAcceptEditBook"
-      >
+      <Modal v-model="showEditBookModal" :disable-accept-button="disabledAcceptButtonEditBook"
+        :loading="loadingAcceptEditButton" @handle-accept="handleAcceptEditBook">
         <template #header-title>Edita un Libro</template>
         <template #header-description>
           Edita un nuevo libro del catálogo
         </template>
 
         <div class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col">
-          <FormBaseInput
-            v-model="editBookFormData.title"
-            name="title"
-            label="Título"
-            placeholder="Ingrese el título del libro"
-            required
-          />
-          <FormBaseInput
-            v-model="editBookFormData.pages"
-            name="pages"
-            label="Páginas"
-            placeholder="Ingrese el número de páginas del libro"
-          />
-          <FormBaseInput
-            v-model="editBookFormData.category"
-            name="category"
-            label="Categoría"
-            placeholder="Ingrese la categoría del libro"
-          />
-          <FormBaseInput
-            v-model="editBookFormData.subcategory"
-            name="subcategory"
-            label="Subcategoría"
-            placeholder="Ingrese la subcategoría del libro"
-          />
+          <FormBaseInput v-model="editBookFormData.title" name="title" label="Título"
+            placeholder="Ingrese el título del libro" required />
+          <FormBaseInput v-model="editBookFormData.pages" name="pages" label="Páginas"
+            placeholder="Ingrese el número de páginas del libro" />
+          <FormBaseInput v-model="editBookFormData.category" name="category" label="Categoría"
+            placeholder="Ingrese la categoría del libro" />
+          <FormBaseInput v-model="editBookFormData.subcategory" name="subcategory" label="Subcategoría"
+            placeholder="Ingrese la subcategoría del libro" />
 
           <Button icon="i-mdi-plus" @click="handleAddNewAuthorToEditForm">
             Agregar Autor
           </Button>
 
           <div class="flex flex-col gap-4">
-            <div
-              class="flex outline outline-1 outline-white p-2 rounded-md"
-              v-for="author in editBookFormData.authors"
-            >
+            <div class="flex outline outline-1 outline-white p-2 rounded-md" v-for="author in editBookFormData.authors">
               <p class="text-white flex-1">
                 {{ author.name }}{{ author.email ? ` - ${author.email}` : "" }}
               </p>
-              <UButton
-                class="cursor-pointer text-red-600"
-                variant="ghost"
-                icon="i-mdi-delete-forever"
-                @click="handleRemoveAuthorOfEditBookForm(author)"
-              />
+              <UButton class="cursor-pointer text-red-600" variant="ghost" icon="i-mdi-delete-forever"
+                @click="handleRemoveAuthorOfEditBookForm(author)" />
             </div>
           </div>
         </div>
 
-        <Modal
-          v-model="showEditAuthorModal"
-          :disabled-accept-button="disabledAcceptButtonEditAuthor"
-          @handle-accept="handleAcceptAddAuthorToEditForm"
-        >
+        <Modal v-model="showEditAuthorModal" :disabled-accept-button="disabledAcceptButtonEditAuthor"
+          @handle-accept="handleAcceptAddAuthorToEditForm">
           <template #header-title>Agrega un Autor</template>
           <template #header-description>
             Agrega un autor para el libro
           </template>
 
-          <FormBaseInput
-            v-model="authorFormData.name"
-            name="author-name"
-            label="Nombre"
-            placeholder="Ingrese el nombre del autor"
-            required
-          />
-          <FormBaseInput
-            v-model="authorFormData.email"
-            name="author-email"
-            label="Correo"
-            placeholder="Ingrese el correo del autor"
-            type="email"
-          />
+          <FormBaseInput v-model="authorFormData.name" name="author-name" label="Nombre"
+            placeholder="Ingrese el nombre del autor" required />
+          <FormBaseInput v-model="authorFormData.email" name="author-email" label="Correo"
+            placeholder="Ingrese el correo del autor" type="email" />
         </Modal>
       </Modal>
       <!-- Add copy -->
-      <Modal
-        v-model="showAddCopiesModal"
-        :loading="loadingAddCopiesButton"
-        @handle-accept="handleAcceptAddCopies"
-      >
+      <Modal v-model="showAddCopiesModal" :loading="loadingAddCopiesButton" @handle-accept="handleAcceptAddCopies">
         <template #header-title>Agrega una copia</template>
         <template #header-description>
           Agrega una copia del libro &quot;
@@ -989,95 +863,43 @@ const handleAcceptEditCopy = async () => {
         </template>
 
         <div class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col">
-          <FormBaseInput
-            v-model="copyFormData.code"
-            name="copy-code"
-            label="Código del libro"
-            placeholder="Ingrese el código del libro"
-            required
-          />
-          <USelect
-            v-model="copyFormData.condition"
-            :options="[
-              { value: BookConditionE.NEW, label: 'Nuevo' },
-              { value: BookConditionE.GOOD, label: 'Bueno' },
-              { value: BookConditionE.FAIR, label: 'Regular' },
-              { value: BookConditionE.DAMAGED, label: 'Dañado' },
-              { value: BookConditionE.BAD, label: 'Malo' },
-            ]"
-          />
+          <FormBaseInput v-model="copyFormData.code" name="copy-code" label="Código del libro"
+            placeholder="Ingrese el código del libro" required />
+          <USelect v-model="copyFormData.condition" :options="[
+            { value: BookConditionE.NEW, label: 'Nuevo' },
+            { value: BookConditionE.GOOD, label: 'Bueno' },
+            { value: BookConditionE.FAIR, label: 'Regular' },
+            { value: BookConditionE.DAMAGED, label: 'Dañado' },
+            { value: BookConditionE.BAD, label: 'Malo' },
+          ]" />
 
           <p class="w-full text-center text-white font-bold">Ubicación</p>
 
-          <FormBaseInput
-            v-model="copyFormData.location.shelf"
-            name="copy-location-shelf"
-            label="Estante"
-            placeholder="Estante donde se encuentra"
-            required
-          />
-          <FormBaseInput
-            v-model="copyFormData.location.shelfColor"
-            name="copy-location-shelfcolor"
-            label="Color del estante"
-            placeholder="Color del estante donde se encuentra"
-          />
-          <FormBaseInput
-            v-model="copyFormData.location.shelfLevel"
-            name="copy-location-shelflevel"
-            label="Nivel del estante"
-            placeholder="Nivel del estante donde se encuentra"
-          />
+          <FormBaseInput v-model="copyFormData.location.shelf" name="copy-location-shelf" label="Estante"
+            placeholder="Estante donde se encuentra" required />
+          <FormBaseInput v-model="copyFormData.location.shelfColor" name="copy-location-shelfcolor"
+            label="Color del estante" placeholder="Color del estante donde se encuentra" />
+          <FormBaseInput v-model="copyFormData.location.shelfLevel" name="copy-location-shelflevel"
+            label="Nivel del estante" placeholder="Nivel del estante donde se encuentra" />
 
           <p class="w-full text-center text-white font-bold">Editorial</p>
 
-          <FormBaseInput
-            v-model="copyFormData.publisher.name"
-            name="copy-publisher-name"
-            label="Nombre de la editorial"
-            placeholder="Nombre de la editorial"
-            required
-          />
-          <FormBaseInput
-            v-model="copyFormData.publisher.email"
-            name="copy-publisher-email"
-            label="Correo de la editorial"
-            placeholder="Correo de la editorial"
-            type="email"
-          />
-          <FormBaseInput
-            v-model="copyFormData.publisher.country"
-            name="copy-publisher-country"
-            label="País de la editorial"
-            placeholder="País de la editorial"
-          />
-          <FormBaseInput
-            v-model="copyFormData.publisher.address"
-            name="copy-publisher-address"
-            label="Dirección de la editorial"
-            placeholder="Dirección de la editorial"
-          />
-          <FormBaseInput
-            v-model="copyFormData.publisher.phoneNumber"
-            name="copy-publisher-phonenumber"
-            label="Teléfono de la editorial"
-            placeholder="Número de teléfono de la editorial"
-            type="tel"
-          />
-          <FormBaseInput
-            v-model="copyFormData.publisher.website"
-            name="copy-publisher-website"
-            label="Sitio web de la editorial"
-            placeholder="Sitio Web de la editorial"
-          />
+          <FormBaseInput v-model="copyFormData.publisher.name" name="copy-publisher-name" label="Nombre de la editorial"
+            placeholder="Nombre de la editorial" required />
+          <FormBaseInput v-model="copyFormData.publisher.email" name="copy-publisher-email"
+            label="Correo de la editorial" placeholder="Correo de la editorial" type="email" />
+          <FormBaseInput v-model="copyFormData.publisher.country" name="copy-publisher-country"
+            label="País de la editorial" placeholder="País de la editorial" />
+          <FormBaseInput v-model="copyFormData.publisher.address" name="copy-publisher-address"
+            label="Dirección de la editorial" placeholder="Dirección de la editorial" />
+          <FormBaseInput v-model="copyFormData.publisher.phoneNumber" name="copy-publisher-phonenumber"
+            label="Teléfono de la editorial" placeholder="Número de teléfono de la editorial" type="tel" />
+          <FormBaseInput v-model="copyFormData.publisher.website" name="copy-publisher-website"
+            label="Sitio web de la editorial" placeholder="Sitio Web de la editorial" />
         </div>
       </Modal>
       <!-- Edit Copy -->
-      <Modal
-        v-model="showEditCopyModal"
-        :loading="loadingEditCopyAcceptButton"
-        @handle-accept="handleAcceptEditCopy"
-      >
+      <Modal v-model="showEditCopyModal" :loading="loadingEditCopyAcceptButton" @handle-accept="handleAcceptEditCopy">
         <template #header-title>Edita una copia</template>
         <template #header-description>
           Edita una copia del libro &quot;
@@ -1085,84 +907,38 @@ const handleAcceptEditCopy = async () => {
           &quot;
         </template>
 
-        <div
-          class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col"
-          v-if="editCopyFormData"
-        >
-          <USelect
-            v-model="editCopyFormData.condition"
-            :options="[
-              { value: BookConditionE.NEW, label: 'Nuevo' },
-              { value: BookConditionE.GOOD, label: 'Bueno' },
-              { value: BookConditionE.FAIR, label: 'Regular' },
-              { value: BookConditionE.DAMAGED, label: 'Dañado' },
-              { value: BookConditionE.BAD, label: 'Malo' },
-            ]"
-          />
+        <div class="max-h-60 overflow-y-auto py-4 px-2 flex gap-3 flex-col" v-if="editCopyFormData">
+          <USelect v-model="editCopyFormData.condition" :options="[
+            { value: BookConditionE.NEW, label: 'Nuevo' },
+            { value: BookConditionE.GOOD, label: 'Bueno' },
+            { value: BookConditionE.FAIR, label: 'Regular' },
+            { value: BookConditionE.DAMAGED, label: 'Dañado' },
+            { value: BookConditionE.BAD, label: 'Malo' },
+          ]" />
 
           <p class="w-full text-center text-white font-bold">Ubicación</p>
 
-          <FormBaseInput
-            v-model="editCopyFormData.location.shelf"
-            name="copy-location-shelf"
-            label="Estante"
-            placeholder="Estante donde se encuentra"
-            required
-          />
-          <FormBaseInput
-            v-model="editCopyFormData.location.shelfColor"
-            name="copy-location-shelfcolor"
-            label="Color del estante"
-            placeholder="Color del estante donde se encuentra"
-          />
-          <FormBaseInput
-            v-model="editCopyFormData.location.shelfLevel"
-            name="copy-location-shelflevel"
-            label="Nivel del estante"
-            placeholder="Nivel del estante donde se encuentra"
-          />
+          <FormBaseInput v-model="editCopyFormData.location.shelf" name="copy-location-shelf" label="Estante"
+            placeholder="Estante donde se encuentra" required />
+          <FormBaseInput v-model="editCopyFormData.location.shelfColor" name="copy-location-shelfcolor"
+            label="Color del estante" placeholder="Color del estante donde se encuentra" />
+          <FormBaseInput v-model="editCopyFormData.location.shelfLevel" name="copy-location-shelflevel"
+            label="Nivel del estante" placeholder="Nivel del estante donde se encuentra" />
 
           <p class="w-full text-center text-white font-bold">Editorial</p>
 
-          <FormBaseInput
-            v-model="editCopyFormData.publisher.name"
-            name="copy-publisher-name"
-            label="Nombre de la editorial"
-            placeholder="Nombre de la editorial"
-            required
-          />
-          <FormBaseInput
-            v-model="editCopyFormData.publisher.email"
-            name="copy-publisher-email"
-            label="Correo de la editorial"
-            placeholder="Correo de la editorial"
-            type="email"
-          />
-          <FormBaseInput
-            v-model="editCopyFormData.publisher.country"
-            name="copy-publisher-country"
-            label="País de la editorial"
-            placeholder="País de la editorial"
-          />
-          <FormBaseInput
-            v-model="editCopyFormData.publisher.address"
-            name="copy-publisher-address"
-            label="Dirección de la editorial"
-            placeholder="Dirección de la editorial"
-          />
-          <FormBaseInput
-            v-model="editCopyFormData.publisher.phoneNumber"
-            name="copy-publisher-phonenumber"
-            label="Teléfono de la editorial"
-            placeholder="Número de teléfono de la editorial"
-            type="tel"
-          />
-          <FormBaseInput
-            v-model="editCopyFormData.publisher.website"
-            name="copy-publisher-website"
-            label="Sitio web de la editorial"
-            placeholder="Sitio Web de la editorial"
-          />
+          <FormBaseInput v-model="editCopyFormData.publisher.name" name="copy-publisher-name"
+            label="Nombre de la editorial" placeholder="Nombre de la editorial" required />
+          <FormBaseInput v-model="editCopyFormData.publisher.email" name="copy-publisher-email"
+            label="Correo de la editorial" placeholder="Correo de la editorial" type="email" />
+          <FormBaseInput v-model="editCopyFormData.publisher.country" name="copy-publisher-country"
+            label="País de la editorial" placeholder="País de la editorial" />
+          <FormBaseInput v-model="editCopyFormData.publisher.address" name="copy-publisher-address"
+            label="Dirección de la editorial" placeholder="Dirección de la editorial" />
+          <FormBaseInput v-model="editCopyFormData.publisher.phoneNumber" name="copy-publisher-phonenumber"
+            label="Teléfono de la editorial" placeholder="Número de teléfono de la editorial" type="tel" />
+          <FormBaseInput v-model="editCopyFormData.publisher.website" name="copy-publisher-website"
+            label="Sitio web de la editorial" placeholder="Sitio Web de la editorial" />
         </div>
       </Modal>
     </template>

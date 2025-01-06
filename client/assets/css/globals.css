@@ -40,6 +40,18 @@ table tbody tr {
 
 table tbody tr td {
   background-color: transparent !important;
+  max-width: 180px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+table tbody tr td span {
+  display: inline-block;
+  max-width: 100%; /* Asegura que el span no exceda el ancho de la celda */
+  word-wrap: break-word; /* Permite que las palabras largas se dividan */
+  overflow-wrap: break-word; /* Alternativa para soporte más amplio */
+  white-space: normal; /* Permite el salto de línea */
 }
 
 @layer base {

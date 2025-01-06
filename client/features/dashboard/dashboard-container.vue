@@ -25,13 +25,13 @@
           </div>
         </section>
 
-        <div
-          class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-2 py-4"
-        >
-          <div className="flex-1 text-sm text-[#C7C7CC]">
-            Página <slot name="current-page" /> de <slot name="total-pages" />
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+          <div class="flex-1 text-sm text-[#C7C7CC]">
+            Página
+            <slot name="current-page" /> de
+            <slot name="total-pages" />
           </div>
-          <div className="flex items-center space-x-2">
+          <div class="flex flex-col sm:flex-row items-center gap-2">
             <slot name="pagination" />
             <slot name="select-limit-per-page" />
           </div>

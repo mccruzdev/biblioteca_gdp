@@ -15,6 +15,7 @@ import {
 } from "~/types";
 
 const { data } = useAuthStore();
+const { width } = useWindowSize();
 const toast = useToast();
 const paginatedReservations = ref<PaginatedI<ReservationI>>();
 const isNotAuthorized = ref(false);
@@ -213,14 +214,10 @@ const handleAcceptConvertToLoan = async () => {
           <USelectMenu v-model="selectedFilter" :options="filters" />
         </template>
         <template #search-reset-filter>
-          <Button
-            v-show="selectedFilter !== 'Todo'"
-            @click="
-              selectedFilter = 'Todo';
-              handleFilter();
-            "
-            icon="i-tabler-circle-x-filled"
-          >
+          <Button v-show="selectedFilter !== 'Todo'" @click="
+            selectedFilter = 'Todo';
+          handleFilter();
+          " icon="i-tabler-circle-x-filled">
             Limpiar filtro
           </Button>
         </template>
@@ -232,15 +229,8 @@ const handleAcceptConvertToLoan = async () => {
       </SearchContainer>
     </template>
 
-    <UTable
-      :loading="
-        paginatedReservations === undefined || !paginatedReservations.data
-      "
-      :columns="columns"
-      :rows="paginatedReservations?.data"
-      v-model:expand="expand"
-      :multiple-expand="false"
-    >
+    <UTable :loading="paginatedReservations === undefined || !paginatedReservations.data
+      " :columns="columns" :rows="paginatedReservations?.data" v-model:expand="expand" :multiple-expand="false">
       <template #id-header="{ column }">
         <span class="text-white">{{ column.label }}</span>
       </template>
@@ -290,46 +280,32 @@ const handleAcceptConvertToLoan = async () => {
             row.status === "PENDING"
               ? "Pendiente"
               : row.status === "PICKED_UP"
-              ? "Recogido"
-              : row.status === "CANCELED"
-              ? "Cancelado"
-              : "Expirado"
+                ? "Recogido"
+                : row.status === "CANCELED"
+                  ? "Cancelado"
+                  : "Expirado"
           }}
         </span>
       </template>
       <template #actions-data="{ row }">
         <UDropdown :items="items(row, row.status)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
+          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
 
           <template #item="{ item }">
             <span class="truncate text-black">
               {{ item.label }}
             </span>
 
-            <UIcon
-              :name="item.icon"
-              class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto"
-            />
+            <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-black dark:text-gray-500 ms-auto" />
           </template>
         </UDropdown>
       </template>
 
       <template #expand="{ row }">
         <div class="p-4 flex flex-col gap-2">
-          <div
-            class="flex flex-col space-y-4 w-full"
-            v-for="copy in row.copies"
-            :key="copy.id"
-          >
+          <div class="flex flex-col space-y-4 w-full" v-for="copy in row.copies" :key="copy.id">
             <!-- Información del ejemplar -->
-            <div
-              class="p-4 border rounded-lg shadow"
-              style="border-color: #ffffff"
-            >
+            <div class="p-4 border rounded-lg shadow" style="border-color: #ffffff">
               <h3 class="text-lg font-semibold text-white">
                 Código: {{ copy.code }}
               </h3>
@@ -407,51 +383,33 @@ const handleAcceptConvertToLoan = async () => {
     <template #total-pages>{{ paginatedReservations?.lastPage }}</template>
 
     <template #pagination v-if="paginatedReservations">
-      <UPagination
-        v-model="currentPage"
-        :page-count="Number(limitPerPage)"
-        :total="paginatedReservations.total"
-      >
+      <UPagination v-model="currentPage" :page-count="Number(limitPerPage)" :total="paginatedReservations.total"
+        :size="width <= 360 ? '2xs' : width <= 450 ? 'xs' : 'sm'">
       </UPagination>
     </template>
     <template #select-limit-per-page>
-      <USelect
-        v-model="limitPerPage"
-        :options="[
-          { value: 10, label: 'Mostrar 10' },
-          { value: 20, label: 'Mostrar 20' },
-          { value: 30, label: 'Mostrar 30' },
-          { value: 40, label: 'Mostrar 40' },
-          { value: 50, label: 'Mostrar 50' },
-        ]"
-      ></USelect>
+      <USelect v-model="limitPerPage" :options="[
+        { value: 10, label: 'Mostrar 10' },
+        { value: 20, label: 'Mostrar 20' },
+        { value: 30, label: 'Mostrar 30' },
+        { value: 40, label: 'Mostrar 40' },
+        { value: 50, label: 'Mostrar 50' },
+      ]"></USelect>
     </template>
 
     <template #modals>
-      <Modal
-        v-model="showEditStatusModal"
-        :loading="loadingButton"
-        @handle-accept="handleAcceptEditStatusReservation"
-      >
+      <Modal v-model="showEditStatusModal" :loading="loadingButton" @handle-accept="handleAcceptEditStatusReservation">
         <template #header-title>Editar Reserva</template>
         <template #header-description> Edita el estado de la reserva </template>
 
-        <USelect
-          v-if="editStatusFormData"
-          v-model="editStatusFormData.status"
-          :options="[
-            { value: ReservationStatusE.PENDING, label: 'Pendiente' },
-            { value: ReservationStatusE.PICKED_UP, label: 'Recogido' },
-            { value: ReservationStatusE.EXPIRED, label: 'Expirado' },
-            { value: ReservationStatusE.CANCELED, label: 'Cancelado' },
-          ]"
-        ></USelect>
+        <USelect v-if="editStatusFormData" v-model="editStatusFormData.status" :options="[
+          { value: ReservationStatusE.PENDING, label: 'Pendiente' },
+          { value: ReservationStatusE.PICKED_UP, label: 'Recogido' },
+          { value: ReservationStatusE.EXPIRED, label: 'Expirado' },
+          { value: ReservationStatusE.CANCELED, label: 'Cancelado' },
+        ]"></USelect>
       </Modal>
-      <Modal
-        v-model="showConvertToLoanModal"
-        :loading="loadingButton"
-        @handle-accept="handleAcceptConvertToLoan"
-      >
+      <Modal v-model="showConvertToLoanModal" :loading="loadingButton" @handle-accept="handleAcceptConvertToLoan">
         <template #header-title>Convertir a préstamo</template>
         <template #header-description>
           Convierte la reserva a préstamo
@@ -461,18 +419,11 @@ const handleAcceptConvertToLoan = async () => {
 
         <div class="flex">
           <UPopover :popper="{ placement: 'bottom-start' }">
-            <UButton
-              icon="i-heroicons-calendar-days-20-solid"
-              :label="format(reservationDate, 'd MMM, yyy', { locale: es })"
-            />
+            <UButton icon="i-heroicons-calendar-days-20-solid"
+              :label="format(reservationDate, 'd MMM, yyy', { locale: es })" />
 
             <template #panel="{ close }">
-              <DatePicker
-                v-model="reservationDate"
-                :min-date="new Date()"
-                is-required
-                @close="close"
-              />
+              <DatePicker v-model="reservationDate" :min-date="new Date()" is-required @close="close" />
             </template>
           </UPopover>
         </div>
