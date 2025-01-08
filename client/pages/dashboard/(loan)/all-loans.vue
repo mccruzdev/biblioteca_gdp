@@ -139,8 +139,7 @@ const handleAcceptEditStatusButton = async () => {
         description: "El préstamo ha sido actualizado con éxito",
       });
 
-      if (currentPage.value === paginatedLoans.value?.lastPage)
-        await fetchLoans(currentPage.value, Number(limitPerPage.value));
+      await fetchLoans(currentPage.value, Number(limitPerPage.value));
     }
   } catch {
     toast.add({
@@ -206,6 +205,13 @@ const handleAcceptEditStatusButton = async () => {
               {{ format(new Date(row.dueDate), "dd-MM-yyyy", { locale: es }) }}
             </p>
             <p><strong>Status:</strong> {{ transformLoanStatus(row.status) }}</p>
+          </div>
+
+          <div
+            class="mt-4 p-4 bg-gray-700 rounded-lg cursor-pointer"
+            @click="toggleExpand(row)"
+          >
+            <span class="text-white font-semibold">Ver detalles</span>
           </div>
 
           <!-- Expansión -->
@@ -278,15 +284,6 @@ const handleAcceptEditStatusButton = async () => {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="mt-4">
-            <button
-              @click="toggleExpand(row)"
-              class="bg-blue-500 text-white py-2 px-4 rounded"
-            >
-              {{ expand.row?.id === row.id ? "Ocultar detalles" : "Ver detalles" }}
-            </button>
           </div>
         </div>
       </div>

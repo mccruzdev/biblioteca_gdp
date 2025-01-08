@@ -46,7 +46,7 @@ export class CopyService {
             },
           },
         },
-        where: { Book: { id } },
+        where: { Book: { id }, isDeleted: { equals: false } },
       },
       { page, limit, path: 'copy' },
     );
@@ -164,7 +164,10 @@ export class CopyService {
 
   async deleteCopy(id: number) {
     try {
-      await this.prisma.copy.delete({ where: { id } });
+      await this.prisma.copy.update({
+        data: { isDeleted: true },
+        where: { id },
+      });
     } catch (error) {
       throw new HttpException(
         'Error updating the copy, please verify the provided data.',

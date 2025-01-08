@@ -73,6 +73,14 @@ const expand = ref<Expanded<BookI>>({
   row: null,
 });
 
+const toggleExpand = (row: BookI) => {
+  if (expand.value.row?.id === row.id) {
+    expand.value.row = null;
+  } else {
+    expand.value.row = row;
+  }
+};
+
 // Pagination
 
 const currentPage = ref(1);
@@ -166,8 +174,7 @@ const handleAcceptAddBook = async () => {
         title: "El libro se a creado con éxito",
       });
 
-      if (currentPage.value === paginatedBooks.value?.lastPage)
-        await fetchBooks(currentPage.value, Number(limitPerPage.value));
+      await fetchBooks(currentPage.value, Number(limitPerPage.value));
     }
   } catch {
     toast.add({
@@ -321,8 +328,7 @@ const handleAcceptEditBook = async () => {
         title: "El libro se a actualizado con éxito",
       });
 
-      if (currentPage.value === paginatedBooks.value?.lastPage)
-        await fetchBooks(currentPage.value, Number(limitPerPage.value));
+      await fetchBooks(currentPage.value, Number(limitPerPage.value));
     }
   } catch {
     toast.add({
@@ -428,8 +434,7 @@ const handleAcceptAddCopies = async () => {
       toast.add({
         title: "Copia registrada con éxito",
       });
-      if (currentPage.value === paginatedBooks.value?.lastPage)
-        await fetchBooks(currentPage.value, Number(limitPerPage.value));
+      await fetchBooks(currentPage.value, Number(limitPerPage.value));
     } else
       toast.add({
         title: "Error",
@@ -528,8 +533,7 @@ const handleAcceptEditCopy = async () => {
       toast.add({
         title: "Copia editada con éxito",
       });
-      if (currentPage.value === paginatedBooks.value?.lastPage)
-        await fetchBooks(currentPage.value, Number(limitPerPage.value));
+      await fetchBooks(currentPage.value, Number(limitPerPage.value));
     } else
       toast.add({
         title: "Error",
@@ -546,6 +550,49 @@ const handleAcceptEditCopy = async () => {
   loadingEditCopyAcceptButton.value = false;
   selectedEditCopy.value = undefined;
 };
+
+// Delete Copy
+
+const showDeleteCopyModal = ref(false)
+const selectedCopy = ref<CopyI>()
+const loadingAcceptDeleteCopy = ref(false)
+
+const handleDeleteCopyButton = (copy: CopyI) => {
+  showDeleteCopyModal.value = true
+  selectedCopy.value = copy
+}
+
+const handleAcceptDeleteCopy = async () => {
+  loadingAcceptDeleteCopy.value = true
+
+  try {
+    const response = await axios.delete(`${BACKEND_SERVER}/copy/${selectedCopy.value?.id}`, {
+      headers: {Authorization: `Bearer ${data}`}
+    })
+
+    if (response.status === 200) {
+      toast.add({
+        title: "Copia eliminada con éxito",
+      })
+
+      await fetchBooks(currentPage.value, Number(limitPerPage.value));
+    } else {
+      toast.add({
+        title: "Error",
+        description: "Error eliminando la copia",
+      });
+    }
+  } catch {
+    toast.add({
+      title: "Error",
+      description: "Error eliminando la copia",
+    });
+  }
+
+  loadingAcceptDeleteCopy.value = false
+  showDeleteCopyModal.value = false
+  selectedCopy.value = undefined
+}
 </script>
 
 <template>
@@ -596,6 +643,14 @@ const handleAcceptEditCopy = async () => {
           <!-- Acciones -->
           <div class="mt-4">
             <ActionsDropdown :items="items" :row="row" />
+          </div>
+
+          <!-- Expansión -->
+          <div
+            class="mt-4 p-4 bg-gray-700 rounded-lg cursor-pointer"
+            @click="toggleExpand(row)"
+          >
+            <span class="text-white font-semibold">Ver detalles</span>
           </div>
 
           <!-- Expandir detalles -->
@@ -728,14 +783,25 @@ const handleAcceptEditCopy = async () => {
           >
             <!-- Información del ejemplar -->
             <div class="p-4 border rounded-lg shadow" style="border-color: #ffffff">
-              <div class="flex w-40">
-                <Button
-                  icon="i-mdi-edit"
-                  @click="() => handleEditCopy(copy)"
-                  class="mb-4"
-                >
-                  Editar
-                </Button>
+              <div class="flex gap-2">
+                <div class="flex w-40">
+                  <Button
+                    icon="i-mdi-edit"
+                    @click="() => handleEditCopy(copy)"
+                    class="mb-4"
+                  >
+                    Editar
+                  </Button>
+                </div>
+                <div class="flex w-40">
+                  <Button
+                    icon="i-mdi-delete"
+                    @click="() => handleDeleteCopyButton(copy)"
+                    class="mb-4"
+                  >
+                    Eliminar
+                  </Button>
+                </div>
               </div>
               <h3 class="text-lg font-semibold text-white">Código: {{ copy.code }}</h3>
               <p class="text-sm text-gray-300">
@@ -1180,6 +1246,17 @@ const handleAcceptEditCopy = async () => {
             placeholder="Sitio Web de la editorial"
           />
         </div>
+      </Modal>
+      <!-- Delete Copy -->
+      <Modal
+        v-model="showDeleteCopyModal"
+        :loading="loadingAcceptDeleteCopy"
+        @handle-accept="handleAcceptDeleteCopy"
+      >
+        <template #header-title>Eliminar copia</template>
+        <template #header-description>
+          Elimina la copia con el código {{ selectedCopy?.code }}
+        </template>
       </Modal>
     </template>
   </DashboardContainer>

@@ -143,8 +143,7 @@ const handleAcceptAddDonorButton = async () => {
       });
     }
 
-    if (currentPage.value === paginatedDonors.value?.lastPage)
-      await fetchDonors(currentPage.value, Number(limitPerPage.value));
+    await fetchDonors(currentPage.value, Number(limitPerPage.value));
   } catch {
     toast.add({
       title: "Error",

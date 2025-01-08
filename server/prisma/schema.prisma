@@ -43,6 +43,7 @@ model Copy {
   condition    BookCondition
   reservations Reservation[]
   loans        Loan[]
+  isDeleted    Boolean       @default(false)
   Location     Location?     @relation(fields: [locationId], references: [id])
   locationId   Int?
   Publisher    Publisher?    @relation(fields: [publisherId], references: [id])

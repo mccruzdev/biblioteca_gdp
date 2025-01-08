@@ -7,7 +7,7 @@ import ActionsDropdown from "~/features/dashboard/components/actions-dropdown.vu
 import SearchContainer from "~/features/dashboard/components/search-container.vue";
 import { MIN_WIDTH_SCREEN_FOR_TABLE } from "~/features/dashboard/constants";
 import DashboardContainer from "~/features/dashboard/dashboard-container.vue";
-import type { Expanded, TableRow } from "~/features/dashboard/interface";
+import type { Expanded } from "~/features/dashboard/interface";
 import { transformCondition } from "~/transforms/copy-condition";
 import {
   ReservationStatusE,
@@ -134,8 +134,7 @@ const handleAcceptCancelReservation = async () => {
       toast.add({
         title: "Reserva cancelada con éxito",
       });
-      if (currentPage.value === paginatedReservations.value?.lastPage)
-        await fetchReservations(currentPage.value, Number(limitPerPage.value));
+      await fetchReservations(currentPage.value, Number(limitPerPage.value));
     }
   } catch {
     toast.add({

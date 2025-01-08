@@ -71,6 +71,9 @@ export class BooksService {
                     none: {},
                   },
                 },
+                {
+                  isDeleted: { equals: true },
+                },
               ],
             },
           },
@@ -131,6 +134,9 @@ export class BooksService {
                   },
                 },
               },
+            },
+            where: {
+              isDeleted: { equals: false },
             },
           },
         },

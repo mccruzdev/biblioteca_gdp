@@ -136,13 +136,11 @@ const handleFilter = async () => {
             <p><strong>Email:</strong> {{ row.donor?.email }}</p>
           </div>
 
-          <div class="mt-4">
-            <button
-              @click="toggleExpand(row)"
-              class="text-white text-sm bg-blue-500 p-2 rounded hover:bg-blue-600"
-            >
-              {{ expand.row?.id === row.id ? "Cerrar detalles" : "Ver detalles" }}
-            </button>
+          <div
+            class="mt-4 p-4 bg-gray-700 rounded-lg cursor-pointer"
+            @click="toggleExpand(row)"
+          >
+            <span class="text-white font-semibold">Ver detalles</span>
           </div>
 
           <div v-if="expand.row?.id === row.id" class="mt-4 p-4 bg-gray-700 rounded-lg">

@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PaginateFunction, paginator } from 'src/common/pagination/paginator';
 import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { transformBooks } from 'src/transformers/book';
+import {
+  transformBooks,
+  transformBooksWithCopies,
+} from 'src/transformers/book';
 
 const paginateCatalogAuthor: PaginateFunction = paginator({
   path: 'search/books-catalog-by-author',
@@ -79,6 +82,9 @@ export class SearchBooksService {
               loans: {
                 none: {},
               },
+            },
+            {
+              isDeleted: { equals: true },
             },
           ],
         },
@@ -159,15 +165,68 @@ export class SearchBooksService {
     );
   }
 
+  selectBooks = {
+    id: true,
+    title: true,
+    pages: true,
+    authors: true,
+    Subcategory: {
+      select: {
+        name: true,
+        Category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    },
+    copies: {
+      select: {
+        id: true,
+        code: true,
+        condition: true,
+        Location: true,
+        Publisher: true,
+        Book: {
+          select: {
+            id: true,
+            title: true,
+            pages: true,
+            authors: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            Subcategory: {
+              select: {
+                name: true,
+                Category: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        isDeleted: { equals: false },
+      },
+    },
+  };
+
   async getBooksByAuthor(page: number, limit: number, author: string) {
     return paginateAuthor(
       this.prisma.book,
       {
-        select: this.customSelect,
+        select: this.selectBooks,
         where: { authors: { some: { name: { contains: author } } } },
       },
       { page, limit, path: `search/books-by-author/${author}` },
-      transformBooks,
+      transformBooksWithCopies,
     );
   }
 
@@ -175,7 +234,7 @@ export class SearchBooksService {
     return paginateCategory(
       this.prisma.book,
       {
-        select: this.customSelect,
+        select: this.selectBooks,
         where: {
           Subcategory: {
             Category: {
@@ -185,7 +244,7 @@ export class SearchBooksService {
         },
       },
       { page, limit, path: `search/books-by-category/${category}` },
-      transformBooks,
+      transformBooksWithCopies,
     );
   }
 
@@ -197,7 +256,7 @@ export class SearchBooksService {
     return paginateSubcategory(
       this.prisma.book,
       {
-        select: this.customSelect,
+        select: this.selectBooks,
         where: {
           Subcategory: {
             name: { contains: subcategory },
@@ -205,7 +264,7 @@ export class SearchBooksService {
         },
       },
       { page, limit, path: `search/books-by-subcategory/${subcategory}` },
-      transformBooks,
+      transformBooksWithCopies,
     );
   }
 
@@ -213,11 +272,11 @@ export class SearchBooksService {
     return paginateTitle(
       this.prisma.book,
       {
-        select: this.customSelect,
+        select: this.selectBooks,
         where: { title: { contains: title } },
       },
       { page, limit, path: `search/books-by-title/${title}` },
-      transformBooks,
+      transformBooksWithCopies,
     );
   }
 }

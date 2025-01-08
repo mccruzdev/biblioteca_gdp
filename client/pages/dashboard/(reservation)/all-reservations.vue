@@ -153,8 +153,7 @@ const handleAcceptEditStatusReservation = async () => {
       toast.add({
         title: "Reserva actualizada con éxito",
       });
-      if (currentPage.value === paginatedReservations.value?.lastPage)
-        await fetchReservations(currentPage.value, Number(limitPerPage.value));
+      await fetchReservations(currentPage.value, Number(limitPerPage.value));
     }
   } catch {
     toast.add({

@@ -148,6 +148,13 @@ const handleFilter = async () => {
           </div>
 
           <!-- Expansión -->
+          <div
+            class="mt-4 p-4 bg-gray-700 rounded-lg cursor-pointer"
+            @click="toggleExpand(row)"
+          >
+            <span class="text-white font-semibold">Ver detalles</span>
+          </div>
+
           <div class="mt-4" v-if="expand.row?.id === row.id">
             <div class="flex flex-col gap-2">
               <div
@@ -217,15 +224,6 @@ const handleFilter = async () => {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="mt-4">
-            <button
-              @click="toggleExpand(row)"
-              class="bg-blue-500 text-white py-2 px-4 rounded"
-            >
-              {{ expand.row?.id === row.id ? "Ocultar detalles" : "Ver detalles" }}
-            </button>
           </div>
         </div>
       </div>
