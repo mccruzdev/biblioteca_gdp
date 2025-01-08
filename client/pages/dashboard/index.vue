@@ -127,6 +127,8 @@ const parseCopy = (copy: Copy) => {
 const handleAddToCardSelectRow = async (row: BookI) => {
   showAddToCardModal.value = true;
   bookToAddToCard.value = row;
+  copiesOfSelectedBook.value = undefined;
+  copiesOfSelectedBookOptions.value = [];
 
   const response = await axios.get<PaginatedI<Copy>>(
     `${BACKEND_SERVER}/copy/${row.id}`,

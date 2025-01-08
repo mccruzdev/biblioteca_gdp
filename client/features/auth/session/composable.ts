@@ -55,6 +55,10 @@ export function useIndexPage() {
           title: "Usuario no disponible",
           description: "La cuenta no ha sido confirmada",
         });
+      else if ((reason as AxiosError).status === 404)
+        toast.add({
+          title: "Usuario no disponible",
+        });
     }
   };
 
@@ -72,7 +76,7 @@ export function useIndexPage() {
           : null,
         password: formData.value.password,
       });
-  
+
       if (response.status === 201)
         toast.add({
           title: "Usuario creado con éxito",

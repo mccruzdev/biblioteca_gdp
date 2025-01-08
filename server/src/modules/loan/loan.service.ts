@@ -62,7 +62,7 @@ export class LoanService {
   async getAllLoans(page: number, limit: number) {
     return paginateAll(
       this.prisma.loan,
-      { select: this.selectLoan },
+      { select: this.selectLoan, orderBy: [{ loanDate: 'desc' }] },
       { page, limit, path: 'loan' },
       transformLoans,
     );
@@ -80,6 +80,7 @@ export class LoanService {
       {
         select: this.selectLoan,
         where: { userId: data.id },
+        orderBy: [{ loanDate: 'desc' }],
       },
       { page, limit, path: 'loan/me' },
       transformLoans,

@@ -72,6 +72,7 @@ export class SearchLoanService {
       {
         select: this.selectLoan,
         where: { userId: data.id, status },
+        orderBy: [{ loanDate: 'desc' }],
       },
       { page, limit, path: `search/loan-me-by-status/${status}` },
       transformLoans,
@@ -84,6 +85,7 @@ export class SearchLoanService {
       {
         select: this.selectLoan,
         where: { status },
+        orderBy: [{ loanDate: 'desc' }],
       },
       { page, limit, path: `search/loan-by-status/${status}` },
       transformLoans,

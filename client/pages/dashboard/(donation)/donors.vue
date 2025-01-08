@@ -3,7 +3,7 @@ import axios from "axios";
 import { BACKEND_SERVER } from "~/config/api";
 import ActionsContainer from "~/features/dashboard/components/actions-container.vue";
 import ActionsDropdown from "~/features/dashboard/components/actions-dropdown.vue";
-import SearchContainer from "~/features/dashboard/components/search-container.vue";
+import Searchbar from "~/features/dashboard/components/searchbar.vue";
 import { MIN_WIDTH_SCREEN_FOR_TABLE } from "~/features/dashboard/constants";
 import DashboardContainer from "~/features/dashboard/dashboard-container.vue";
 import {

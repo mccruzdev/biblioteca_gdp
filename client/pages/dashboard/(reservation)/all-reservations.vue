@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import DatePicker from "~/components/date-picker.vue";
 import { BACKEND_SERVER } from "~/config/api";
+import ActionsDropdown from "~/features/dashboard/components/actions-dropdown.vue";
 import SearchContainer from "~/features/dashboard/components/search-container.vue";
 import { MIN_WIDTH_SCREEN_FOR_TABLE } from "~/features/dashboard/constants";
 import DashboardContainer from "~/features/dashboard/dashboard-container.vue";
@@ -275,7 +276,7 @@ const handleAcceptConvertToLoan = async () => {
           <div class="mt-4">
             <ActionsDropdown
               v-if="row.status === ReservationStatusE.PENDING"
-              :items="items"
+              :items="() => items(row, row.status)"
               :row="row"
             />
           </div>

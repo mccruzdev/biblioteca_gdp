@@ -72,6 +72,7 @@ export class SearchReservationService {
       {
         select: this.selectReservation,
         where: { userId: data.id, status },
+        orderBy: [{ created: 'desc' }],
       },
       { page, limit, path: `search/reservation-me-by-status/${status}` },
       transformReservations,
@@ -88,6 +89,7 @@ export class SearchReservationService {
       {
         select: this.selectReservation,
         where: { status },
+        orderBy: [{ created: 'desc' }],
       },
       { page, limit, path: `search/reservation-by-status/${status}` },
       transformReservations,

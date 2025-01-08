@@ -63,7 +63,7 @@ export class ReservationService {
   async getAllReservations(page: number, limit: number) {
     return paginateAll(
       this.prisma.reservation,
-      { select: this.selectReservation },
+      { select: this.selectReservation, orderBy: [{ created: 'desc' }] },
       { page, limit, path: 'reservation' },
       transformReservations,
     );
@@ -81,6 +81,7 @@ export class ReservationService {
       {
         select: this.selectReservation,
         where: { userId: data.id },
+        orderBy: [{ created: 'desc' }],
       },
       { page, limit, path: 'reservation/me' },
       transformReservations,
