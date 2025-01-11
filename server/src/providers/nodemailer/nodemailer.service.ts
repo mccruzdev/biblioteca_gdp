@@ -13,7 +13,7 @@ interface Mail {
 export class NodemailerService {
   transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: 587,
+    port: 465,
     secure: false,
     auth: {
       user: process.env.EMAIL_AUTH_USER,
