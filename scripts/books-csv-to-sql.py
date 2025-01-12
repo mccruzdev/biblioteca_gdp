@@ -188,7 +188,7 @@ def generate_sql_book(file):
         if book != books[-1]:
             sql += ',\n'
     sql += ';\n\n'
-    sql += "INSERT INTO _authortobook (A, B) VALUES \n"
+    sql += "INSERT INTO _AuthorToBook (A, B) VALUES \n"
 
     indexs = []
 
