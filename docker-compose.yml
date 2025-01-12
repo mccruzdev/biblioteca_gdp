@@ -1,25 +1,28 @@
 services:
-  client:
-    build:
-      context: .
-      dockerfile: dockerfile.client
-    container_name: nuxt-client
+  frontend:
+    build: client
+    container_name: nuxt_frontend
     ports:
       - "3000:3000"
     depends_on:
-      - server
+      - backend
 
-  server:
-    build:
-      context: .
-      dockerfile: dockerfile.server
-    container_name: nest-server
-    env_file:
-      - server/.env
+  backend:
+    container_name: nest_backend
+    build: server
     ports:
       - "8000:8000"
+    depends_on:
+      - mysql
+    env_file:
+      - server/.env
+  
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: biblioteca
     volumes:
-      - ./server:/app
-
-volumes:
-  db_data:
+      - ./server/prisma/data:/var/lib/mysql
