@@ -660,6 +660,26 @@ const handleAcceptDeleteCopy = async () => {
               :key="copy.id"
               class="mb-4 p-4 border rounded-lg shadow bg-gray-600"
             >
+              <div class="flex gap-2 flex-col">
+                <div class="flex">
+                  <Button
+                    icon="i-mdi-edit"
+                    @click="() => handleEditCopy(copy)"
+                    class="mb-4"
+                  >
+                    Editar
+                  </Button>
+                </div>
+                <div class="flex">
+                  <Button
+                    icon="i-mdi-delete"
+                    @click="() => handleDeleteCopyButton(copy)"
+                    class="mb-4"
+                  >
+                    Eliminar
+                  </Button>
+                </div>
+              </div>
               <h3 class="text-white text-lg font-semibold">Código: {{ copy.code }}</h3>
               <p class="text-sm text-gray-300">
                 Condición: {{ transformCondition(copy.condition) }}
@@ -693,6 +713,28 @@ const handleAcceptDeleteCopy = async () => {
                 <p class="text-sm text-gray-300">
                   Sitio Web: {{ copy.publisher.website || "N/A" }}
                 </p>
+              </div>
+
+              <div class="mt-2">
+                <h4 class="text-md font-medium text-gray-200">Libro</h4>
+                <p class="text-sm text-gray-300">Título: {{ copy.book.title }}</p>
+                <p class="text-sm text-gray-300">Páginas: {{ copy.book.pages }}</p>
+                <p class="text-sm text-gray-300" v-if="copy.book.category">
+                  Categoría: {{ copy.book.category }}
+                </p>
+                <p class="text-sm text-gray-300" v-if="copy.book.subcategory">
+                  Subcategoría: {{ copy.book.subcategory }}
+                </p>
+
+                <!-- Autores -->
+                <div class="mt-2" v-if="copy.book.authors.length">
+                  <h5 class="text-sm font-medium text-gray-200">Autores</h5>
+                  <ul class="list-disc list-inside text-sm text-gray-300">
+                    <li v-for="author in copy.book.authors" :key="author.id">
+                      {{ author.name }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
