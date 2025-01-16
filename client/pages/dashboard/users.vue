@@ -226,6 +226,14 @@ const {
           required
           type="email"
         />
+
+        <USelect
+          v-model="editFormData.emailVerified"
+          :options="[
+            { value: 'VERIFIED', label: 'Verificar correo' },
+            { value: 'UNVERIFIED', label: 'No verificar correo' },
+          ]"
+        />
       </Modal>
     </template>
   </DashboardContainer>

@@ -13,4 +13,8 @@ export class UpdateUserDTO {
   @IsBoolean({ message: 'isDisabled debe ser un valor booleano.' })
   @IsOptional()
   isDisabled?: boolean;
+
+  @IsBoolean({ message: 'emailVerified debe ser un valor booleano.' })
+  @IsOptional()
+  emailVerified?: boolean;
 }

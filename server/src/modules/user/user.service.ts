@@ -74,6 +74,7 @@ export class UserService {
           role: data.role,
           isDisabled: data.isDisabled,
           email: data.email,
+          emailVerified: data.emailVerified,
         },
         where: { id },
       });

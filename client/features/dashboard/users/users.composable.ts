@@ -119,10 +119,12 @@ export function useUsersPage() {
     role: UserRoleT;
     isDisabled: "true" | "false";
     email: string;
+    emailVerified: "VERIFIED" | "UNVERIFIED";
   }>({
     role: UserRoleE.READER,
     isDisabled: "true",
     email: "",
+    emailVerified: "UNVERIFIED",
   });
 
   const handleEditSelectRow = (row: AllDataUserI) => {
@@ -132,6 +134,9 @@ export function useUsersPage() {
     editFormData.value.role = row.role;
     editFormData.value.isDisabled = row.isDisabled ? "true" : "false";
     editFormData.value.email = row.email;
+    editFormData.value.emailVerified = row.emailVerified
+      ? "VERIFIED"
+      : "UNVERIFIED";
   };
 
   const handleAcceptEdit = async () => {
@@ -143,6 +148,7 @@ export function useUsersPage() {
         role: editFormData.value.role,
         isDisabled: editFormData.value.isDisabled === "true",
         email: editFormData.value.email,
+        emailVerified: editFormData.value.emailVerified === "VERIFIED",
       },
       {
         headers: { Authorization: `Bearer ${data}` },
