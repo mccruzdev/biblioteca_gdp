@@ -70,7 +70,11 @@ export class UserService {
         );
 
       await this.prisma.user.update({
-        data: { role: data.role, isDisabled: data.isDisabled },
+        data: {
+          role: data.role,
+          isDisabled: data.isDisabled,
+          email: data.email,
+        },
         where: { id },
       });
     } catch {

@@ -29,16 +29,8 @@ const {
 
     <div class="flex w-full justify-center">
       <div class="ButtonContainer flex mb-6 rounded-full p-0 w-72">
-        <ButtonTab
-          text="Iniciar Sesión"
-          :active="isLogin"
-          @click="isLogin = true"
-        />
-        <ButtonTab
-          text="Registrarse"
-          :active="!isLogin"
-          @click="isLogin = false"
-        />
+        <ButtonTab text="Iniciar Sesión" :active="isLogin" @click="isLogin = true" />
+        <ButtonTab text="Registrarse" :active="!isLogin" @click="isLogin = false" />
       </div>
     </div>
 
@@ -118,6 +110,12 @@ const {
         type="password"
         required
       />
+      <p class="text-black w-full text-center text-[13px] pb-4">
+        Consultas o errores comunicarse a
+        <a class="text-blue-600" href="mailto:informatica@muniguadalupe.gob.pe">
+          informatica@muniguadalupe.gob.pe
+        </a>
+      </p>
       <Button type="submit" :loading="buttonLoginLoading" v-show="isLogin">
         Iniciar Sesión
       </Button>

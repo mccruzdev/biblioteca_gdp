@@ -218,6 +218,14 @@ const {
             { value: 'true', label: 'Inhabilitado' },
           ]"
         />
+        <FormBaseInput
+          name="email"
+          label="Correo Electrónico"
+          v-model="editFormData.email"
+          placeholder="Ingresa tu correo electrónico"
+          required
+          type="email"
+        />
       </Modal>
     </template>
   </DashboardContainer>

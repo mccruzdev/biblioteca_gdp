@@ -115,9 +115,14 @@ export function useUsersPage() {
 
   const showEditModal = ref(false);
   const userToEdit = ref<AllDataUserI>();
-  const editFormData = ref<{ role: UserRoleT; isDisabled: "true" | "false" }>({
+  const editFormData = ref<{
+    role: UserRoleT;
+    isDisabled: "true" | "false";
+    email: string;
+  }>({
     role: UserRoleE.READER,
     isDisabled: "true",
+    email: "",
   });
 
   const handleEditSelectRow = (row: AllDataUserI) => {
@@ -126,6 +131,7 @@ export function useUsersPage() {
 
     editFormData.value.role = row.role;
     editFormData.value.isDisabled = row.isDisabled ? "true" : "false";
+    editFormData.value.email = row.email;
   };
 
   const handleAcceptEdit = async () => {
@@ -136,6 +142,7 @@ export function useUsersPage() {
       {
         role: editFormData.value.role,
         isDisabled: editFormData.value.isDisabled === "true",
+        email: editFormData.value.email,
       },
       {
         headers: { Authorization: `Bearer ${data}` },
