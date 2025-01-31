@@ -170,7 +170,30 @@ const handleAcceptToAddNewBook = () => {
 // Reservation modal
 
 const showReservationModal = ref(false);
-const reservationDate = ref<Date>(new Date());
+const reservationDate = ref<Date>((() => {
+  const peruTimeZone = 'America/Lima';
+  const now = new Date();
+
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  tomorrow.setHours(9, 0, 0, 0);
+
+  const formattedDate = new Date(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: peruTimeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).format(tomorrow)
+  );
+
+  return formattedDate;
+})());
+
 
 const disabledShoppingCardButton = computed(
   () => shoppingCard.copies.length <= 0
@@ -422,7 +445,7 @@ const handleReservation = async () => {
           </div>
         </div>
 
-        <div class="flex">
+        <div class="flex gap-4">
           <UPopover :popper="{ placement: 'bottom-start' }">
             <UButton
               icon="i-heroicons-calendar-days-20-solid"
@@ -438,6 +461,7 @@ const handleReservation = async () => {
               />
             </template>
           </UPopover>
+          <TimePicker v-model="reservationDate" />
         </div>
       </Modal>
     </template>
